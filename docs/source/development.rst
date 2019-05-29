@@ -3,7 +3,7 @@ Development
 ===========
 
 * Open a pull request for changes. TravisCI will test them.
-* To cut a release, bump the version number in ``custodian_policygen/version.py``, update ``CHANGES.rst``, and open a pull request for that. When merged to master, TravisCI will trigger the release.
+* To cut a release, bump the version number in ``manheim_c7n_tools/version.py``, update ``CHANGES.rst``, and open a pull request for that. When merged to master, TravisCI will trigger the release.
 
 Local Development and Testing
 =============================
@@ -15,4 +15,4 @@ Local Development and Testing
 
 To run tests: ``tox``
 
-For information on how to run the actual commands locally, see :ref:`introduction`.
+For information on how to run the actual commands locally, see :ref:`index`.
