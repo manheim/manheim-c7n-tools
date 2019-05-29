@@ -273,7 +273,9 @@ class TestMailerStep(StepTester):
         expected = {
             'mailer': 'config',
             'defaults': 'set',
-            'templates_folders': ['/manheim_c7n_tools/manheim_c7n_tools/mailer-templates']
+            'templates_folders': [
+                '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'
+            ]
         }
         assert res == expected
         assert mock_validate.mock_calls == [
@@ -600,7 +602,9 @@ class TestCustodianRunner(object):
             call.info(bold('Step 4 of 4 - cls4')),
             call.info(bold('SUCCESS: All 4 steps complete!'))
         ]
-        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
+        assert mock_cff.mock_calls == [
+            call('manheim-c7n-tools.yml', 'acctName')
+        ]
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_run_dryrun_some_steps_some_regions(self):
@@ -709,7 +713,9 @@ class TestCustodianRunner(object):
                 mock_cff.return_value = m_conf
                 cls = runner.CustodianRunner('acctName')
                 cls._validate_account()
-        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
+        assert mock_cff.mock_calls == [
+            call('manheim-c7n-tools.yml', 'acctName')
+        ]
         assert mock_client.mock_calls == [
             call('sts', region_name='us-east-1'),
             call().get_caller_identity()
@@ -737,7 +743,9 @@ class TestCustodianRunner(object):
                                  '1234567890 (myAcct), but ' \
                                  'sts:GetCallerIdentity reports connected to ' \
                                  'account 9876543210'
-        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
+        assert mock_cff.mock_calls == [
+            call('manheim-c7n-tools.yml', 'acctName')
+        ]
         assert mock_client.mock_calls == [
             call('sts', region_name='us-east-1'),
             call().get_caller_identity()

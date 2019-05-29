@@ -146,7 +146,8 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
+            autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -228,7 +229,8 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
+            autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -301,7 +303,8 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
+            autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -374,7 +377,8 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
+            autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -448,7 +452,8 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
+            autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -1765,7 +1770,8 @@ class TestPolicyRst(PolicyGenTester):
             )
         expected += "tableHere"
         with patch(
-            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data',
+            autospec=True
         ) as m_prd:
             m_prd.return_value = [
                 ['aaa', '', 'comment-aaa'],
@@ -1785,7 +1791,8 @@ class TestPolicyRst(PolicyGenTester):
                         'manheim_c7n_tools.policygen.tabulate', autospec=True
                     ) as m_tabulate:
                         with patch(
-                            'manheim_c7n_tools.policygen.git_html_url', autospec=True
+                            'manheim_c7n_tools.policygen.git_html_url',
+                            autospec=True
                         ) as ghu:
                             ghu.return_value = 'https://example.com/org/repo/'
                             m_tabulate.return_value = 'tableHere'
@@ -1822,7 +1829,8 @@ class TestPolicyRst(PolicyGenTester):
             "\n\n" % (gitlink, timestr)
         expected += "tableHere"
         with patch(
-            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data',
+            autospec=True
         ) as m_prd:
             m_prd.return_value = [
                 ['aaa', '', 'comment-aaa'],
@@ -1839,7 +1847,8 @@ class TestPolicyRst(PolicyGenTester):
                         'manheim_c7n_tools.policygen.tabulate', autospec=True
                     ) as m_tabulate:
                         with patch(
-                            'manheim_c7n_tools.policygen.git_html_url', autospec=True
+                            'manheim_c7n_tools.policygen.git_html_url',
+                            autospec=True
                         ) as ghu:
                             ghu.return_value = 'https://example.com/org/repo/'
                             m_tabulate.return_value = 'tableHere'
@@ -2013,9 +2022,12 @@ class TestReadPolicies(PolicyGenTester):
             name = fpath.split('/')[-1].split('.')[0]
             return {'file': fpath, 'name': name}
 
-        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
+        with patch(
+            'manheim_c7n_tools.policygen.os.listdir', autospec=True
+        ) as mock_list:
             with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml',
+                autospec=True
             ) as mock_read:
                 mock_list.return_value = [
                     'foo.yml',
@@ -2037,9 +2049,12 @@ class TestReadPolicies(PolicyGenTester):
                 name = 'wrongName'
             return {'file': fpath, 'name': name}
 
-        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
+        with patch(
+            'manheim_c7n_tools.policygen.os.listdir', autospec=True
+        ) as mock_list:
             with patch(
-                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml',
+                autospec=True
             ) as mock_read:
                 mock_list.return_value = [
                     'foo.yml',
@@ -2059,7 +2074,9 @@ class TestReadPolicies(PolicyGenTester):
                 "[Errno 2] No such file or directory: '%s'" % dirname
             )
 
-        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
+        with patch(
+            'manheim_c7n_tools.policygen.os.listdir', autospec=True
+        ) as mock_list:
             with patch(
                     'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml',
                     autospec=True
@@ -2075,7 +2092,9 @@ class TestReadFileYaml(PolicyGenTester):
 
     def test_read(self):
         m = mock_open(read_data="- foo\n- bar\n")
-        with patch('manheim_c7n_tools.policygen.open', m, create=True) as m_open:
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
             res = self.cls._read_file_yaml('/foo/bar.yml')
         assert res == ['foo', 'bar']
         assert m_open.mock_calls == [
@@ -2087,7 +2106,9 @@ class TestReadFileYaml(PolicyGenTester):
 
     def test_read_exception(self):
         m = mock_open(read_data="  - foo:\n- bar")
-        with patch('manheim_c7n_tools.policygen.open', m, create=True) as m_open:
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
             with pytest.raises(Exception):
                 self.cls._read_file_yaml('/foo/bar.yml')
         assert m_open.mock_calls == [
@@ -2128,7 +2149,9 @@ class TestMain(object):
 
     def test_main_config_path(self):
         m_conf = Mock()
-        with patch('manheim_c7n_tools.policygen.PolicyGen', autospec=True) as mock_pg:
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen', autospec=True
+        ) as mock_pg:
             with patch('sys.argv', ['policygen', '-c', 'foo.yml', 'acctName']):
                 with patch(
                     'manheim_c7n_tools.policygen.CaisConfig', autospec=True

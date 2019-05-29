@@ -43,7 +43,9 @@ from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 from c7n_mailer.utils import setup_defaults as mailer_setup_defaults
 from c7n_mailer import deploy as mailer_deploy
 
-from manheim_c7n_tools.utils import set_log_info, set_log_debug, bold, assume_role
+from manheim_c7n_tools.utils import (
+    set_log_info, set_log_debug, bold, assume_role
+)
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.policygen import PolicyGen
 from manheim_c7n_tools.vendor.mugc import (
@@ -85,10 +87,10 @@ class BaseStep(object):
 
         :param region_name: region name to run this step against
         :type region_name: str
-        :param config: The manheim-c7n-tools config to use for this step, already
-          made region-specific (:py:meth:`~.CaisConfig.config_for_region` is
-          called where this class is intialized in
-          :py:meth:`~.CustodianRunner._run_step_in_regions`).
+        :param config: The manheim-c7n-tools config to use for this step,
+          already made region-specific
+          (:py:meth:`~.CaisConfig.config_for_region` is called where this class
+          is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
         :type config: CaisConfig
         """
         self.region_name = region_name
@@ -110,10 +112,10 @@ class BaseStep(object):
 
         :param region_name: region name to test
         :type region_name: str
-        :param config: The manheim-c7n-tools config to use for this step, already
-          made region-specific (:py:meth:`~.CaisConfig.config_for_region` is
-          called where this class is intialized in
-          :py:meth:`~.CustodianRunner._run_step_in_regions`).
+        :param config: The manheim-c7n-tools config to use for this step,
+          already made region-specific
+          (:py:meth:`~.CaisConfig.config_for_region` is called where this class
+          is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
         :type config: CaisConfig
         :return: whether this step should run in the specified region
         :rtype: bool
@@ -282,7 +284,9 @@ class MailerStep(BaseStep):
         conf = deepcopy(self.config.mailer_config)
         jsonschema.validate(conf, MAILER_SCHEMA)
         mailer_setup_defaults(conf)
-        if os.path.isdir('/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'):
+        if os.path.isdir(
+            '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'
+        ):
             conf['templates_folders'] = [
                 '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'
             ]
@@ -538,8 +542,8 @@ class CustodianRunner(object):
 def parse_args(argv):
     """Parse command-line arguments with ArgumentParser."""
     p = argparse.ArgumentParser(
-        description='manheim-c7n-tools runner; runs one, multiple, or all actions for'
-                    'c7n build/deploy',
+        description='manheim-c7n-tools runner; runs one, multiple, or all '
+                    'actions for c7n build/deploy',
         epilog='This tool is part of manheim_c7n_tools v%s.\n'
                'For documentation, see: %s' % (VERSION, PROJECT_URL),
         formatter_class=argparse.RawDescriptionHelpFormatter

@@ -145,8 +145,9 @@ class CaisConfig(object):
     @staticmethod
     def list_accounts(path):
         """
-        Given the path to a manheim-c7n-tools YML configuration file, return a dict of
-        account name to account ID number for each account defined in the file.
+        Given the path to a manheim-c7n-tools YML configuration file, return a
+        dict of account name to account ID number for each account defined in
+        the file.
 
         :param path: path of the yaml config file to load
         :type path: str
