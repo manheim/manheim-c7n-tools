@@ -17,6 +17,7 @@ from mock import patch, call, DEFAULT, Mock, PropertyMock
 import pytest
 from functools import partial
 
+from c7n.config import Config
 from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 
 import manheim_c7n_tools.runner as runner
@@ -184,8 +185,8 @@ class TestCustodianStep(StepTester):
         type(self.m_conf).custodian_log_group = PropertyMock(
             return_value='/cloud-custodian/ACCT/REGION'
         )
-        mock_conf = Mock(spec_set=CaisConfig)
-        with patch('%s.run' % pbm, autospec=True) as mock_run:
+        mock_conf = Mock(spec_set=Config)
+        with patch('%s.run' % pbm) as mock_run:
             with patch('%s.Config.empty' % pbm) as mock_empty:
                 mock_empty.return_value = mock_conf
                 runner.CustodianStep('rName', self.m_conf).run()
@@ -214,8 +215,8 @@ class TestCustodianStep(StepTester):
         type(self.m_conf).custodian_log_group = PropertyMock(
             return_value='/cloud-custodian/ACCT/REGION'
         )
-        mock_conf = Mock(spec_set=CaisConfig)
-        with patch('%s.run' % pbm, autospec=True) as mock_run:
+        mock_conf = Mock(spec_set=Config)
+        with patch('%s.run' % pbm) as mock_run:
             with patch('%s.Config.empty' % pbm) as mock_empty:
                 mock_empty.return_value = mock_conf
                 runner.CustodianStep('rName', self.m_conf).dryrun()
@@ -1005,7 +1006,7 @@ class FakeArgs(object):
     assume_role = True
 
     def __init__(self, **kwargs):
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             setattr(self, k, v)
 
 
