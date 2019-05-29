@@ -50,7 +50,8 @@ setup(
             'policygen = manheim_c7n_tools.policygen:main',
             's3-archiver = manheim_c7n_tools.s3_archiver:main',
             'dryrun-diff = manheim_c7n_tools.dryrun_diff:main',
-            'mugc = manheim_c7n_tools.vendor.mugc:main'
+            'mugc = manheim_c7n_tools.vendor.mugc:main',
+            'manheim-c7n-runner = manheim_c7n_tools.runner:main',
         ]
     }
 )
