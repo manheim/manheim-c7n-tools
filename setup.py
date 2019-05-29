@@ -5,12 +5,13 @@ with open('README.rst') as f:
     long_description = f.read()
 
 requires = [
-    'c7n',
     'boto3',
     'tabulate>=0.8.0,<0.9.0',
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
-    'pyyaml'
+    'pyyaml',
+    'c7n>=0.8.43.1',
+    'c7n-mailer>=0.5.0'
 ]
 
 classifiers = [
