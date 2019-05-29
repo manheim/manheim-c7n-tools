@@ -69,6 +69,15 @@ class TestUtils(object):
             call.setLevel(5)
         ]
 
+    def test_red(self):
+        assert red('foo') == "\033[0;31mfoo\033[0m"
+
+    def test_green(self):
+        assert green('foo') == "\033[0;32mfoo\033[0m"
+
+    def test_bold(self):
+        assert bold('foo') == "\033[1mfoo\033[0m"
+
 
 class TestGitHtmlUrl(object):
 

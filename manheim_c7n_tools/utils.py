@@ -50,6 +50,42 @@ def set_log_level_format(log, level, format):
     log.setLevel(level)
 
 
+def red(s):
+    """
+    Return the given string (``s``) surrounded by the ANSI escape codes to
+    print it in red.
+    :param s: string to console-color red
+    :type s: str
+    :returns: s surrounded by ANSI color escapes for red text
+    :rtype: str
+    """
+    return "\033[0;31m" + s + "\033[0m"
+
+
+def green(s):
+    """
+    Return the given string (``s``) surrounded by the ANSI escape codes to
+    print it in green.
+    :param s: string to console-color green
+    :type s: str
+    :returns: s surrounded by ANSI color escapes for green text
+    :rtype: str
+    """
+    return "\033[0;32m" + s + "\033[0m"
+
+
+def bold(s):
+    """
+    Return the given string (``s``) surrounded by the ANSI escape codes to
+    print it in bold.
+    :param s: string to console format as bold
+    :type s: str
+    :returns: s surrounded by ANSI color escapes for green text
+    :rtype: str
+    """
+    return "\033[1m" + s + "\033[0m"
+
+
 def git_html_url():
     """
     Run ``git config remote.origin.url`` in the current directory. Assuming it
