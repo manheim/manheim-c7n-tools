@@ -1,7 +1,7 @@
-custodian_policygen
+manheim_c7n_tools
 ========
 
 .. toctree::
    :maxdepth: 4
 
-   custodian_policygen
+   manheim_c7n_tools

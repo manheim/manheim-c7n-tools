@@ -8,10 +8,15 @@ Development
 Local Development and Testing
 =============================
 
-1. Clone this repo locally.
-2. ``virtualenv --python=python3.7 .``
-3. ``source bin/activate``
-4. ``pip install 'tox>=3.4.0'``
+Clone this repo locally on a machine with Python 3.7. Then:
+
+.. code-block:: shell
+
+    virtualenv --python=python3.7 .
+    source bin/activate
+    pip install 'tox>=3.4.0'
+    pip install -r requirements.txt
+    python setup.py develop
 
 To run tests: ``tox``
 

@@ -1,5 +1,7 @@
 .. meta::
-   :description: Description of custodian-policygen goes here.
+   :description: Description of manheim-c7n-tools goes here.
+
+.. _`index`:
 
 .. include:: ../../README.rst
 
@@ -9,12 +11,12 @@ Contents
 .. toctree::
    :maxdepth: 4
 
-   Introduction and Getting Help <introduction>
    Policy Language <policies>
    Configuration <configuration>
    Policygen <policygen>
    Dryrun-Diff <dryrun-diff>
    S3 Archiver <s3archiver>
+   manheim-c7n-runner <runner>
    API <modules>
    Development <development>
    Changelog <changes>
