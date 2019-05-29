@@ -99,7 +99,7 @@ def assume_role(config):
         return
     kwargs = {
         'RoleArn': conf['role_arn'],
-        'RoleSessionName': 'custodian-policygen_%s' % config.account_name
+        'RoleSessionName': 'manheim-c7n-tools_%s' % config.account_name
     }
     if 'external_id' in conf:
         kwargs['ExternalId'] = conf['external_id']

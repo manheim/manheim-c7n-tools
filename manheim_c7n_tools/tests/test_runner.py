@@ -19,12 +19,12 @@ from functools import partial
 
 from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 
-import custodian_policygen.runner as runner
-from custodian_policygen.runner import BaseStep
-from custodian_policygen.utils import bold
-from custodian_policygen.config import CaisConfig
+import manheim_c7n_tools.runner as runner
+from manheim_c7n_tools.runner import BaseStep
+from manheim_c7n_tools.utils import bold
+from manheim_c7n_tools.config import CaisConfig
 
-pbm = 'custodian_policygen.runner'
+pbm = 'manheim_c7n_tools.runner'
 
 
 ALL_REGIONS = [
@@ -273,7 +273,7 @@ class TestMailerStep(StepTester):
         expected = {
             'mailer': 'config',
             'defaults': 'set',
-            'templates_folders': ['/custodian_policygen/custodian_policygen/mailer-templates']
+            'templates_folders': ['/manheim_c7n_tools/manheim_c7n_tools/mailer-templates']
         }
         assert res == expected
         assert mock_validate.mock_calls == [
@@ -600,7 +600,7 @@ class TestCustodianRunner(object):
             call.info(bold('Step 4 of 4 - cls4')),
             call.info(bold('SUCCESS: All 4 steps complete!'))
         ]
-        assert mock_cff.mock_calls == [call('custodian-policygen.yml', 'acctName')]
+        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_run_dryrun_some_steps_some_regions(self):
@@ -646,7 +646,7 @@ class TestCustodianRunner(object):
             call.info(bold('Step 2 of 2 - cls3')),
             call.info(bold('SUCCESS: All 2 steps complete!'))
         ]
-        assert mock_cff.mock_calls == [call('custodian-policygen.yml', 'aName')]
+        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'aName')]
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_run_invalid_region_name(self):
@@ -678,7 +678,7 @@ class TestCustodianRunner(object):
                             )
         assert str(exc.value) == 'ERROR: All specified region names must be ' \
                                  'listed in the "regions" section of the ' \
-                                 'config file (custodian-policygen.yml)'
+                                 'config file (manheim-c7n-tools.yml)'
         assert mocks['_steps_to_run'].mock_calls == [
             call(cls, ['cls2', 'cls3', 'cls4'], ['cls4'])
         ]
@@ -709,7 +709,7 @@ class TestCustodianRunner(object):
                 mock_cff.return_value = m_conf
                 cls = runner.CustodianRunner('acctName')
                 cls._validate_account()
-        assert mock_cff.mock_calls == [call('custodian-policygen.yml', 'acctName')]
+        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
         assert mock_client.mock_calls == [
             call('sts', region_name='us-east-1'),
             call().get_caller_identity()
@@ -737,7 +737,7 @@ class TestCustodianRunner(object):
                                  '1234567890 (myAcct), but ' \
                                  'sts:GetCallerIdentity reports connected to ' \
                                  'account 9876543210'
-        assert mock_cff.mock_calls == [call('custodian-policygen.yml', 'acctName')]
+        assert mock_cff.mock_calls == [call('manheim-c7n-tools.yml', 'acctName')]
         assert mock_client.mock_calls == [
             call('sts', region_name='us-east-1'),
             call().get_caller_identity()
@@ -923,7 +923,7 @@ class TestParseArgs(object):
         assert p.skip == []
         assert p.ACTION == 'run'
         assert p.regions == []
-        assert p.config == 'custodian-policygen.yml'
+        assert p.config == 'manheim-c7n-tools.yml'
         assert p.ACCT_NAME == 'aName'
         assert p.assume_role is True
 
@@ -936,7 +936,7 @@ class TestParseArgs(object):
         assert p.skip == ['foo', 'bar']
         assert p.ACTION == 'run'
         assert p.regions == []
-        assert p.config == 'custodian-policygen.yml'
+        assert p.config == 'manheim-c7n-tools.yml'
         assert p.ACCT_NAME == 'acctName'
         assert p.assume_role is True
 
@@ -947,7 +947,7 @@ class TestParseArgs(object):
         assert p.skip == []
         assert p.ACTION == 'dryrun'
         assert p.regions == ['us-east-1']
-        assert p.config == 'custodian-policygen.yml'
+        assert p.config == 'manheim-c7n-tools.yml'
         assert p.ACCT_NAME == 'aName'
         assert p.assume_role is True
 
@@ -968,7 +968,7 @@ class TestParseArgs(object):
         assert p.skip == []
         assert p.ACTION == 'accounts'
         assert p.regions == []
-        assert p.config == 'custodian-policygen.yml'
+        assert p.config == 'manheim-c7n-tools.yml'
         assert p.assume_role is True
 
     def test_run_debug_steps_assume_role(self):
@@ -980,7 +980,7 @@ class TestParseArgs(object):
         assert p.skip == []
         assert p.ACTION == 'run'
         assert p.regions == []
-        assert p.config == 'custodian-policygen.yml'
+        assert p.config == 'manheim-c7n-tools.yml'
         assert p.ACCT_NAME == 'aName'
         assert p.assume_role is False
 
@@ -992,7 +992,7 @@ class FakeArgs(object):
     skip = []
     ACTION = None
     regions = []
-    config = 'custodian-policygen.yml'
+    config = 'manheim-c7n-tools.yml'
     ACCT_NAME = 'acctName'
     assume_role = True
 
@@ -1029,7 +1029,7 @@ class TestMain(object):
         assert mocks['set_log_debug'].mock_calls == []
         assert mocks['set_log_info'].mock_calls == []
         assert mocks['CustodianRunner'].mock_calls == [
-            call('acctName', 'custodian-policygen.yml'),
+            call('acctName', 'manheim-c7n-tools.yml'),
             call().run(
                 'run', ['foo2'], step_names=[], skip_steps=[]
             )
@@ -1111,7 +1111,7 @@ class TestMain(object):
         assert mocks['set_log_debug'].mock_calls == []
         assert mocks['set_log_info'].mock_calls == []
         assert mocks['CaisConfig'].mock_calls == []
-        assert mock_la.mock_calls == [call('custodian-policygen.yml')]
+        assert mock_la.mock_calls == [call('manheim-c7n-tools.yml')]
         assert captured.out == "acct1 (1111)\nacct2 (2222)\nacct3 (3333)\n"
         assert captured.err == ''
         assert mocks['assume_role'].mock_calls == []

@@ -1,9 +1,9 @@
 [run]
 branch = True
 omit = lib/*
-       custodian_policygen/tests/*
+       manheim_c7n_tools/tests/*
        setup.py
-       custodian_policygen/vendor/*
+       manheim_c7n_tools/vendor/*
 
 [report]
 exclude_lines =

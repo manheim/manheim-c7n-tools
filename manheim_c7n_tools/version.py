@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """
-custodian-policygen version configuration.
+manheim-c7n-tools version configuration.
 """
 
 #: The semver-compliant version of the package.
-VERSION = '1.0.0'
+VERSION = '0.7.0'
 
 #: The URL for further information about the package.
-PROJECT_URL = 'https://github.com/manheim/custodian-policygen'
+PROJECT_URL = 'https://github.com/manheim/manheim-c7n-tools'

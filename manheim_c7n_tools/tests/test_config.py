@@ -16,9 +16,9 @@ from mock import patch, call, Mock, mock_open
 import pytest
 import yaml
 
-from custodian_policygen.config import CaisConfig, CAIS_CONFIG_SCHEMA
+from manheim_c7n_tools.config import CaisConfig, CAIS_CONFIG_SCHEMA
 
-pbm = 'custodian_policygen.config'
+pbm = 'manheim_c7n_tools.config'
 
 
 class TestCaisConfig(object):
@@ -30,10 +30,10 @@ class TestCaisConfig(object):
             ) as mock_validate:
                 cls = CaisConfig(
                     foo='bar', baz=2, regions=['us-east-1'],
-                    config_path='custodian-policygen.yml'
+                    config_path='manheim-c7n-tools.yml'
                 )
         assert cls._config == {'foo': 'bar', 'baz': 2, 'regions': ['us-east-1']}
-        assert cls.config_path == 'custodian-policygen.yml'
+        assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
             call.debug('Validating configuration...')
         ]
@@ -52,7 +52,7 @@ class TestCaisConfig(object):
                 with pytest.raises(RuntimeError) as exc:
                     CaisConfig(
                         foo='bar', baz=2, regions=['us-east-2'],
-                        config_path='custodian-policygen.yml'
+                        config_path='manheim-c7n-tools.yml'
                     )
         assert str(exc.value) == 'ERROR: the first configured region must be ' \
                                  'us-east-1'

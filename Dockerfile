@@ -6,7 +6,7 @@ ARG build_url
 ARG version
 ARG custodian_version
 
-COPY . /custodian_policygen
+COPY . /manheim_c7n_tools
 RUN cd /tmp \
   # install bash
   && apk add bash git curl \
@@ -30,7 +30,7 @@ RUN cd /tmp \
   && pip install -r requirements.txt \
   && python setup.py develop \
   # END c7n installation
-  && cd /custodian_policygen \
+  && cd /manheim_c7n_tools \
   && pip install -e . \
   # clean up build dependencies
   && apk del .build-deps \

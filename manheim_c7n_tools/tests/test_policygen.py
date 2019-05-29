@@ -17,8 +17,8 @@ import pytest
 import os
 from freezegun import freeze_time
 
-import custodian_policygen.policygen as policygen
-from custodian_policygen.config import CaisConfig
+import manheim_c7n_tools.policygen as policygen
+from manheim_c7n_tools.config import CaisConfig
 
 
 class TestStripDoc(object):
@@ -146,7 +146,7 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-            'custodian_policygen.policygen.PolicyGen._add_always_notify', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -228,7 +228,7 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'custodian_policygen.policygen.PolicyGen._add_always_notify', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -301,7 +301,7 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'custodian_policygen.policygen.PolicyGen._add_always_notify', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -374,7 +374,7 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'custodian_policygen.policygen.PolicyGen._add_always_notify', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -448,7 +448,7 @@ class TestApplyDefaults(PolicyGenTester):
             ]
         }
         with patch(
-                'custodian_policygen.policygen.PolicyGen._add_always_notify', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._add_always_notify', autospec=True
         ) as m:
             m.side_effect = lambda _, x: {'foo': 'bar'}
             res = self.cls._apply_defaults(defaults, policy)
@@ -457,11 +457,11 @@ class TestApplyDefaults(PolicyGenTester):
 
     def test_apply_defaults_merge_call(self):
         with patch(
-            'custodian_policygen.policygen.PolicyGen._merge_conf', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._merge_conf', autospec=True
         ) as m:
             m.return_value = {'mode': {'type': 'foo'}}
             with patch(
-                    'custodian_policygen.policygen.PolicyGen._add_always_notify',
+                    'manheim_c7n_tools.policygen.PolicyGen._add_always_notify',
                     autospec=True
             ) as m_aan:
                 m_aan.side_effect = lambda _, x: {'foo': 'bar'}
@@ -759,7 +759,7 @@ class TestMergeConf(PolicyGenTester):
             'myarr': ['foo', 'bar', 1]
         }
         with patch(
-            'custodian_policygen.policygen.PolicyGen._array_merge', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._array_merge', autospec=True
         ) as mock_am:
             mock_am.return_value = ['foo', 'bar', 1]
             res = self.cls._merge_conf(base, update, 'pname', [])
@@ -847,7 +847,7 @@ class TestWriteFile(PolicyGenTester):
 
     def test_write(self):
         with patch(
-            'custodian_policygen.policygen.open', mock_open(), create=True
+            'manheim_c7n_tools.policygen.open', mock_open(), create=True
         ) as m_open:
             self.cls._write_file('fpath', 'fcontent')
         assert m_open.mock_calls == [
@@ -917,7 +917,7 @@ class TestRun(PolicyGenTester):
             return policies[dirname]
 
         with patch.multiple(
-            'custodian_policygen.policygen.PolicyGen',
+            'manheim_c7n_tools.policygen.PolicyGen',
             autospec=True,
             _read_policy_directory=DEFAULT,
             _generate_configs=DEFAULT,
@@ -1051,7 +1051,7 @@ class TestReadPolicyDirectory(PolicyGenTester):
             return d
 
         with patch.multiple(
-            'custodian_policygen.policygen.PolicyGen',
+            'manheim_c7n_tools.policygen.PolicyGen',
             autospec=True,
             _read_policies=DEFAULT
         ) as mocks:
@@ -1094,7 +1094,7 @@ class TestGenerateConfigs(PolicyGenTester):
             'baz': 'blam'
         }
         with patch.multiple(
-            'custodian_policygen.policygen.PolicyGen',
+            'manheim_c7n_tools.policygen.PolicyGen',
             autospec=True,
             _apply_defaults=DEFAULT,
             _generate_cleanup_policies=DEFAULT,
@@ -1172,10 +1172,10 @@ class TestWriteCustodianConfigs(PolicyGenTester):
             }
         }
         with patch(
-            'custodian_policygen.policygen.PolicyGen._write_file', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._write_file', autospec=True
         ) as mock_wf:
             with patch(
-                'custodian_policygen.policygen.yaml.dump', autospec=True
+                'manheim_c7n_tools.policygen.yaml.dump', autospec=True
             ) as mock_dump:
                 mock_dump.return_value = \
                     'yaml%%AWS_REGION%%yaml%%BUCKET_NAME%%x%%LOG_GROUP%%x' \
@@ -1202,13 +1202,13 @@ class TestCheckPolicies(PolicyGenTester):
             {'name': 'baz', 'baz': 'blam'}
         ]
         with patch.multiple(
-            'custodian_policygen.policygen.PolicyGen',
+            'manheim_c7n_tools.policygen.PolicyGen',
             autospec=True,
             _check_policy_marked_for_op_first=DEFAULT
         ) as mocks:
             mocks['_check_policy_marked_for_op_first'].return_value = True
             with patch(
-                'custodian_policygen.policygen.logger', autospec=True
+                'manheim_c7n_tools.policygen.logger', autospec=True
             ) as mock_logger:
                 self.cls._check_policies(policies)
         assert mocks['_check_policy_marked_for_op_first'].mock_calls == [
@@ -1228,19 +1228,19 @@ class TestCheckPolicies(PolicyGenTester):
             {'name': 'baz', 'baz': 'blam'}
         ]
         with patch.multiple(
-            'custodian_policygen.policygen.PolicyGen',
+            'manheim_c7n_tools.policygen.PolicyGen',
             autospec=True,
             _check_policy_marked_for_op_first=DEFAULT,
         ) as mocks:
             with patch(
-                'custodian_policygen.policygen.strip_doc', autospec=True
+                'manheim_c7n_tools.policygen.strip_doc', autospec=True
             ) as mock_sd:
                 for x in mocks:
                     setattr(mocks[x], 'name', x)
                 mocks['_check_policy_marked_for_op_first'].return_value = False
                 mock_sd.side_effect = se_strip_doc
                 with patch(
-                    'custodian_policygen.policygen.logger', autospec=True
+                    'manheim_c7n_tools.policygen.logger', autospec=True
                 ) as mock_logger:
                     with pytest.raises(SystemExit) as ex:
                         self.cls._check_policies(policies)
@@ -1765,7 +1765,7 @@ class TestPolicyRst(PolicyGenTester):
             )
         expected += "tableHere"
         with patch(
-            'custodian_policygen.policygen.PolicyGen._policy_rst_data', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data', autospec=True
         ) as m_prd:
             m_prd.return_value = [
                 ['aaa', '', 'comment-aaa'],
@@ -1779,13 +1779,13 @@ class TestPolicyRst(PolicyGenTester):
                 'BUILD_URL': 'https://bento/job/2'
             }, clear=True):
                 with patch(
-                    'custodian_policygen.policygen.timestr', autospec=True
+                    'manheim_c7n_tools.policygen.timestr', autospec=True
                 ) as m_timestr:
                     with patch(
-                        'custodian_policygen.policygen.tabulate', autospec=True
+                        'manheim_c7n_tools.policygen.tabulate', autospec=True
                     ) as m_tabulate:
                         with patch(
-                            'custodian_policygen.policygen.git_html_url', autospec=True
+                            'manheim_c7n_tools.policygen.git_html_url', autospec=True
                         ) as ghu:
                             ghu.return_value = 'https://example.com/org/repo/'
                             m_tabulate.return_value = 'tableHere'
@@ -1822,7 +1822,7 @@ class TestPolicyRst(PolicyGenTester):
             "\n\n" % (gitlink, timestr)
         expected += "tableHere"
         with patch(
-            'custodian_policygen.policygen.PolicyGen._policy_rst_data', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen._policy_rst_data', autospec=True
         ) as m_prd:
             m_prd.return_value = [
                 ['aaa', '', 'comment-aaa'],
@@ -1833,13 +1833,13 @@ class TestPolicyRst(PolicyGenTester):
                 'GIT_COMMIT': 'abcd1234'
             }, clear=True):
                 with patch(
-                    'custodian_policygen.policygen.timestr', autospec=True
+                    'manheim_c7n_tools.policygen.timestr', autospec=True
                 ) as m_timestr:
                     with patch(
-                        'custodian_policygen.policygen.tabulate', autospec=True
+                        'manheim_c7n_tools.policygen.tabulate', autospec=True
                     ) as m_tabulate:
                         with patch(
-                            'custodian_policygen.policygen.git_html_url', autospec=True
+                            'manheim_c7n_tools.policygen.git_html_url', autospec=True
                         ) as ghu:
                             ghu.return_value = 'https://example.com/org/repo/'
                             m_tabulate.return_value = 'tableHere'
@@ -2013,9 +2013,9 @@ class TestReadPolicies(PolicyGenTester):
             name = fpath.split('/')[-1].split('.')[0]
             return {'file': fpath, 'name': name}
 
-        with patch('custodian_policygen.policygen.os.listdir', autospec=True) as mock_list:
+        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
             with patch(
-                'custodian_policygen.policygen.PolicyGen._read_file_yaml', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml', autospec=True
             ) as mock_read:
                 mock_list.return_value = [
                     'foo.yml',
@@ -2037,9 +2037,9 @@ class TestReadPolicies(PolicyGenTester):
                 name = 'wrongName'
             return {'file': fpath, 'name': name}
 
-        with patch('custodian_policygen.policygen.os.listdir', autospec=True) as mock_list:
+        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
             with patch(
-                'custodian_policygen.policygen.PolicyGen._read_file_yaml', autospec=True
+                'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml', autospec=True
             ) as mock_read:
                 mock_list.return_value = [
                     'foo.yml',
@@ -2059,9 +2059,9 @@ class TestReadPolicies(PolicyGenTester):
                 "[Errno 2] No such file or directory: '%s'" % dirname
             )
 
-        with patch('custodian_policygen.policygen.os.listdir', autospec=True) as mock_list:
+        with patch('manheim_c7n_tools.policygen.os.listdir', autospec=True) as mock_list:
             with patch(
-                    'custodian_policygen.policygen.PolicyGen._read_file_yaml',
+                    'manheim_c7n_tools.policygen.PolicyGen._read_file_yaml',
                     autospec=True
             ) as mock_read:
                 mock_list.side_effect = se_listdir
@@ -2075,7 +2075,7 @@ class TestReadFileYaml(PolicyGenTester):
 
     def test_read(self):
         m = mock_open(read_data="- foo\n- bar\n")
-        with patch('custodian_policygen.policygen.open', m, create=True) as m_open:
+        with patch('manheim_c7n_tools.policygen.open', m, create=True) as m_open:
             res = self.cls._read_file_yaml('/foo/bar.yml')
         assert res == ['foo', 'bar']
         assert m_open.mock_calls == [
@@ -2087,7 +2087,7 @@ class TestReadFileYaml(PolicyGenTester):
 
     def test_read_exception(self):
         m = mock_open(read_data="  - foo:\n- bar")
-        with patch('custodian_policygen.policygen.open', m, create=True) as m_open:
+        with patch('manheim_c7n_tools.policygen.open', m, create=True) as m_open:
             with pytest.raises(Exception):
                 self.cls._read_file_yaml('/foo/bar.yml')
         assert m_open.mock_calls == [
@@ -2110,16 +2110,16 @@ class TestMain(object):
     def test_main(self):
         m_conf = Mock()
         with patch(
-            'custodian_policygen.policygen.PolicyGen', autospec=True
+            'manheim_c7n_tools.policygen.PolicyGen', autospec=True
         ) as mock_pg:
             with patch('sys.argv', ['policygen', 'acctName']):
                 with patch(
-                    'custodian_policygen.policygen.CaisConfig', autospec=True
+                    'manheim_c7n_tools.policygen.CaisConfig', autospec=True
                 ) as mock_cc:
                     mock_cc.from_file.return_value = m_conf
                     policygen.main()
         assert mock_cc.mock_calls == [
-            call.from_file('custodian-policygen.yml', 'acctName')
+            call.from_file('manheim-c7n-tools.yml', 'acctName')
         ]
         assert mock_pg.mock_calls == [
             call(m_conf),
@@ -2128,10 +2128,10 @@ class TestMain(object):
 
     def test_main_config_path(self):
         m_conf = Mock()
-        with patch('custodian_policygen.policygen.PolicyGen', autospec=True) as mock_pg:
+        with patch('manheim_c7n_tools.policygen.PolicyGen', autospec=True) as mock_pg:
             with patch('sys.argv', ['policygen', '-c', 'foo.yml', 'acctName']):
                 with patch(
-                    'custodian_policygen.policygen.CaisConfig', autospec=True
+                    'manheim_c7n_tools.policygen.CaisConfig', autospec=True
                 ) as mock_cc:
                     mock_cc.from_file.return_value = m_conf
                     policygen.main()

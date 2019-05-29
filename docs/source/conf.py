@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# custodian-policygen documentation build configuration file, created by
+# manheim-c7n-tools documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun  6 16:12:56 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -17,7 +17,7 @@ import os
 import re
 # to let sphinx find the actual source...
 sys.path.insert(0, os.path.abspath("../.."))
-from custodian_policygen.version import VERSION
+from manheim_c7n_tools.version import VERSION
 import sphinx.environment
 from docutils.utils import get_source_line
 
@@ -67,7 +67,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'custodian-policygen'
+project = u'manheim-c7n-tools'
 copyright = u'2019 Manheim / Cox Automotive'
 author = u'Manheim Release Engineering'
 
@@ -145,9 +145,9 @@ html_static_path = ['_static']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'v{v} - custodian-policygen'.format(v=version)
+html_title = 'v{v} - manheim-c7n-tools'.format(v=version)
 
-htmlhelp_basename = 'custodian-policygendoc'
+htmlhelp_basename = 'manheim-c7n-toolsdoc'
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -217,7 +217,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-#htmlhelp_basename = 'custodian-policygendoc'
+#htmlhelp_basename = 'manheim-c7n-toolsdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -239,7 +239,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'custodian-policygen.tex', u'custodian-policygen Documentation',
+  (master_doc, 'manheim-c7n-tools.tex', u'manheim-c7n-tools Documentation',
    u'Manheim RE', 'manual'),
 ]
 
@@ -269,7 +269,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'custodian-policygen', u'custodian-policygen Documentation',
+    (master_doc, 'manheim-c7n-tools', u'manheim-c7n-tools Documentation',
      [author], 1)
 ]
 
@@ -283,8 +283,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'custodian-policygen', u'custodian-policygen Documentation',
-   author, 'custodian-policygen', 'One line description of project.',
+  (master_doc, 'manheim-c7n-tools', u'manheim-c7n-tools Documentation',
+   author, 'manheim-c7n-tools', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -323,7 +323,7 @@ linkcheck_ignore = [
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
     r'https?://.*readthedocs\.org.*',
-    r'https?://pypi\.python\.org/pypi/custodian-policygen'
+    r'https?://pypi\.python\.org/pypi/manheim-c7n-tools'
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734

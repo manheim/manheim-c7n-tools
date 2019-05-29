@@ -14,11 +14,11 @@ _Optional; instructions to reviewers, plans for how to release this, dependencie
 
 Required for external contributors.
 
-By submitting this work for inclusion in custodian-policygen, I agree to the following terms:
+By submitting this work for inclusion in manheim-c7n-tools, I agree to the following terms:
 
 * The contribution included in this request (and any subsequent revisions or versions of it)
-  is being made under the same license as the custodian-policygen project (Apache v2).
-* My contribution may perpetually be included in and distributed with custodian-policygen; submitting
+  is being made under the same license as the manheim-c7n-tools project (Apache v2).
+* My contribution may perpetually be included in and distributed with manheim-c7n-tools; submitting
   this pull request grants a perpetual, global, unlimited license for it to be used and distributed
-  under the terms of custodian-policygen's license.
+  under the terms of manheim-c7n-tools's license.
 * I have the legal power and rights to agree to these terms.

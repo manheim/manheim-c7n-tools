@@ -17,15 +17,15 @@ import pytest
 import os
 from datetime import datetime
 
-from custodian_policygen.utils import (
+from manheim_c7n_tools.utils import (
     set_log_debug, set_log_info, set_log_level_format, red, green, bold,
     git_html_url, assume_role
 )
-from custodian_policygen.config import CaisConfig
+from manheim_c7n_tools.config import CaisConfig
 
 from mock import patch, call, Mock, PropertyMock  # noqa
 
-pbm = 'custodian_policygen.utils'
+pbm = 'manheim_c7n_tools.utils'
 
 
 class TestUtils(object):
@@ -163,7 +163,7 @@ class TestAssumeRole(object):
                     }
         expected_args = {
             'RoleArn': 'assumeRoleArn',
-            'RoleSessionName': 'custodian-policygen_aName'
+            'RoleSessionName': 'manheim-c7n-tools_aName'
         }
         assert mock_boto.mock_calls == [
             call(region_name='us-east-1'),
@@ -216,7 +216,7 @@ class TestAssumeRole(object):
                     }
         expected_args = {
             'RoleArn': 'assumeRoleArn',
-            'RoleSessionName': 'custodian-policygen_aName',
+            'RoleSessionName': 'manheim-c7n-tools_aName',
             'ExternalId': 'eID',
             'DurationSeconds': 1234
         }

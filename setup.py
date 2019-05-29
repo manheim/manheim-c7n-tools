@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from custodian_policygen.version import VERSION, PROJECT_URL
+from manheim_c7n_tools.version import VERSION, PROJECT_URL
 
 with open('README.rst') as f:
     long_description = f.read()
@@ -30,7 +30,7 @@ classifiers = [
 ]
 
 setup(
-    name='custodian-policygen',
+    name='manheim-c7n-tools',
     version=VERSION,
     author='Manheim Release Engineering',
     author_email='man-releaseengineering@manheim.com',
@@ -43,10 +43,10 @@ setup(
     classifiers=classifiers,
     entry_points={
         'console_scripts': [
-            'policygen = custodian_policygen.policygen:main',
-            's3-archiver = custodian_policygen.s3_archiver:main',
-            'dryrun-diff = custodian_policygen.dryrun_diff:main',
-            'mugc = custodian_policygen.vendor.mugc:main'
+            'policygen = manheim_c7n_tools.policygen:main',
+            's3-archiver = manheim_c7n_tools.s3_archiver:main',
+            'dryrun-diff = manheim_c7n_tools.dryrun_diff:main',
+            'mugc = manheim_c7n_tools.vendor.mugc:main'
         ]
     }
 )

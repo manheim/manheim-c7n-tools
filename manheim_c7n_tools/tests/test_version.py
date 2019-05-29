@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import custodian_policygen.version as version
+import manheim_c7n_tools.version as version
 
 import re
 
@@ -20,7 +20,7 @@ import re
 class TestVersion(object):
 
     def test_project_url(self):
-        expected = 'https://github.com/manheim/custodian-policygen'
+        expected = 'https://github.com/manheim/manheim-c7n-tools'
         assert version.PROJECT_URL == expected
 
     def test_is_semver(self):
