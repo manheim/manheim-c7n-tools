@@ -1,4 +1,4 @@
-FROM python:2.7.15-alpine3.7
+FROM python:3.7.3-alpine3.9
 
 ARG git_commit
 ARG git_url
