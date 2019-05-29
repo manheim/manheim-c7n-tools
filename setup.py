@@ -11,7 +11,10 @@ requires = [
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
     'c7n>=0.8.43.1',
-    'c7n-mailer>=0.5.0'
+    'c7n-mailer>=0.5.0',
+    # for building generated policy docs
+    'sphinx>=1.8.0,<1.9.0',
+    'sphinx_rtd_theme==0.2.4'
 ]
 
 classifiers = [
