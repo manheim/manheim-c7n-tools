@@ -219,8 +219,7 @@ code for each (which is liked from that documentation).
 -  :py:mod:`Health filters <cloud custodian:c7n.filters.health>` to identify resources with associated
    `AWS Health <https://aws.amazon.com/documentation/health/>`_ events.
 -  :py:mod:`Metric filters <cloud custodian:c7n.filters.metrics>` to retrieve and filter based on CloudWatch metrics for resources.
--  The :py:mod:`offhours filters <cloud custodian:c7n.filters.offhours>`, described
-   in detail in the :ref:`policies.onoffhours` section.
+-  The :py:mod:`offhours filters <cloud custodian:c7n.filters.offhours>`.
 
 .. _`policies.actions`:
 

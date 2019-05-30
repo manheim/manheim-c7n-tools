@@ -12,7 +12,7 @@ This provides a single command-line script/entrypoint to run some or all of the 
 - custodian run or dry-run
 - c7n-mailer deploy or validate (dry-run)
 - :ref:`dryrun-diff`
-- :ref:`s3archive`
+- :ref:`s3archiver`
 - Sphinx docs build (HTML listing of policies by account/region)
 
 The wrapper runs for one account at a time, and the account name (matching one in the configuration file) must be specified on the command line. See ``manheim-c7n-runner accounts`` to list configured accounts.

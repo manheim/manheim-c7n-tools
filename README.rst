@@ -25,11 +25,11 @@ Main Components
 
 The following commands are available in the Docker container (or Python installation), generated as Python package entrypoints:
 
-* :ref:`manheim-c7n-runner <runner>` - A single entrypoint to wrap running one or more, or all, of the following steps in the proper order, in either run (real) or dryrun mode.
-* :ref:`policygen` - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
-* :ref:`s3-archiver` - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
-* :ref:`dryrun-diff` - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
-* :py:mod:`mugc <manheim_c7n_tools.vendor.mugc>` - built-in c7n Lambda garbage collection. The Docker image provides a wrapper for running this more easily, as c7n provides it only as a non-executable Python source file in their git repo.
+* ``manheim-c7n-runner`` - A single entrypoint to wrap running one or more, or all, of the following steps in the proper order, in either run (real) or dryrun mode.
+* ``policygen`` - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
+* ``s3-archiver`` - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
+* ``dryrun-diff`` - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
+* ``mugc`` - built-in c7n Lambda garbage collection. The Docker image provides a wrapper for running this more easily, as c7n provides it only as a non-executable Python source file in their git repo.
 
 ======================
 Installation and Usage

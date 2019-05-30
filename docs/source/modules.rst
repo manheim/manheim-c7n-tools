@@ -1,5 +1,5 @@
 manheim_c7n_tools
-========
+=================
 
 .. toctree::
    :maxdepth: 4
