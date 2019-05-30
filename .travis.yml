@@ -1,0 +1,61 @@
+language: python
+dist: trusty
+sudo: required
+services:
+- docker
+cache: pip
+
+install:
+- virtualenv --version
+- git config --global user.email "man-releaseengineering@manheim.com"
+- git config --global user.name "Manheim RE"
+- pip install tox
+- pip install codecov
+- pip freeze
+- virtualenv --version
+
+script:
+- tox -r
+after_success:
+- codecov
+
+stages:
+  - test
+  - name: deploy
+    if: tag IS present
+
+jobs:
+  include:
+    - stage: test
+      python: '2.7'
+      env: TOXENV=py27
+    - stage: test
+      python: '3.6'
+      env: TOXENV=py36
+    - stage: test
+      python: '3.7'
+      env: TOXENV=py37
+    - stage: test
+      python: '3.7'
+      env: TOXENV=docs
+    - stage: test
+      python: '3.7'
+      env: TOXENV=docker
+    - stage: deploy
+      python: '3.7'
+      script: bash build_or_deploy.sh build
+      after_success: echo after_success
+      deploy:
+        provider: script
+        script: bash build_or_deploy.sh push
+        skip_cleanup: true
+        on:
+          tags: true
+
+notifications:
+  email:
+    on_failure: always
+
+branches:
+  except:
+  - "/^noci-.*$/"
