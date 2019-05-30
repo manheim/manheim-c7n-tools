@@ -81,24 +81,24 @@ class TestUtils(object):
 
 class TestGitHtmlUrl(object):
 
-    def test_ghe_git(self):
+    def test_private_git(self):
         with patch(
             '%s.subprocess.check_output' % pbm, autospec=True
         ) as mock_co:
-            mock_co.return_value = 'git@ghe.coxautoinc.com:Foo/bar.git'
+            mock_co.return_value = 'git@git.example.com:Foo/bar.git'
             res = git_html_url()
-        assert res == 'https://ghe.coxautoinc.com/Foo/bar/'
+        assert res == 'https://git.example.com/Foo/bar/'
         assert mock_co.mock_calls == [
             call(['git', 'config', 'remote.origin.url'])
         ]
 
-    def test_ghe_https(self):
+    def test_private_https(self):
         with patch(
             '%s.subprocess.check_output' % pbm, autospec=True
         ) as mock_co:
-            mock_co.return_value = 'https://ghe.coxautoinc.com/Foo/bar.git'
+            mock_co.return_value = 'https://git.example.com/Foo/bar.git'
             res = git_html_url()
-        assert res == 'https://ghe.coxautoinc.com/Foo/bar/'
+        assert res == 'https://git.example.com/Foo/bar/'
         assert mock_co.mock_calls == [
             call(['git', 'config', 'remote.origin.url'])
         ]
