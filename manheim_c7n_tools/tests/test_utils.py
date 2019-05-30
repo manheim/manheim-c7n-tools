@@ -21,7 +21,7 @@ from manheim_c7n_tools.utils import (
     set_log_debug, set_log_info, set_log_level_format, red, green, bold,
     git_html_url, assume_role
 )
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 
 from mock import patch, call, Mock, PropertyMock  # noqa
 
@@ -137,7 +137,7 @@ class TestGitHtmlUrl(object):
 class TestAssumeRole(object):
 
     def setup(self):
-        self.m_conf = Mock(spec_set=CaisConfig)
+        self.m_conf = Mock(spec_set=ManheimConfig)
         type(self.m_conf).account_name = PropertyMock(return_value='aName')
 
     def test_success(self):

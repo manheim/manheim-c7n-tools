@@ -101,7 +101,7 @@ CAIS_CONFIG_SCHEMA = {
 logger = logging.getLogger(__name__)
 
 
-class CaisConfig(object):
+class ManheimConfig(object):
     """
     Configuration object for manheim-c7n-tools / :py:mod:`~.runner`.
     """
@@ -119,15 +119,15 @@ class CaisConfig(object):
     @staticmethod
     def from_file(path, account_name):
         """
-        Construct a new CaisConfig object from the YML configuration file
+        Construct a new ManheimConfig object from the YML configuration file
         at the specified path.
 
         :param path: path of the yaml config file to load
         :type path: str
         :param account_name: top-level account name/alias to load
         :type account_name: str
-        :return: new CaisConfig object for the specified config file
-        :rtype: CaisConfig
+        :return: new ManheimConfig object for the specified config file
+        :rtype: ManheimConfig
         """
         logger.info('Loading config from: %s', path)
         with open(path, 'r') as fh:
@@ -135,7 +135,7 @@ class CaisConfig(object):
         for acct_conf in config_dict:
             if acct_conf['account_name'] == account_name:
                 acct_conf['config_path'] = path
-                return CaisConfig(**acct_conf)
+                return ManheimConfig(**acct_conf)
         raise RuntimeError(
             'ERROR: No account with name "%s" in %s' % (
                 account_name, path
@@ -167,12 +167,12 @@ class CaisConfig(object):
         ``%%AWS_REGION%%`` with the specified ``region_name`` and all
         occurrences of ``%%POLICYGEN_ENV_name%%`` replaced with the value of the
         corresponding environment variable, then deserializes the result and
-        returns a new :py:class:`~.CaisConfig` object using it.
+        returns a new :py:class:`~.ManheimConfig` object using it.
 
         :param region_name: the region name to build a config for
         :type region_name: str
-        :return: new CaisConfig for the specified region
-        :rtype: CaisConfig
+        :return: new ManheimConfig for the specified region
+        :rtype: ManheimConfig
         """
         d = {'config_path': self.config_path}
         d.update(self._config)
@@ -185,7 +185,7 @@ class CaisConfig(object):
             if not k.startswith('POLICYGEN_ENV_'):
                 continue
             config_str = config_str.replace('%%' + k + '%%', v)
-        return CaisConfig(**yaml.load(config_str, Loader=yaml.SafeLoader))
+        return ManheimConfig(**yaml.load(config_str, Loader=yaml.SafeLoader))
 
     def __getattr__(self, k):
         try:

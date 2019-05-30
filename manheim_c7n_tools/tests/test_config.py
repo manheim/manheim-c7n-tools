@@ -16,19 +16,19 @@ from mock import patch, call, Mock, mock_open
 import pytest
 import yaml
 
-from manheim_c7n_tools.config import CaisConfig, CAIS_CONFIG_SCHEMA
+from manheim_c7n_tools.config import ManheimConfig, CAIS_CONFIG_SCHEMA
 
 pbm = 'manheim_c7n_tools.config'
 
 
-class TestCaisConfig(object):
+class TestManheimConfig(object):
 
     def test_init(self):
         with patch('%s.logger' % pbm, autospec=True) as mock_logger:
             with patch(
                 '%s.jsonschema.validate' % pbm, autospec=True
             ) as mock_validate:
-                cls = CaisConfig(
+                cls = ManheimConfig(
                     foo='bar', baz=2, regions=['us-east-1'],
                     config_path='manheim-c7n-tools.yml'
                 )
@@ -50,7 +50,7 @@ class TestCaisConfig(object):
                 '%s.jsonschema.validate' % pbm, autospec=True
             ) as mock_validate:
                 with pytest.raises(RuntimeError) as exc:
-                    CaisConfig(
+                    ManheimConfig(
                         foo='bar', baz=2, regions=['us-east-2'],
                         config_path='manheim-c7n-tools.yml'
                     )
@@ -69,7 +69,7 @@ class TestCaisConfig(object):
     def test_getattr(self):
         with patch('%s.logger' % pbm, autospec=True):
             with patch('%s.jsonschema.validate' % pbm, autospec=True):
-                cls = CaisConfig(
+                cls = ManheimConfig(
                     foo='bar', baz=2, regions=['us-east-1'], config_path='foo'
                 )
         assert cls.foo == 'bar'
@@ -86,7 +86,7 @@ class TestCaisConfig(object):
             ) as m_open:
                 with patch('%s.yaml.load' % pbm, autospec=True) as mock_load:
                     with patch(
-                        '%s.CaisConfig' % pbm, autospec=True
+                        '%s.ManheimConfig' % pbm, autospec=True
                     ) as mock_conf:
                         mock_conf.return_value = m_conf
                         mock_load.return_value = [
@@ -103,7 +103,7 @@ class TestCaisConfig(object):
                                 'regions': ['us-east-2']
                             }
                         ]
-                        res = CaisConfig.from_file('/tmp/conf.yml', 'a2')
+                        res = ManheimConfig.from_file('/tmp/conf.yml', 'a2')
         assert res == m_conf
         assert mock_logger.mock_calls == [
             call.info('Loading config from: %s', '/tmp/conf.yml')
@@ -132,7 +132,7 @@ class TestCaisConfig(object):
             ) as m_open:
                 with patch('%s.yaml.load' % pbm, autospec=True) as mock_load:
                     with patch(
-                        '%s.CaisConfig' % pbm, autospec=True
+                        '%s.ManheimConfig' % pbm, autospec=True
                     ) as mock_conf:
                         mock_conf.return_value = m_conf
                         mock_load.return_value = [
@@ -150,7 +150,7 @@ class TestCaisConfig(object):
                             }
                         ]
                         with pytest.raises(RuntimeError) as exc:
-                            CaisConfig.from_file('/tmp/conf.yml', 'BAD')
+                            ManheimConfig.from_file('/tmp/conf.yml', 'BAD')
         assert str(exc.value) == 'ERROR: No account with name "BAD"' \
                                  ' in /tmp/conf.yml'
         assert mock_logger.mock_calls == [
@@ -174,7 +174,7 @@ class TestCaisConfig(object):
             ) as m_open:
                 with patch('%s.yaml.load' % pbm, autospec=True) as mock_load:
                     with patch(
-                        '%s.CaisConfig' % pbm, autospec=True
+                        '%s.ManheimConfig' % pbm, autospec=True
                     ) as mock_conf:
                         mock_load.return_value = [
                             {
@@ -192,7 +192,7 @@ class TestCaisConfig(object):
                                 'regions': ['us-east-2']
                             }
                         ]
-                        res = CaisConfig.list_accounts('/tmp/conf.yml')
+                        res = ManheimConfig.list_accounts('/tmp/conf.yml')
         assert res == {'a1': 1111, 'a2': 2222}
         assert mock_logger.mock_calls == [
             call.info('Loading config from: %s', '/tmp/conf.yml')
@@ -250,7 +250,7 @@ class TestCaisConfig(object):
                 {'foo': 'bar', 'POLICYGEN_ENV_foo': 'barVAR'},
                 clear=True
             ):
-                conf = CaisConfig(**original)
+                conf = ManheimConfig(**original)
                 result = conf.config_for_region('us-east-2')
         assert result._config == expected
         assert result.config_path == '/tmp/baz.yml'

@@ -139,8 +139,8 @@ def assume_role(config):
 
     The configuration is taken from the ``assume_role`` section of the config.
 
-    :param config: CaisConfig object containing assume_role configuration
-    :type config: CaisConfig
+    :param config: ManheimConfig object containing assume_role configuration
+    :type config: ManheimConfig
     """
     try:
         conf = config.assume_role

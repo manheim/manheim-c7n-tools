@@ -53,7 +53,7 @@ from manheim_c7n_tools.vendor.mugc import (
 )
 from manheim_c7n_tools.dryrun_diff import DryRunDiffer
 from manheim_c7n_tools.s3_archiver import S3Archiver
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 
 FORMAT = "[%(asctime)s %(levelname)s] %(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT)
@@ -89,9 +89,9 @@ class BaseStep(object):
         :type region_name: str
         :param config: The manheim-c7n-tools config to use for this step,
           already made region-specific
-          (:py:meth:`~.CaisConfig.config_for_region` is called where this class
+          (:py:meth:`~.ManheimConfig.config_for_region` is called where this class
           is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
-        :type config: CaisConfig
+        :type config: ManheimConfig
         """
         self.region_name = region_name
         self.config = config
@@ -114,9 +114,9 @@ class BaseStep(object):
         :type region_name: str
         :param config: The manheim-c7n-tools config to use for this step,
           already made region-specific
-          (:py:meth:`~.CaisConfig.config_for_region` is called where this class
+          (:py:meth:`~.ManheimConfig.config_for_region` is called where this class
           is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
-        :type config: CaisConfig
+        :type config: ManheimConfig
         :return: whether this step should run in the specified region
         :rtype: bool
         """
@@ -408,7 +408,7 @@ class CustodianRunner(object):
         :type config_path: str
         """
         self._config_path = config_path
-        self.config = CaisConfig.from_file(config_path, account_name)
+        self.config = ManheimConfig.from_file(config_path, account_name)
 
     def _steps_to_run(self, step_names, skip_steps):
         """
@@ -609,7 +609,7 @@ def main():
             print(x.name)
         raise SystemExit(0)
     if args.ACTION == 'accounts':
-        accts = CaisConfig.list_accounts(args.config)
+        accts = ManheimConfig.list_accounts(args.config)
         for acctname in sorted(accts.keys()):
             print("%s (%s)" % (acctname, accts[acctname]))
         raise SystemExit(0)

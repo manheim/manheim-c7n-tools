@@ -23,7 +23,7 @@ from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 import manheim_c7n_tools.runner as runner
 from manheim_c7n_tools.runner import BaseStep
 from manheim_c7n_tools.utils import bold
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 
 pbm = 'manheim_c7n_tools.runner'
 
@@ -50,7 +50,7 @@ ALL_REGIONS = [
 class StepTester(object):
 
     def setup(self):
-        self.m_conf = Mock(spec_set=CaisConfig)
+        self.m_conf = Mock(spec_set=ManheimConfig)
 
 
 class TestPolicygenStep(StepTester):
@@ -82,7 +82,7 @@ class TestPolicygenStep(StepTester):
 class TestValidateStep(StepTester):
 
     def test_run(self):
-        mock_conf = Mock(spec_set=CaisConfig)
+        mock_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.validate' % pbm, autospec=True) as mock_validate:
             with patch('%s.Config.empty' % pbm) as mock_empty:
                 mock_empty.return_value = mock_conf
@@ -93,7 +93,7 @@ class TestValidateStep(StepTester):
         ]
 
     def test_dryrun(self):
-        mock_conf = Mock(spec_set=CaisConfig)
+        mock_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.validate' % pbm, autospec=True) as mock_validate:
             with patch('%s.Config.empty' % pbm) as mock_empty:
                 mock_empty.return_value = mock_conf
@@ -111,7 +111,7 @@ class TestValidateStep(StepTester):
 class TestMugcStep(StepTester):
 
     def test_run(self):
-        mock_conf = Mock(spec_set=CaisConfig)
+        mock_conf = Mock(spec_set=ManheimConfig)
         with patch(
             '%s.resources.load_resources' % pbm, autospec=True
         ) as mock_lr:
@@ -141,7 +141,7 @@ class TestMugcStep(StepTester):
         assert mock_rgp.mock_calls == [call(mock_conf, {'my': 'policies'})]
 
     def test_dryrun(self):
-        mock_conf = Mock(spec_set=CaisConfig)
+        mock_conf = Mock(spec_set=ManheimConfig)
         with patch(
             '%s.resources.load_resources' % pbm, autospec=True
         ) as mock_lr:
@@ -245,7 +245,7 @@ class TestCustodianStep(StepTester):
 class TestMailerStep(StepTester):
 
     def test_mailer_config_docker(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).mailer_config = PropertyMock(
             return_value={'mailer': 'config'}
         )
@@ -287,7 +287,7 @@ class TestMailerStep(StepTester):
         ]
 
     def test_mailer_config_nondocker(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).mailer_config = PropertyMock(
             return_value={'mailer': 'config'}
         )
@@ -328,7 +328,7 @@ class TestMailerStep(StepTester):
 
     def test_run(self):
         m_partial = Mock(spec_set=partial)
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch(
             '%s.MailerStep.mailer_config' % pbm, new_callable=PropertyMock
         ) as mock_config:
@@ -350,7 +350,7 @@ class TestMailerStep(StepTester):
 
     def test_dryrun(self):
         m_partial = Mock(spec_set=partial)
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch(
             '%s.MailerStep.mailer_config' % pbm, new_callable=PropertyMock
         ) as mock_config:
@@ -371,7 +371,7 @@ class TestMailerStep(StepTester):
         assert mock_config.mock_calls == [call()]
 
     def test_run_in_region(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).mailer_regions = PropertyMock(
             return_value=['us-east-1']
         )
@@ -553,8 +553,8 @@ class TestCustodianRunner(object):
         self.steps = [self.cls1, self.cls2, self.cls3, self.cls4]
 
     def test_init(self):
-        m_conf = Mock(spec_set=CaisConfig)
-        with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+        m_conf = Mock(spec_set=ManheimConfig)
+        with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
             mock_cff.return_value = m_conf
             cls = runner.CustodianRunner('acctName', 'cpath')
         assert cls.config == m_conf
@@ -562,7 +562,7 @@ class TestCustodianRunner(object):
         assert mock_cff.mock_calls == [call('cpath', 'acctName')]
 
     def test_run_all_steps(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).regions = PropertyMock(
             return_value=['r1', 'r2', 'r3']
         )
@@ -579,7 +579,7 @@ class TestCustodianRunner(object):
                 ]
                 with patch('%s.logger' % pbm, autospec=True) as mock_logger:
                     with patch(
-                        '%s.CaisConfig.from_file' % pbm
+                        '%s.ManheimConfig.from_file' % pbm
                     ) as mock_cff:
                         mock_cff.return_value = m_conf
                         cls = runner.CustodianRunner('acctName')
@@ -609,7 +609,7 @@ class TestCustodianRunner(object):
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_run_dryrun_some_steps_some_regions(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).regions = PropertyMock(
             return_value=['r1', 'r2', 'r3']
         )
@@ -625,7 +625,7 @@ class TestCustodianRunner(object):
                     self.cls2, self.cls3
                 ]
                 with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-                    with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+                    with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                         mock_cff.return_value = m_conf
                         cls = runner.CustodianRunner('aName')
                         cls.run(
@@ -655,7 +655,7 @@ class TestCustodianRunner(object):
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_run_invalid_region_name(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).regions = PropertyMock(
             return_value=['r1', 'r2', 'r3']
         )
@@ -671,7 +671,7 @@ class TestCustodianRunner(object):
                     self.cls2, self.cls3
                 ]
                 with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-                    with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+                    with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                         mock_cff.return_value = m_conf
                         with pytest.raises(RuntimeError) as exc:
                             cls = runner.CustodianRunner('acctName')
@@ -698,7 +698,7 @@ class TestCustodianRunner(object):
         assert mocks['_validate_account'].mock_calls == [call(cls)]
 
     def test_validate_account(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).account_name = PropertyMock(
             return_value='myAcct'
         )
@@ -710,7 +710,7 @@ class TestCustodianRunner(object):
                 'Arn': 'myARN',
                 'Account': '1234567890'
             }
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 cls = runner.CustodianRunner('acctName')
                 cls._validate_account()
@@ -723,7 +723,7 @@ class TestCustodianRunner(object):
         ]
 
     def test_validate_account_failed(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).account_name = PropertyMock(
             return_value='myAcct'
         )
@@ -735,7 +735,7 @@ class TestCustodianRunner(object):
                 'Arn': 'myARN',
                 'Account': '9876543210'
             }
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 cls = runner.CustodianRunner('acctName')
                 with pytest.raises(RuntimeError) as exc:
@@ -753,17 +753,17 @@ class TestCustodianRunner(object):
         ]
 
     def test_steps_to_run_all(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.CustodianRunner.ordered_step_classes' % pbm, self.steps):
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 res = runner.CustodianRunner('acctName')._steps_to_run([], [])
         assert res == self.steps
 
     def test_steps_to_run_step_names(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.CustodianRunner.ordered_step_classes' % pbm, self.steps):
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 res = runner.CustodianRunner('acctName')._steps_to_run(
                     ['cls3', 'cls1'], []
@@ -771,9 +771,9 @@ class TestCustodianRunner(object):
         assert res == [self.cls1, self.cls3]
 
     def test_steps_to_run_skip_steps(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.CustodianRunner.ordered_step_classes' % pbm, self.steps):
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 res = runner.CustodianRunner('aName')._steps_to_run(
                     [], ['cls4', 'cls2']
@@ -781,9 +781,9 @@ class TestCustodianRunner(object):
         assert res == [self.cls1, self.cls3]
 
     def test_steps_to_run_names_and_skip(self):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         with patch('%s.CustodianRunner.ordered_step_classes' % pbm, self.steps):
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 res = runner.CustodianRunner('aName')._steps_to_run(
                     ['cls3', 'cls2', 'cls1'], ['cls1']
@@ -792,17 +792,17 @@ class TestCustodianRunner(object):
 
     def test_ordered_step_classes(self):
         """ensures all are subclasses of BaseStep"""
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         for klass in runner.CustodianRunner.ordered_step_classes:
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 assert isinstance(klass(None, m_conf), runner.BaseStep)
 
     def test_run_in_regions_run(self):
-        m_conf = Mock(spec_set=CaisConfig)
-        m_conf_r1 = Mock(spec_set=CaisConfig)
-        m_conf_r2 = Mock(spec_set=CaisConfig)
-        m_conf_r3 = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
+        m_conf_r1 = Mock(spec_set=ManheimConfig)
+        m_conf_r2 = Mock(spec_set=ManheimConfig)
+        m_conf_r3 = Mock(spec_set=ManheimConfig)
 
         def se_conf_for_region(rname):
             if rname == 'r1':
@@ -815,7 +815,7 @@ class TestCustodianRunner(object):
         m_conf.config_for_region.side_effect = se_conf_for_region
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 runner.CustodianRunner('acctName')._run_step_in_regions(
                     'run', self.cls1, ['r1', 'r2', 'r3']
@@ -843,10 +843,10 @@ class TestCustodianRunner(object):
         ]
 
     def test_run_in_regions_policygen_run(self):
-        m_conf = Mock(spec_set=CaisConfig)
-        m_conf_r1 = Mock(spec_set=CaisConfig)
-        m_conf_r2 = Mock(spec_set=CaisConfig)
-        m_conf_r3 = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
+        m_conf_r1 = Mock(spec_set=ManheimConfig)
+        m_conf_r2 = Mock(spec_set=ManheimConfig)
+        m_conf_r3 = Mock(spec_set=ManheimConfig)
 
         def se_conf_for_region(rname):
             if rname == 'r1':
@@ -859,7 +859,7 @@ class TestCustodianRunner(object):
         m_conf.config_for_region.side_effect = se_conf_for_region
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 with patch('%s.PolicygenStep' % pbm, autospec=True) as mock_pgs:
                     type(mock_pgs).name = PropertyMock(return_value='policygen')
@@ -886,10 +886,10 @@ class TestCustodianRunner(object):
         ]
 
     def test_run_in_regions_dryrun_skip_some(self):
-        m_conf = Mock(spec_set=CaisConfig)
-        m_conf_r1 = Mock(spec_set=CaisConfig)
-        m_conf_r2 = Mock(spec_set=CaisConfig)
-        m_conf_r3 = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
+        m_conf_r1 = Mock(spec_set=ManheimConfig)
+        m_conf_r2 = Mock(spec_set=ManheimConfig)
+        m_conf_r3 = Mock(spec_set=ManheimConfig)
 
         def se_conf_for_region(rname):
             if rname == 'r1':
@@ -902,7 +902,7 @@ class TestCustodianRunner(object):
         m_conf.config_for_region.side_effect = se_conf_for_region
 
         with patch('%s.logger' % pbm, autospec=True) as mock_logger:
-            with patch('%s.CaisConfig.from_file' % pbm) as mock_cff:
+            with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
                 runner.CustodianRunner('acctName')._run_step_in_regions(
                     'dryrun', self.cls2, ['r2', 'r3']
@@ -1014,7 +1014,7 @@ class TestMain(object):
 
     def test_run(self, capsys):
         m_cr = Mock(spec_set=runner.CustodianRunner)
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_cr).config = m_conf
         with patch.multiple(
             pbm,
@@ -1023,7 +1023,7 @@ class TestMain(object):
             set_log_debug=DEFAULT,
             set_log_info=DEFAULT,
             CustodianRunner=DEFAULT,
-            CaisConfig=DEFAULT,
+            ManheimConfig=DEFAULT,
             assume_role=DEFAULT
         ) as mocks:
             mocks['parse_args'].return_value = FakeArgs(
@@ -1043,7 +1043,7 @@ class TestMain(object):
                 'run', ['foo2'], step_names=[], skip_steps=[]
             )
         ]
-        assert mocks['CaisConfig'].mock_calls == []
+        assert mocks['ManheimConfig'].mock_calls == []
         assert captured.out == ''
         assert captured.err == ''
         assert mocks['assume_role'].mock_calls == []
@@ -1051,7 +1051,7 @@ class TestMain(object):
     def test_info_list(self, capsys):
         osc = runner.CustodianRunner.ordered_step_classes
         m_cr = Mock(spec_set=runner.CustodianRunner)
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_cr).config = m_conf
         with patch.multiple(
             pbm,
@@ -1060,7 +1060,7 @@ class TestMain(object):
             set_log_debug=DEFAULT,
             set_log_info=DEFAULT,
             CustodianRunner=DEFAULT,
-            CaisConfig=DEFAULT,
+            ManheimConfig=DEFAULT,
             assume_role=DEFAULT
         ) as mocks:
             mocks['parse_args'].return_value = FakeArgs(
@@ -1077,7 +1077,7 @@ class TestMain(object):
         ]
         assert mocks['set_log_debug'].mock_calls == []
         assert mocks['set_log_info'].mock_calls == [call(runner.logger)]
-        assert mocks['CaisConfig'].mock_calls == []
+        assert mocks['ManheimConfig'].mock_calls == []
         expected = "\n".join(
             x.name for x in osc
         )
@@ -1086,7 +1086,7 @@ class TestMain(object):
         assert mocks['assume_role'].mock_calls == []
 
     def test_accounts(self, capsys):
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         osc = runner.CustodianRunner.ordered_step_classes
         m_cr = Mock(spec_set=runner.CustodianRunner)
         type(m_cr).config = m_conf
@@ -1097,14 +1097,14 @@ class TestMain(object):
             set_log_debug=DEFAULT,
             set_log_info=DEFAULT,
             CustodianRunner=DEFAULT,
-            CaisConfig=DEFAULT,
+            ManheimConfig=DEFAULT,
             assume_role=DEFAULT
         ) as mocks:
             mocks['parse_args'].return_value = FakeArgs(ACTION='accounts')
             mocks['CustodianRunner'].return_value = m_cr
             type(mocks['CustodianRunner']).ordered_step_classes = osc
-            type(mocks['CaisConfig']).return_value = m_conf
-            with patch('%s.CaisConfig.list_accounts' % pbm) as mock_la:
+            type(mocks['ManheimConfig']).return_value = m_conf
+            with patch('%s.ManheimConfig.list_accounts' % pbm) as mock_la:
                 mock_la.return_value = {
                     'acct1': 1111,
                     'acct3': 3333,
@@ -1119,7 +1119,7 @@ class TestMain(object):
         ]
         assert mocks['set_log_debug'].mock_calls == []
         assert mocks['set_log_info'].mock_calls == []
-        assert mocks['CaisConfig'].mock_calls == []
+        assert mocks['ManheimConfig'].mock_calls == []
         assert mock_la.mock_calls == [call('manheim-c7n-tools.yml')]
         assert captured.out == "acct1 (1111)\nacct2 (2222)\nacct3 (3333)\n"
         assert captured.err == ''
@@ -1127,7 +1127,7 @@ class TestMain(object):
 
     def test_debug_dryrun_assume_role(self, capsys):
         m_cr = Mock(spec_set=runner.CustodianRunner)
-        m_conf = Mock(spec_set=CaisConfig)
+        m_conf = Mock(spec_set=ManheimConfig)
         type(m_cr).config = m_conf
         with patch.multiple(
             pbm,
@@ -1136,7 +1136,7 @@ class TestMain(object):
             set_log_debug=DEFAULT,
             set_log_info=DEFAULT,
             CustodianRunner=DEFAULT,
-            CaisConfig=DEFAULT,
+            ManheimConfig=DEFAULT,
             assume_role=DEFAULT
         ) as mocks:
             mocks['parse_args'].return_value = FakeArgs(
@@ -1157,7 +1157,7 @@ class TestMain(object):
                 'dryrun', [], step_names=['foo'], skip_steps=['bar']
             )
         ]
-        assert mocks['CaisConfig'].mock_calls == []
+        assert mocks['ManheimConfig'].mock_calls == []
         assert captured.out == ''
         assert captured.err == ''
         assert mocks['assume_role'].mock_calls == [call(m_conf)]

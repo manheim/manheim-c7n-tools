@@ -60,7 +60,7 @@ When :ref:`policygen` generates configuration files for each AWS Region that we 
 
 The list of regions that we generate configs for is taken from the ``regions`` key of ``manheim-c7n-tools.yml``.
 
-There are also some other values from ``manheim-c7n-tools.yml`` (the :py:class:`~.CaisConfig` class) that can be interpolated in the policies:
+There are also some other values from ``manheim-c7n-tools.yml`` (the :py:class:`~.ManheimConfig` class) that can be interpolated in the policies:
 
 +----------------------+-------------------------+--------------------------------------------------------------------+
 | String               | Config Value            | Description                                                        |

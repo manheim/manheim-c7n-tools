@@ -29,7 +29,7 @@ from zlib import decompress
 import subprocess
 
 from manheim_c7n_tools.utils import set_log_info, set_log_debug
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 from manheim_c7n_tools.version import VERSION
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class DryRunDiffer(object):
         Initialize a dryrun differ.
 
         :param config: manheim-c7n-tools configuration object
-        :type config: CaisConfig
+        :type config: ManheimConfig
         """
         self._live_results = {}
         self.config = config
@@ -321,7 +321,7 @@ def main():
     elif args.verbose == 1:
         set_log_info(logger)
 
-    conf = CaisConfig.from_file(args.config)
+    conf = ManheimConfig.from_file(args.config)
     DryRunDiffer(conf).run(
         git_dir=args.git_dir, diff_against=args.diff_against
     )

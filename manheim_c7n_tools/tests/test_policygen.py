@@ -18,7 +18,7 @@ import os
 from freezegun import freeze_time
 
 import manheim_c7n_tools.policygen as policygen
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 
 
 class TestStripDoc(object):
@@ -48,7 +48,7 @@ class TestInit(object):
 class PolicyGenTester(object):
 
     def setup(self):
-        self.m_conf = Mock(spec_set=CaisConfig)
+        self.m_conf = Mock(spec_set=ManheimConfig)
         type(self.m_conf).regions = PropertyMock(
             return_value=['region1', 'region2', 'region3']
         )
@@ -1954,7 +1954,7 @@ class TestRegionsRst(PolicyGenTester):
 
     def test_regions(self):
 
-        m_confA = Mock(spec_set=CaisConfig)
+        m_confA = Mock(spec_set=ManheimConfig)
         type(m_confA).regions = PropertyMock(
             return_value=['region1', 'region2', 'region3']
         )
@@ -1963,7 +1963,7 @@ class TestRegionsRst(PolicyGenTester):
         type(m_confA).config_path = PropertyMock(
             return_value='/tmp/conf.yml'
         )
-        m_confB = Mock(spec_set=CaisConfig)
+        m_confB = Mock(spec_set=ManheimConfig)
         type(m_confB).regions = PropertyMock(
             return_value=['region2', 'region3']
         )
@@ -2135,7 +2135,7 @@ class TestMain(object):
         ) as mock_pg:
             with patch('sys.argv', ['policygen', 'acctName']):
                 with patch(
-                    'manheim_c7n_tools.policygen.CaisConfig', autospec=True
+                    'manheim_c7n_tools.policygen.ManheimConfig', autospec=True
                 ) as mock_cc:
                     mock_cc.from_file.return_value = m_conf
                     policygen.main()
@@ -2154,7 +2154,7 @@ class TestMain(object):
         ) as mock_pg:
             with patch('sys.argv', ['policygen', '-c', 'foo.yml', 'acctName']):
                 with patch(
-                    'manheim_c7n_tools.policygen.CaisConfig', autospec=True
+                    'manheim_c7n_tools.policygen.ManheimConfig', autospec=True
                 ) as mock_cc:
                     mock_cc.from_file.return_value = m_conf
                     policygen.main()

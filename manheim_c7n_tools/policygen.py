@@ -30,7 +30,7 @@ except ImportError:
     from yaml import SafeLoader
 
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
-from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.config import ManheimConfig
 from manheim_c7n_tools.utils import git_html_url
 
 whtspc_re = re.compile('\s+')
@@ -59,7 +59,7 @@ class PolicyGen(object):
         Initialize the policy generator tool.
 
         :param config: manheim-c7n-tools configuration object
-        :type config: CaisConfig
+        :type config: ManheimConfig
         """
         self._config = config
         logger.info(
@@ -681,7 +681,7 @@ def main():
                         'current account')
 
     args = p.parse_args(sys.argv[1:])
-    conf = CaisConfig.from_file(args.config, args.ACCT_NAME)
+    conf = ManheimConfig.from_file(args.config, args.ACCT_NAME)
     PolicyGen(conf).run()
 
 
