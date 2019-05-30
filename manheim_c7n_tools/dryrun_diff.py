@@ -30,6 +30,7 @@ import subprocess
 
 from manheim_c7n_tools.utils import set_log_info, set_log_debug
 from manheim_c7n_tools.config import CaisConfig
+from manheim_c7n_tools.version import VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -279,6 +280,7 @@ def parse_args(argv):
         description='Generate a diff of resources matched by policies in '
                     'this dryrun vs the live policies'
     )
+    p.add_argument('-V', '--version', action='version', version=VERSION)
     p.add_argument('-v', '--verbose', dest='verbose', action='count', default=0,
                    help='verbose output. specify twice for debug-level output.')
     p.add_argument('-g', '--git-dir', dest='git_dir', action='store', type=str,

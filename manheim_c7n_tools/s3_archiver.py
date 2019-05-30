@@ -30,6 +30,7 @@ except ImportError:
     from yaml import SafeLoader
 
 from manheim_c7n_tools.utils import set_log_info, set_log_debug
+from manheim_c7n_tools.version import VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,7 @@ def parse_args(argv):
     p = argparse.ArgumentParser(
         description='Archive S3 logs for deleted policies'
     )
+    p.add_argument('-V', '--version', action='version', version=VERSION)
     p.add_argument('-v', '--verbose', dest='verbose', action='count', default=0,
                    help='verbose output. specify twice for debug-level output.')
     p.add_argument('-d', '--dry-run', dest='dryrun', action='store_true',
