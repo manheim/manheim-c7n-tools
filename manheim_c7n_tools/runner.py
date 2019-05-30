@@ -89,8 +89,9 @@ class BaseStep(object):
         :type region_name: str
         :param config: The manheim-c7n-tools config to use for this step,
           already made region-specific
-          (:py:meth:`~.ManheimConfig.config_for_region` is called where this class
-          is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
+          (:py:meth:`~.ManheimConfig.config_for_region` is called where this
+          class is intialized in
+          :py:meth:`~.CustodianRunner._run_step_in_regions`).
         :type config: ManheimConfig
         """
         self.region_name = region_name
@@ -114,8 +115,9 @@ class BaseStep(object):
         :type region_name: str
         :param config: The manheim-c7n-tools config to use for this step,
           already made region-specific
-          (:py:meth:`~.ManheimConfig.config_for_region` is called where this class
-          is intialized in :py:meth:`~.CustodianRunner._run_step_in_regions`).
+          (:py:meth:`~.ManheimConfig.config_for_region` is called where this
+          class is intialized in
+          :py:meth:`~.CustodianRunner._run_step_in_regions`).
         :type config: ManheimConfig
         :return: whether this step should run in the specified region
         :rtype: bool
