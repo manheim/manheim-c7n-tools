@@ -23,7 +23,7 @@ from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 #: designed for use with the ``jsonschema`` package. This schema is for ONE
 #: ACCOUNT in the config file; the file itself is made up of an array of objects
 #: matching this schema.
-CAIS_CONFIG_SCHEMA = {
+MANHEIM_CONFIG_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
     'required': [
@@ -109,7 +109,7 @@ class ManheimConfig(object):
     def __init__(self, **kwargs):
         self.config_path = kwargs.pop('config_path')
         logger.debug('Validating configuration...')
-        jsonschema.validate(kwargs, CAIS_CONFIG_SCHEMA)
+        jsonschema.validate(kwargs, MANHEIM_CONFIG_SCHEMA)
         if kwargs['regions'][0] != 'us-east-1':
             raise RuntimeError(
                 'ERROR: the first configured region must be us-east-1'

@@ -16,7 +16,7 @@ from mock import patch, call, Mock, mock_open
 import pytest
 import yaml
 
-from manheim_c7n_tools.config import ManheimConfig, CAIS_CONFIG_SCHEMA
+from manheim_c7n_tools.config import ManheimConfig, MANHEIM_CONFIG_SCHEMA
 
 pbm = 'manheim_c7n_tools.config'
 
@@ -40,7 +40,7 @@ class TestManheimConfig(object):
         assert mock_validate.mock_calls == [
             call(
                 {'foo': 'bar', 'baz': 2, 'regions': ['us-east-1']},
-                CAIS_CONFIG_SCHEMA
+                MANHEIM_CONFIG_SCHEMA
             )
         ]
 
@@ -62,7 +62,7 @@ class TestManheimConfig(object):
         assert mock_validate.mock_calls == [
             call(
                 {'foo': 'bar', 'baz': 2, 'regions': ['us-east-2']},
-                CAIS_CONFIG_SCHEMA
+                MANHEIM_CONFIG_SCHEMA
             )
         ]
 
