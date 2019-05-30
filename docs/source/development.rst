@@ -3,7 +3,7 @@ Development
 ===========
 
 * Open a pull request for changes. TravisCI will test them.
-* To cut a release, bump the version number in ``manheim_c7n_tools/version.py``, update ``CHANGES.rst``, and open a pull request for that. When merged to master, TravisCI will trigger the release.
+* To cut a release, bump the version number in ``manheim_c7n_tools/version.py``, update ``CHANGES.rst``, and open a pull request for that. Once merged to master, tag the release in GitHub and TravisCI will build and deploy the package and Docker image.
 
 Local Development and Testing
 =============================
