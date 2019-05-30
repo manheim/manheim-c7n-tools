@@ -5,7 +5,6 @@ tabulate>=0.8.0,<0.9.0
 pyyaml
 # for building generated policy docs
 sphinx>=1.8.0,<1.9.0
-sphinx_rtd_theme
 # use c7n pinned to 09db23f8c951b9c70bc8a3cad219a8fc4d6bb68a for PRs 4044 and 4050
 # @TODO bump this to latest release once >= 0.8.43.1 is out
 -e git+https://github.com/cloud-custodian/cloud-custodian.git@09db23f8c951b9c70bc8a3cad219a8fc4d6bb68a#egg=c7n
