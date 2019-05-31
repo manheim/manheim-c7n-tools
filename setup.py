@@ -14,7 +14,7 @@ requires = [
     'c7n-mailer>=0.5.0',
     # for building generated policy docs
     'sphinx>=1.8.0,<1.9.0',
-    'sphinx_rtd_theme==0.2.4'
+    'sphinx_rtd_theme'
 ]
 
 classifiers = [

@@ -1,12 +1,20 @@
 manheim-c7n-tools
 =================
 
+.. image:: https://readthedocs.org/projects/manheim-c7n-tools/badge/?version=latest
+   :target: https://manheim-c7n-tools.readthedocs.io/
+   :alt: ReadTheDocs.org build status
+
+.. image:: https://api.travis-ci.org/manheim/manheim-c7n-tools.png?branch=master
+   :target: https://travis-ci.org/manheim/manheim-c7n-tools
+   :alt: TravisCI build badge
+
 Manheim's Cloud Custodian (c7n) wrapper package, policy generator, runner, and supporting tools.
 
 This project provides common tooling, distributed as a Docker image, for managing Manheim's cloud-custodian (c7n) tooling, including c7n itself, c7n_mailer, and our custom components. This project/repository is intended to be used (generally via the generated Docker image) alongside a configuration repository of a specific layout, containing configuration for one or more AWS accounts.
 
-* **Full Documentation**: **TODO**
-* TravisCI Builds: **TODO**
+* **Full Documentation**: https://manheim-c7n-tools.readthedocs.io/
+* TravisCI Builds: https://travis-ci.org/manheim/manheim-c7n-tools
 * Docker image: **TODO**
 
 For documentation on the upstream cloud-custodian project, please see `https://cloudcustodian.io/docs/index.html <https://cloudcustodian.io/docs/index.html>`_ and the source code at `https://github.com/cloud-custodian/cloud-custodian <https://github.com/cloud-custodian/cloud-custodian>`_.
