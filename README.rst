@@ -5,7 +5,7 @@ manheim-c7n-tools
    :target: https://manheim-c7n-tools.readthedocs.io/
    :alt: ReadTheDocs.org build status
 
-.. image:: https://api.travis-ci.org/manheim/manheim-c7n-tools.svg?branch=master
+.. image:: https://api.travis-ci.org/manheim/manheim-c7n-tools.png?branch=master
    :target: https://travis-ci.org/manheim/manheim-c7n-tools
    :alt: TravisCI build badge
 
