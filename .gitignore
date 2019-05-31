@@ -67,8 +67,6 @@ include/
 
 .idea/
 .pytest_cache
-docs/source/manheim_c7n_tools*
-docs/source/c7n.*
 testresults.xml
 testresults.html
 assets/
