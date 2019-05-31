@@ -315,7 +315,9 @@ linkcheck_ignore = [
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
     r'https?://.*readthedocs\.org.*',
-    r'https?://pypi\.python\.org/pypi/manheim-c7n-tools'
+    r'https?://pypi\.python\.org/pypi/manheim-c7n-tools',
+    # broken bit.ly link in upstream c7n docs
+    r'https?://bit\.ly/.*'
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734
