@@ -35,7 +35,8 @@ MANHEIM_CONFIG_SCHEMA = {
         'output_s3_bucket_name',
         'custodian_log_group',
         'dead_letter_queue_arn',
-        'role_arn'
+        'role_arn',
+        'cleanup_notify'
     ],
     'properties': {
         # The AWS Account ID number
@@ -66,6 +67,9 @@ MANHEIM_CONFIG_SCHEMA = {
         'dead_letter_queue_arn': {'type': 'string'},
         # ARN of the role to run Lambda functions under
         'role_arn': {'type': 'string'},
+        # Array of notification recipients for orphaned Lambda/CWE Rule
+        # notifications; set to empty array to disable this functionality
+        'cleanup_notify': {'type': 'array'},
 
         # Optional list of notification targets to add to EVERY policy
         'always_notify': {
