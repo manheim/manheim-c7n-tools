@@ -13,7 +13,7 @@ Manheim's Cloud Custodian (c7n) wrapper package, policy generator, runner, and s
 
 This project provides common tooling, distributed as a Docker image, for managing Manheim's cloud-custodian (c7n) tooling, including c7n itself, c7n_mailer, and our custom components. This project/repository is intended to be used (generally via the generated Docker image) alongside a configuration repository of a specific layout, containing configuration for one or more AWS accounts.
 
-* **Full Documentation**: `https://manheim-c7n-tools.readthedocs.io/ <https://manheim-c7n-tools.readthedocs.io/>`__
+* **Full Documentation**: `https://manheim-c7n-tools.readthedocs.io/ <https://manheim-c7n-tools.readthedocs.io/>`_
 * TravisCI Builds: https://travis-ci.org/manheim/manheim-c7n-tools
 * Docker image: **TBD**
 
@@ -33,10 +33,10 @@ Main Components
 
 The following commands are available in the Docker container (or Python installation), generated as Python package entrypoints:
 
-* `manheim-c7n-runner <https://manheim-c7n-tools.readthedocs.io/en/latest/runner/>`__ - A single entrypoint to wrap running one or more, or all, of the following steps in the proper order, in either run (real) or dryrun mode.
-* `policygen <https://manheim-c7n-tools.readthedocs.io/en/latest/policygen/>`__ - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
-* `s3-archiver <https://manheim-c7n-tools.readthedocs.io/en/latest/s3archiver/>`__ - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
-* `dryrun-diff <https://manheim-c7n-tools.readthedocs.io/en/latest/dryrun-diff/>`__ - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
+* `manheim-c7n-runner <https://manheim-c7n-tools.readthedocs.io/en/latest/runner/>`_ - A single entrypoint to wrap running one or more, or all, of the following steps (as well as ``custodian`` itself, ``c7n-mailer`` deploy, and Sphinx documentation build) in the proper order, in either run (real) or dryrun mode.
+* `policygen <https://manheim-c7n-tools.readthedocs.io/en/latest/policygen/>`_ - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
+* `s3-archiver <https://manheim-c7n-tools.readthedocs.io/en/latest/s3archiver/>`_ - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
+* `dryrun-diff <https://manheim-c7n-tools.readthedocs.io/en/latest/dryrun-diff/>`_ - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
 * ``mugc`` - built-in c7n Lambda garbage collection. The Docker image provides a wrapper for running this more easily, as c7n provides it only as a non-executable Python source file in their git repo.
 
 ======================

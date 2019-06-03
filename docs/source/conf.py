@@ -20,6 +20,8 @@ sys.path.insert(0, os.path.abspath("../.."))
 from manheim_c7n_tools.version import VERSION
 import sphinx.environment
 from docutils.utils import get_source_line
+from docutils.nodes import GenericNodeVisitor, inline, Text, literal
+from sphinx.addnodes import pending_xref
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -317,7 +319,8 @@ linkcheck_ignore = [
     r'https?://.*readthedocs\.org.*',
     r'https?://pypi\.python\.org/pypi/manheim-c7n-tools',
     # broken bit.ly link in upstream c7n docs
-    r'https?://bit\.ly/.*'
+    r'https?://bit\.ly/.*',
+    r'https?://.*wikipedia\.org.*'
 ]
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734
@@ -461,10 +464,7 @@ def on_doctree_read(_, doctree):
     """
     docname = os.path.splitext(
         os.path.basename(doctree.attributes['source']))[0]
-    if docname == 'changes':
-        ref_mapping = {}
-        doctree.walk(LinkToRefVisitor(doctree, ref_mapping))
-    elif docname == 'index':
+    if docname == 'index':
         ref_mapping = {
             'https://manheim-c7n-tools.readthedocs.io/':
                 [
@@ -483,7 +483,7 @@ def on_doctree_read(_, doctree):
                 ],
             'https://manheim-c7n-tools.readthedocs.io/en/latest/s3archiver/':
                 [
-                    label_ref_node, docname, 's3-archiver',
+                    label_ref_node, docname, 's3archiver',
                     's3-archiver'
                 ],
             'https://manheim-c7n-tools.readthedocs.io/en/latest/dryrun-diff/':
