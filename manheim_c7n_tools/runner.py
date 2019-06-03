@@ -384,7 +384,7 @@ class DocsBuildStep(BaseStep):
 
 class CustodianRunner(object):
     """
-    Main class to run all steps required for CAIS c7n deployment.
+    Main class to run all steps required for manheim c7n deployment.
     """
 
     #: List of the :py:class:`~.BaseStep` subclasses to run for deployment,

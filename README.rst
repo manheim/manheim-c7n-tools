@@ -23,7 +23,7 @@ For documentation on the upstream cloud-custodian project, please see `https://c
 Introduction and Goals
 ======================
 
-Cloud Custodian (a.k.a. c7n) is a flexible rules engine for reporting on and enforcing policy in AWS. CAIS Release Engineering is migrating from Netflix Janitor Monkey to Cloud Custodian for our tag enforcement, resource cleanup, cost reduction, and other policy needs. This project provides common tooling to allow us to deploy and manage c7n across multiple AWS accounts.
+Cloud Custodian (a.k.a. c7n) is a flexible rules engine for reporting on and enforcing policy in AWS. Manheim has migrated from Netflix Janitor Monkey to Cloud Custodian for our tag enforcement, resource cleanup, cost reduction, and other policy needs. This project provides common tooling to allow us to deploy and manage c7n across multiple AWS accounts.
 
 We're currently deploying all Cloud Custodian policies via AWS Lambda. The default is to run policies once per day, but other execution triggers are available including arbitrary timer triggers as well as CloudTrail, AWS Config and CloudWatch Events.
 
