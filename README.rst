@@ -27,6 +27,8 @@ Cloud Custodian (a.k.a. c7n) is a flexible rules engine for reporting on and enf
 
 We're currently deploying all Cloud Custodian policies via AWS Lambda. The default is to run policies once per day, but other execution triggers are available including arbitrary timer triggers as well as CloudTrail, AWS Config and CloudWatch Events.
 
+A description of the initial tooling that turned into this project can be found in `this blog post <https://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/>`_.
+
 .. _index.main_components:
 
 ===============
@@ -39,8 +41,8 @@ The following commands are available in the Docker container (or Python installa
 * `policygen <https://manheim-c7n-tools.readthedocs.io/en/latest/policygen/>`_ - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
 * `s3-archiver <https://manheim-c7n-tools.readthedocs.io/en/latest/s3archiver/>`_ - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
 * `dryrun-diff <https://manheim-c7n-tools.readthedocs.io/en/latest/dryrun-diff/>`_ - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
-* ``mugc`` - built-in c7n Lambda garbage collection. The Docker image provides a wrapper for running this more easily, as c7n provides it only as a non-executable Python source file in their git repo.
-* ``c7n-mailer`` - built-in c7n mailer tool, packaged along with manheim-c7n-tools for convenience
+* c7n's built-in ``mugc`` Lambda garbage collection. This is vendored-in to manheim-c7n-tools, as c7n provides it only as a non-executable Python source file in their git repo.
+* c7n's ``c7n-mailer`` installed as a dependency for convenience.
 
 ======================
 Installation and Usage
