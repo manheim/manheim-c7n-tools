@@ -1,0 +1,9 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: ami-old-used-report
+resource: ami
+comments: Report on old AMIs that are being used
+filters:
+  - type: image-age
+    days: 90
+  - type: unused
+    value: false
