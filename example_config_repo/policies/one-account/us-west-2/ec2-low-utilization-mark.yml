@@ -1,0 +1,46 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: ec2-low-utilization-mark
+comment: EC2 Instances with low utilization - notify via email and mark to terminate in 14 days. Look at 2 days worth of data.
+resource: ec2
+filters:
+  # not tagged for this policy; otherwise, we'd just keep pushing the mark date forward
+  - {'tag:c7n-ec2-low-utilization': absent}
+  # instance is running
+  - {State.Name: running}
+  # Instance Type isn't t2.nano or t2.micro
+  - type: value
+    key: "InstanceType"
+    op: not-in
+    value:
+      - "t2.nano"
+      - "t2.micro"
+  # CPUUtilization 15-minute average < 4% over the last day
+  - type: metrics
+    name: CPUUtilization
+    days: 1
+    period: 900
+    statistics: Average
+    value: 4
+    op: less-than
+  # NetworkIn less than 7k per 6-hours over the last day
+  - type: metrics
+    name: NetworkIn
+    days: 1
+    period: 21600
+    statistics: Maximum
+    value: 7000
+    op: less-than
+  # NetworkOut less than 7k per 6-hours over the last day
+  - type: metrics
+    name: NetworkOut
+    days: 1
+    period: 21600
+    statistics: Maximum
+    value: 7000
+    op: less-than
+actions:
+  - type: mark-for-op
+    tag: c7n-ec2-low-utilization
+    msg: "ec2-low-utilization-mark: {op}@{action_date}"
+    op: terminate
+    days: 14

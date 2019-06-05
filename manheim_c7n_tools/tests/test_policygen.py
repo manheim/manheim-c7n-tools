@@ -73,6 +73,9 @@ class PolicyGenTester(object):
         type(self.m_conf).config_path = PropertyMock(
             return_value='/tmp/conf.yml'
         )
+        type(self.m_conf).cleanup_notify = PropertyMock(
+            return_value=['me@example.com', 'foo']
+        )
         self.cls = policygen.PolicyGen(self.m_conf)
 
 
@@ -1151,6 +1154,59 @@ class TestGenerateConfigs(PolicyGenTester):
             )
         ]
 
+    def test_no_cleanup(self):
+        type(self.m_conf).cleanup_notify = PropertyMock(
+            return_value=[]
+        )
+
+        def se_apply_defaults(klass, defaults, policy):
+            return '%s+defaults' % policy
+
+        policies = {
+            'foo': 'bar',
+            'baz': 'blam'
+        }
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _apply_defaults=DEFAULT,
+            _generate_cleanup_policies=DEFAULT,
+            _check_policies=DEFAULT,
+            _write_custodian_configs=DEFAULT
+        ) as mocks:
+            mocks['_apply_defaults'].side_effect = se_apply_defaults
+            mocks['_generate_cleanup_policies'].return_value = []
+            res = self.cls._generate_configs(policies, 'quux', 'region2')
+        assert res == {
+            'policies': [
+                'blam+defaults',
+                'bar+defaults'
+            ]
+        }
+        assert mocks['_apply_defaults'].mock_calls == [
+            call(self.cls, 'quux', 'blam'),
+            call(self.cls, 'quux', 'bar')
+        ]
+        assert mocks['_generate_cleanup_policies'].mock_calls == []
+        exp_policies = {
+            'policies': [
+                'blam+defaults',
+                'bar+defaults'
+            ]
+        }
+        assert mocks['_write_custodian_configs'].mock_calls == [
+            call(self.cls, exp_policies, 'region2')
+        ]
+        assert mocks['_check_policies'].mock_calls == [
+            call(
+                self.cls,
+                [
+                    'blam+defaults',
+                    'bar+defaults'
+                ]
+            )
+        ]
+
 
 class TestWriteCustodianConfigs(PolicyGenTester):
 
@@ -1656,7 +1712,7 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
                 'action_desc': 'and should probably be deleted',
                 'subject': '[cloud-custodian {{ account }}] Orphaned '
                            'cloud-custodian Lambda funcs in {{ region }}',
-                'to': ['MAN-ReleaseEngineering@manheim.com']
+                'to': ['me@example.com', 'foo']
             }],
             'filters': [
                 {'tag:Project': 'cloud-custodian'},
@@ -1704,7 +1760,7 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
                 'action_desc': 'and should probably be deleted',
                 'subject': '[cloud-custodian {{ account }}] Orphaned '
                            'cloud-custodian CW Event rules in {{ region }}',
-                'to': ['MAN-ReleaseEngineering@manheim.com']
+                'to': ['me@example.com', 'foo']
             }],
             'filters': [
                 {

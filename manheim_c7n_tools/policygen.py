@@ -142,12 +142,13 @@ class PolicyGen(object):
             result['policies'].append(
                 self._apply_defaults(defaults, policies[k])
             )
-        logger.info('Generating c7n cleanup policies...')
-        # add c7n lambda/CW Even cleanup policies
-        for pol in self._generate_cleanup_policies(
-            deepcopy(result['policies'])
-        ):
-            result['policies'].append(self._apply_defaults(defaults, pol))
+        if self._config.cleanup_notify:
+            logger.info('Generating c7n cleanup policies...')
+            # add c7n lambda/CW Even cleanup policies
+            for pol in self._generate_cleanup_policies(
+                deepcopy(result['policies'])
+            ):
+                result['policies'].append(self._apply_defaults(defaults, pol))
         logger.info('Checking policies for sanity and safety...')
         self._check_policies(result['policies'])
         self._write_custodian_configs(result, region_name)
@@ -306,7 +307,7 @@ class PolicyGen(object):
                 'action_desc': 'and should probably be deleted',
                 'subject': '[cloud-custodian {{ account }}] Orphaned '
                            'cloud-custodian Lambda funcs in {{ region }}',
-                'to': ['MAN-ReleaseEngineering@manheim.com']
+                'to': self._config.cleanup_notify,
             }],
             'filters': [
                 {'tag:Project': 'cloud-custodian'},
@@ -337,7 +338,7 @@ class PolicyGen(object):
                 'action_desc': 'and should probably be deleted',
                 'subject': '[cloud-custodian {{ account }}] Orphaned '
                            'cloud-custodian CW Event rules in {{ region }}',
-                'to': ['MAN-ReleaseEngineering@manheim.com']
+                'to': self._config.cleanup_notify,
             }],
             'filters': [
                 {
