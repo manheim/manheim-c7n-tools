@@ -1,5 +1,5 @@
 .. meta::
-   :description: Description of manheim-c7n-tools goes here.
+   :description: Manheim's Cloud Custodian (c7n) wrapper package, policy generator, runner, and supporting tools.
 
 .. _`index`:
 
@@ -11,8 +11,9 @@ Contents
 .. toctree::
    :maxdepth: 4
 
-   Policy Language <policies>
    Configuration <configuration>
+   Installation and Usage <usage>
+   Policy Language <policies>
    Policygen <policygen>
    Dryrun-Diff <dryrun-diff>
    S3 Archiver <s3archiver>

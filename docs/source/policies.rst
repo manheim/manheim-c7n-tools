@@ -51,6 +51,8 @@ Within each subdirectory (``all_accounts`` or an account name) is a directory ca
 
 When building the final configuration, policies from the account-specific directory will be layered on top of policies from the ``all_accounts/`` directory. A policy with the exact same file and policy name in a per-account directory will override a policy with the same name from the ``all_accounts/`` directory. Similarly, *within the all_accounts/ or account-named directories*, a region-specific policy will override a ``common/`` policy with the same name and filename.
 
+An example configuration repository can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_repo>`_.
+
 .. _`policies.region_interpolation`:
 
 Policy Interpolation
