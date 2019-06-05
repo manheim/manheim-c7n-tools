@@ -490,6 +490,11 @@ def on_doctree_read(_, doctree):
                 [
                     label_ref_node, docname, 'dryrun-diff',
                     'dryrun-diff'
+                ],
+            'https://manheim-c7n-tools.readthedocs.io/en/latest/usage/':
+                [
+                    label_ref_node, docname, 'usage',
+                    'Installation and Usage'
                 ]
         }
         doctree.walk(LinkToRefVisitor(doctree, ref_mapping))
