@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
 
-with open('README.rst') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 requires = [
