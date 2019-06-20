@@ -1,8 +1,6 @@
 FROM python:3.7.3-alpine3.9
 
-ARG git_commit
-ARG build_url
-ARG version
+ARG git_version
 
 COPY . /manheim_c7n_tools
 RUN cd /manheim_c7n_tools \
@@ -18,12 +16,9 @@ RUN cd /manheim_c7n_tools \
   && apk del .build-deps \
   && rm -Rf /root/.cache
 
-LABEL com.manheim.commit=$git_commit \
-      org.opencontainers.image.revision=$git_commit \
+LABEL com.manheim.commit=$git_version \
+      org.opencontainers.image.revision=$git_version \
       com.manheim.repo="https://github.com/manheim/manheim-c7n-tools.git" \
       org.opencontainers.image.source="https://github.com/manheim/manheim-c7n-tools.git" \
-      com.manheim.build_url=$build_url \
-      version=$version \
-      org.opencontainers.image.version=$version \
       org.opencontainers.image.url="https://github.com/manheim/manheim-c7n-tools" \
       org.opencontainers.image.authors="man-releaseengineering@manheim.com"

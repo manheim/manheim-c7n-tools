@@ -66,28 +66,16 @@ function pythonbuild {
     ls -l dist
 }
 
-function dockerpush {
-    tag=$(gettag)
-    if [[ "$TRAVIS" == "true" ]]; then
-        echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-    fi
-    docker images
-    echo "Pushing Docker image: manheim/manheim-c7n-tools:${tag}"
-    docker push "manheim/manheim-c7n-tools:${tag}"
-}
-
 function pythonpush {
     pip install twine
     twine upload dist/*
 }
 
 if [[ "$1" == "build" ]]; then
-    tox -r -e docker
     pythonbuild
 elif [[ "$1" == "dockerbuild" ]]; then
     dockertoxbuild
 elif [[ "$1" == "push" ]]; then
-    dockerpush
     pythonpush
 elif [[ "$1" == "dockerbuildtest" ]]; then
     dockerbuildtest
