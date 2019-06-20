@@ -31,6 +31,7 @@ from operator import itemgetter
 from manheim_c7n_tools.utils import (
     set_log_info, set_log_debug, red, green, assume_role
 )
+from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.config import ManheimConfig
 
 FORMAT = "[%(asctime)s %(levelname)s] %(message)s"
@@ -583,7 +584,13 @@ def _name_value_dict(l):
 
 
 def parse_args(argv):
-    p = argparse.ArgumentParser(description='Report on c7n lambda errors')
+    p = argparse.ArgumentParser(
+        description='Report on c7n lambda errors',
+        epilog='This tool is part of manheim_c7n_tools v%s.\n'
+               'For documentation, see: %s' % (VERSION, PROJECT_URL),
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    p.add_argument('-V', '--version', action='version', version=VERSION)
     p.add_argument('-v', '--verbose', dest='verbose', action='count', default=0,
                    help='verbose output. specify twice for debug-level output.')
     p.add_argument('-A', '--no-assume-role', dest='assume_role',
