@@ -22,4 +22,4 @@ if [ -z "$1" ]; then
 fi
 
 docker run -it --rm "$1" \
-  bash -c "policygen -V && s3-archiver -V && dryrun-diff -V && manheim-c7n-runner -V && mugc --help"
+  bash -c "policygen -V && s3-archiver -V && dryrun-diff -V && manheim-c7n-runner -V && mugc --help && errorscan -V"
