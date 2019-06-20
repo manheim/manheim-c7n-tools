@@ -1,0 +1,3 @@
+docutils
+pygments
+m2r
