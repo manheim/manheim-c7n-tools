@@ -46,9 +46,7 @@ function dockertoxbuild {
     buildurl=$(getbuildurl)
     echo "Building Docker image..."
     docker build \
-      --build-arg version="$tag" \
-      --build-arg git_commit="$(git rev-parse --short HEAD)" \
-      --build-arg build_url="$buildurl" \
+      --build-arg git_version="$(git rev-parse --short HEAD)" \
       --no-cache \
       -t "manheim/manheim-c7n-tools:${tag}" .
     echo "Built image and tagged as: manheim/manheim-c7n-tools:${tag}"
