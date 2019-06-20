@@ -37,6 +37,7 @@ The following commands are available in the Docker container (or Python installa
 * [policygen](https://manheim-c7n-tools.readthedocs.io/en/latest/policygen/) - The python script to generate the actual custodian YML config files from a configuration repo/directory. Must be run from a config repository directory.
 * [s3-archiver](https://manheim-c7n-tools.readthedocs.io/en/latest/s3archiver/) - Script to clean up custodian S3 buckets by moving logs from any deleted policies to an "archived-logs/" prefix.
 * [dryrun-diff](https://manheim-c7n-tools.readthedocs.io/en/latest/dryrun-diff/) - Script to compare the number of resources matched per-policy, per-region between a dryrun and the last actual run of each policy, and write the results to a Markdown file (to be added as a comment on the PR).
+* ``errorscan`` - Script using boto3 to examine CloudWatch Metrics, Logs, and SQS Dead Letter Queue for cloud-custodian Lambda functions, and alert on any failed executions, dead letters, etc.
 * c7n's built-in `mugc` Lambda garbage collection. This is vendored-in to manheim-c7n-tools, as c7n provides it only as a non-executable Python source file in their git repo.
 * c7n's `c7n-mailer` installed as a dependency for convenience.
 

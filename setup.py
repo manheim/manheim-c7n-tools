@@ -52,6 +52,7 @@ setup(
             'dryrun-diff = manheim_c7n_tools.dryrun_diff:main',
             'mugc = manheim_c7n_tools.vendor.mugc:main',
             'manheim-c7n-runner = manheim_c7n_tools.runner:main',
+            'errorscan = manheim_c7n_tools.errorscan:main'
         ]
     }
 )
