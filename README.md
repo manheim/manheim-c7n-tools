@@ -5,7 +5,7 @@ manheim-c7n-tools
 
 [![TravisCI build badge](https://api.travis-ci.org/manheim/manheim-c7n-tools.png?branch=master)](https://travis-ci.org/manheim/manheim-c7n-tools)
 
-[![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/%7Buser%7D/%7Brepo%7D.svg)](https://hub.docker.com/r/manheim/manheim-c7n-tools)
+[![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/manheim/manheim-c7n-tools.svg)](https://hub.docker.com/r/manheim/manheim-c7n-tools)
 
 Manheim's Cloud Custodian (c7n) wrapper package, policy generator, runner, and supporting tools.
 
