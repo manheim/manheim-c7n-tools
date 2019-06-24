@@ -19,7 +19,7 @@ The wrapper runs for one account at a time, and the account name (matching one i
 
 See ``manheim-c7n-runner --help`` in the Docker image for usage information. You can run all steps, or select only a subset of steps to include or exclude, in normal or dry-run mode.
 
-.. _custom.running_locally:
+.. _runner.running_locally:
 
 Running Locally
 ---------------
@@ -40,7 +40,12 @@ To perform a dry-run of Custodian policies locally via the Docker image, run the
 
 This assumes that you have valid AWS credentials exported in your current environment for the desired account (``ACCOUNT-NAME``).
 
-.. _custom.multi-account:
+In some cases, you may need to add additional components to this command:
+
+* If any of your policies or configuration files include ``POLICYGEN_ENV_`` interpolation via :ref:`policies.region_interpolation`, you must also export the relevant environment variables for those interpolations.
+* If you have custom c7n-mailer templates (e.g. in a ``mailer-templates/`` directory in your configuration repository), you should mount in that directory (e.g. ``-v $(pwd)/mailer-templates:/manheim_c7n_tools/manheim_c7n_tools/mailer-templates``).
+
+.. _runner.multi-account:
 
 Multi-Account Support
 ---------------------
