@@ -30,6 +30,9 @@ We highly recommend using the ``manheim/manheim-c7n-tools`` Docker image over a 
 Usage
 -----
 
+.. warning::
+   If you follow a CI process for your policies like we do, it is **highly** recommended that you run locally using read-only AWS credentials, to prevent any accidental policy executions from potentially un-reviewed changes!
+
 To run one of the included entrypoints via the Docker image, run the following from within your :ref:`configuration repo directory <configuration>`:
 
 .. code-block:: shell
