@@ -89,7 +89,7 @@ class TestGitHtmlUrl(object):
             res = git_html_url()
         assert res == 'https://git.example.com/Foo/bar/'
         assert mock_co.mock_calls == [
-            call(['git', 'config', 'remote.origin.url'])
+            call(['git', 'config', 'remote.origin.url'], text=True)
         ]
 
     def test_private_https(self):
@@ -100,7 +100,7 @@ class TestGitHtmlUrl(object):
             res = git_html_url()
         assert res == 'https://git.example.com/Foo/bar/'
         assert mock_co.mock_calls == [
-            call(['git', 'config', 'remote.origin.url'])
+            call(['git', 'config', 'remote.origin.url'], text=True)
         ]
 
     def test_github_git(self):
@@ -111,7 +111,7 @@ class TestGitHtmlUrl(object):
             res = git_html_url()
         assert res == 'https://github.com/Foo/bar/'
         assert mock_co.mock_calls == [
-            call(['git', 'config', 'remote.origin.url'])
+            call(['git', 'config', 'remote.origin.url'], text=True)
         ]
 
     def test_github_https(self):
@@ -122,7 +122,7 @@ class TestGitHtmlUrl(object):
             res = git_html_url()
         assert res == 'https://github.com/Foo/bar/'
         assert mock_co.mock_calls == [
-            call(['git', 'config', 'remote.origin.url'])
+            call(['git', 'config', 'remote.origin.url'], text=True)
         ]
 
     def test_bad_pattern(self):
