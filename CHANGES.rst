@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.7.2 (2019-06-24)
+------------------
+
+* Fix error in ``policygen`` script / step when running under Python3.
+
 0.7.1 (2019-06-24)
 ------------------
 

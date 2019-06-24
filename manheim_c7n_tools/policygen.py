@@ -530,7 +530,7 @@ class PolicyGen(object):
             os.environ.get('BUILD_NUMBER', ''),
             os.environ.get('BUILD_URL', '')
         )
-        commit = os.environ['GIT_COMMIT']
+        commit = os.environ.get('GIT_COMMIT', 'unknown')
         gitlink = '%scommit/%s' % (git_html_url(), commit)
         if buildinfo == 'by `  <>`_':
             buildinfo = 'locally'

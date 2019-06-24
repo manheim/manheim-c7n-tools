@@ -110,8 +110,11 @@ def git_html_url():
     :rtype: str
     :raises: RuntimeError if the command fails or the URL cannot be parsed
     """
-    p = subprocess.check_output(['git', 'config', 'remote.origin.url'])
+    p = subprocess.check_output(
+        ['git', 'config', 'remote.origin.url'], text=True
+    )
     p = p.strip()
+
     # git / ssh remote
     m = re.match(
         r'^([^@]+)@(?P<hostname>[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+):'
