@@ -42,6 +42,7 @@ setup(
     url=PROJECT_URL,
     description='c7n policy generation script and related utilities',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=requires,
     keywords="custodian aws c7n policy",
     classifiers=classifiers,
