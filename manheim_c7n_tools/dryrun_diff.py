@@ -111,7 +111,7 @@ class DryRunDiffer(object):
         :rtype: str
         """
         all_policies = list(set(
-            dryrun.keys() + self._live_results.keys()
+            list(dryrun.keys()) + list(self._live_results.keys())
         ))
         if len(all_policies) == 0:
             return 'No policy reports found. Perhaps all changed policies ' \
@@ -291,6 +291,8 @@ def parse_args(argv):
     p.add_argument('-c', '--config', dest='config', action='store',
                    default='manheim-c7n-tools.yml',
                    help='Config file path (default: ./manheim-c7n-tools.yml)')
+    p.add_argument('ACCOUNT_NAME', type=str, action='store',
+                   help='Account name in config file, to run diff for')
     args = p.parse_args(argv)
     return args
 
@@ -321,7 +323,7 @@ def main():
     elif args.verbose == 1:
         set_log_info(logger)
 
-    conf = ManheimConfig.from_file(args.config)
+    conf = ManheimConfig.from_file(args.config, args.ACCOUNT_NAME)
     DryRunDiffer(conf).run(
         git_dir=args.git_dir, diff_against=args.diff_against
     )
