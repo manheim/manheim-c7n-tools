@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.7.3 (2019-06-25)
+------------------
+
+* Fix ArgumentParser error preventing ``dryrun-diff`` from being run as standalone entrypoint (as opposed to ``manheim-c7n-runner`` step).
+* Fix Python3 error in ``dryrun-diff``.
+
 0.7.2 (2019-06-24)
 ------------------
 
