@@ -72,3 +72,5 @@ testresults.html
 assets/
 docs/source/.doctrees
 mailer.yml
+.direnv/
+.envrc
