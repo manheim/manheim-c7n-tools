@@ -33,7 +33,7 @@ from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.config import ManheimConfig
 from manheim_c7n_tools.utils import git_html_url
 
-whtspc_re = re.compile('\s+')
+whtspc_re = re.compile(r'\s+')
 
 logger = logging.getLogger(__name__)
 
@@ -68,26 +68,11 @@ class PolicyGen(object):
         )
 
     def run(self):
-        # read the global defaults
-        defaults = self._read_file_yaml(
-            os.path.join('policies', 'defaults.yml')
-        )
-        # read the shared configs from all_accounts/ ; returns a dict of
-        # region name to [dict of policy name to policy], for each region
-        all_accts = self._read_policy_directory('all_accounts')
-        # dict to hold account_name -> config for that account
-        acct_configs = {}
-        # loop over all accounts in the config file
-        for acctname in self._config.list_accounts(self._config.config_path):
-            # start with the all_accts dict, for common config
-            conf = deepcopy(all_accts)
-            # read the account's config
-            acct_conf = self._read_policy_directory(acctname)
-            # for each region, layer per-account over all_accounts
-            for rname in self._config.regions:
-                conf[rname].update(acct_conf[rname])
-            # store result
-            acct_configs[acctname] = conf
+        defaults = self._load_defaults()
+        if defaults is None:
+            logger.error('Failed to find a `defaults.yml` file')
+            raise SystemExit(1)
+        acct_configs = self._read_policies()
         # generate the per-region configs for each region, for current account
         for rname in self._config.regions:
             self._generate_configs(
@@ -99,6 +84,72 @@ class PolicyGen(object):
         self._write_file('policies.rst', self._policy_rst(acct_configs))
         logger.info('Writing region list to regions.rst...')
         self._write_file('regions.rst', self._regions_rst())
+
+    def _load_defaults(self):
+        """
+        Load a defaults.yml file from either the ``policies/`` subdirectory
+        or directories in the ``policy_source_paths`` configuration key.
+        """
+        defaults = None
+        # read the global defaults
+        if os.path.exists(os.path.join('policies', 'defaults.yml')):
+            defaults = self._read_file_yaml(
+                os.path.join('policies', 'defaults.yml')
+            )
+
+        # check policy folders for defaults
+        if 'policy_source_paths' in self._config:
+            for path in self._config.policy_source_paths:
+                if os.path.exists(os.path.join('policies', path, 'defaults.yml')):
+                    defaults = self._read_file_yaml(
+                        os.path.join('policies', path, 'defaults.yml')
+                    )
+        return defaults
+
+    def _read_policies(self):
+        """
+        Read the policies, either the current list of ``policy_source_paths``
+        directories if the config key exists, or simply the ``policies/``
+        subdirectory if it doesn't.
+        """
+        # dict to hold account_name -> config for that account
+        acct_configs = {}
+        # SOOO much redundancy
+        if 'policy_source_paths' in self._config:
+            # TODO: Loop over all source paths, meging them together in order
+            for path in self._config.policy_source_paths:
+                policy_path_configs = {}
+                # read the shared configs from all_accounts/ ; returns a dict of
+                # region name to [dict of policy name to policy], for each region
+                all_accts = self._read_policy_directory('all_accounts')
+                # loop over all accounts in the config file
+                for acctname in self._config.list_accounts(self._config.config_path):
+                    # start with the all_accts dict, for common config
+                    conf = deepcopy(all_accts)
+                    # read the account's config
+                    acct_conf = self._read_policy_directory(os.path.join(path, acctname))
+                    # for each region, layer per-account over all_accounts
+                    for rname in self._config.regions:
+                        conf[rname].update(acct_conf[rname])
+                    # store result
+                    policy_path_configs[acctname] = conf
+                acct_configs = deepcopy(policy_path_configs)
+        else:
+            # read the shared configs from all_accounts/ ; returns a dict of
+            # region name to [dict of policy name to policy], for each region
+            all_accts = self._read_policy_directory('all_accounts')
+            # loop over all accounts in the config file
+            for acctname in self._config.list_accounts(self._config.config_path):
+                # start with the all_accts dict, for common config
+                conf = deepcopy(all_accts)
+                # read the account's config
+                acct_conf = self._read_policy_directory(acctname)
+                # for each region, layer per-account over all_accounts
+                for rname in self._config.regions:
+                    conf[rname].update(acct_conf[rname])
+                # store result
+                acct_configs[acctname] = conf
+        return acct_configs
 
     def _read_policy_directory(self, policy_dir):
         """
@@ -144,7 +195,7 @@ class PolicyGen(object):
             )
         if self._config.cleanup_notify:
             logger.info('Generating c7n cleanup policies...')
-            # add c7n lambda/CW Even cleanup policies
+            # add c7n lambda/CW Event cleanup policies
             for pol in self._generate_cleanup_policies(
                 deepcopy(result['policies'])
             ):
