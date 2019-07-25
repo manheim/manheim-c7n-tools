@@ -72,7 +72,7 @@ class PolicyGen(object):
         if defaults is None:
             logger.error('Failed to find a `defaults.yml` file')
             raise SystemExit(1)
-        acct_configs = self._read_policies()
+        acct_configs = self._load_all_policies()
         # generate the per-region configs for each region, for current account
         for rname in self._config.regions:
             self._generate_configs(
@@ -98,15 +98,20 @@ class PolicyGen(object):
             )
 
         # check policy folders for defaults
-        if 'policy_source_paths' in self._config:
-            for path in self._config.policy_source_paths:
-                if os.path.exists(os.path.join('policies', path, 'defaults.yml')):
+        try:
+            paths = self._config.policy_source_paths
+            for path in paths:
+                if os.path.exists(
+                    os.path.join('policies', path, 'defaults.yml')
+                ):
                     defaults = self._read_file_yaml(
                         os.path.join('policies', path, 'defaults.yml')
                     )
+        except AttributeError:
+            logger.debug("No additional source paths for defaults")
         return defaults
 
-    def _read_policies(self):
+    def _load_all_policies(self):
         """
         Read the policies, either the current list of ``policy_source_paths``
         directories if the config key exists, or simply the ``policies/``
@@ -114,41 +119,44 @@ class PolicyGen(object):
         """
         # dict to hold account_name -> config for that account
         acct_configs = {}
-        # SOOO much redundancy
-        if 'policy_source_paths' in self._config:
-            # TODO: Loop over all source paths, meging them together in order
-            for path in self._config.policy_source_paths:
-                policy_path_configs = {}
-                # read the shared configs from all_accounts/ ; returns a dict of
-                # region name to [dict of policy name to policy], for each region
-                all_accts = self._read_policy_directory('all_accounts')
-                # loop over all accounts in the config file
-                for acctname in self._config.list_accounts(self._config.config_path):
-                    # start with the all_accts dict, for common config
-                    conf = deepcopy(all_accts)
-                    # read the account's config
-                    acct_conf = self._read_policy_directory(os.path.join(path, acctname))
-                    # for each region, layer per-account over all_accounts
-                    for rname in self._config.regions:
-                        conf[rname].update(acct_conf[rname])
-                    # store result
-                    policy_path_configs[acctname] = conf
-                acct_configs = deepcopy(policy_path_configs)
-        else:
-            # read the shared configs from all_accounts/ ; returns a dict of
-            # region name to [dict of policy name to policy], for each region
-            all_accts = self._read_policy_directory('all_accounts')
-            # loop over all accounts in the config file
-            for acctname in self._config.list_accounts(self._config.config_path):
-                # start with the all_accts dict, for common config
-                conf = deepcopy(all_accts)
-                # read the account's config
-                acct_conf = self._read_policy_directory(acctname)
-                # for each region, layer per-account over all_accounts
-                for rname in self._config.regions:
-                    conf[rname].update(acct_conf[rname])
-                # store result
-                acct_configs[acctname] = conf
+        try:
+            paths = self._config.policy_source_paths
+            logger.info("Reading from multiple source paths: %s", paths)
+            for path in paths:
+                logger.info("Reading configs from %s", path)
+                configs = self._load_policy(path=path)
+                logger.info(
+                    "Merging configs from %s into existing configs", path
+                )
+                for acctname in configs:
+                    if acctname in acct_configs:
+                        acct_configs[acctname].update(configs[acctname])
+                    else:
+                        acct_configs[acctname] = deepcopy(configs[acctname])
+        except AttributeError:
+            logger.info(
+                "No source paths defined, falling back to single source path"
+            )
+            acct_configs = self._load_policy()
+        return acct_configs
+
+    def _load_policy(self, path=''):
+        acct_configs = {}
+        # read the shared configs from all_accounts/ ; returns a dict of
+        # region name to [dict of policy name to policy], for each region
+        all_accts = self._read_policy_directory('all_accounts')
+        # loop over all accounts in the config file
+        for acctname in self._config.list_accounts(self._config.config_path):
+            # start with the all_accts dict, for common config
+            conf = deepcopy(all_accts)
+            # read the account's config
+            acct_conf = self._read_policy_directory(
+                os.path.join(path, acctname)
+            )
+            # for each region, layer per-account over all_accounts
+            for rname in self._config.regions:
+                conf[rname].update(acct_conf[rname])
+            acct_configs[acctname] = deepcopy(conf)
         return acct_configs
 
     def _read_policy_directory(self, policy_dir):
