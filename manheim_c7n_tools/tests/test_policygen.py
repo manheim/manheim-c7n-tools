@@ -1089,6 +1089,122 @@ class TestLoadDefaults(PolicyGenTester):
             assert d == 'default2'
 
 
+class TestLoadAllPolicies(PolicyGenTester):
+    def test_no_source_paths(self):
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._load_policy', autospec=True
+        ) as m_load:
+            self.cls._load_all_policies()
+            m_load.assert_called_once_with(self.cls)
+
+    def test_source_paths(self):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['path1', 'path2', 'path3']
+        )
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._load_policy',
+            autospec=True, return_value={}
+        ) as m_load:
+            self.cls._load_all_policies()
+            m_load.assert_has_calls([
+                call(self.cls, path='path1'),
+                call(self.cls, path='path2'),
+                call(self.cls, path='path3'),
+            ])
+
+
+class TestLoadPolicy(PolicyGenTester):
+    def test_policies(self, prefix=''):
+        return {
+            "%smyAccount" % prefix: {
+                'region1': {
+                    'foo': 'bar-myAccount/region1',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-myAccount/region2',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-myAccount/region3',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                }
+            },
+            "%sall_accounts" % prefix: {
+                'region1': {
+                    'all_r1': 'region1',
+                    'all_common': 'region1'
+                },
+                'region2': {
+                    'all_r2': 'region2',
+                    'all_common': 'region2'
+                },
+                'region3': {
+                    'all_r3': 'region3',
+                    'all_common': 'region3'
+                }
+            },
+            "%sotherAccount" % prefix: {
+                'region1': {
+                    'foo': 'bar-otherAccount/region1',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-otherAccount/region2',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-otherAccount/region3',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                }
+            }
+        }
+
+    def test_default_path(self):
+        policies = self.test_policies()
+
+        def se_read_pol_dir(_, dirname):
+            return policies[dirname]
+
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _read_policy_directory=DEFAULT,
+        ) as mocks:
+            mocks['_read_policy_directory'].side_effect = se_read_pol_dir
+            self.cls._load_policy()
+        assert mocks['_read_policy_directory'].mock_calls == [
+            call(self.cls, 'all_accounts'),
+            call(self.cls, 'myAccount'),
+            call(self.cls, 'otherAccount')
+        ]
+
+    def test_with_path(self):
+        policies = self.test_policies('foo/')
+
+        def se_read_pol_dir(_, dirname):
+            return policies[dirname]
+
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _read_policy_directory=DEFAULT,
+        ) as mocks:
+            mocks['_read_policy_directory'].side_effect = se_read_pol_dir
+            self.cls._load_policy(path='foo')
+        assert mocks['_read_policy_directory'].mock_calls == [
+            call(self.cls, 'foo/all_accounts'),
+            call(self.cls, 'foo/myAccount'),
+            call(self.cls, 'foo/otherAccount')
+        ]
+
+
 class TestReadPolicyDirectory(PolicyGenTester):
 
     def test_simple(self):
