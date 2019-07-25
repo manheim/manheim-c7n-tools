@@ -47,7 +47,7 @@ class TestInit(object):
 
 class PolicyGenTester(object):
 
-    def setup(self):
+    def setup_method(self):
         self.m_conf = Mock(spec_set=ManheimConfig)
         type(self.m_conf).regions = PropertyMock(
             return_value=['region1', 'region2', 'region3']
@@ -932,12 +932,14 @@ class TestRun(PolicyGenTester):
             _policy_rst=DEFAULT,
             _write_file=DEFAULT,
             _regions_rst=DEFAULT,
+            _load_defaults=DEFAULT,
             _read_file_yaml=DEFAULT
         ) as mocks:
             mocks['_read_policy_directory'].side_effect = se_read_pol_dir
             mocks['_policy_rst'].return_value = 'polMD'
             mocks['_regions_rst'].return_value = 'regionsRST'
             mocks['_read_file_yaml'].return_value = 'DEFAULTS'
+            mocks['_load_defaults'].return_value = 'DEFAULTS'
             self.cls.run()
         assert mocks['_read_policy_directory'].mock_calls == [
             call(self.cls, 'all_accounts'),
@@ -1040,9 +1042,51 @@ class TestRun(PolicyGenTester):
             call(self.cls, 'policies.rst', 'polMD'),
             call(self.cls, 'regions.rst', 'regionsRST')
         ]
-        assert mocks['_read_file_yaml'].mock_calls == [
-            call(self.cls, 'policies/defaults.yml')
+        assert mocks['_load_defaults'].mock_calls == [call(self.cls)]
+
+
+class TestLoadDefaults(PolicyGenTester):
+    @patch('os.path.exists', return_value=True)
+    def test_load_defaults_top_level(self, mock_exists):
+        m = mock_open(read_data="defaults")
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
+            self.cls._load_defaults()
+            mock_exists.assert_called_once_with('policies/defaults.yml')
+            m_open.assert_called_once_with('policies/defaults.yml', 'r')
+
+    @patch('os.path.exists', side_effect=(True, True, False, True))
+    def test_load_defaults_with_source_paths(self, mock_exists):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['path1', 'path2', 'path3']
+        )
+        contents = [
+            'default',
+            'default1',
+            'default2'
         ]
+        mock_files = [
+            mock_open(read_data=content).return_value for content in contents
+        ]
+        m = mock_open()
+        m.side_effect = mock_files
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
+            d = self.cls._load_defaults()
+            assert mock_exists.mock_calls == [
+                call('policies/defaults.yml'),
+                call('policies/path1/defaults.yml'),
+                call('policies/path2/defaults.yml'),
+                call('policies/path3/defaults.yml')
+            ]
+            assert m_open.mock_calls == [
+                call('policies/defaults.yml', 'r'),
+                call('policies/path1/defaults.yml', 'r'),
+                call('policies/path3/defaults.yml', 'r')
+            ]
+            assert d == 'default2'
 
 
 class TestReadPolicyDirectory(PolicyGenTester):
@@ -1137,7 +1181,7 @@ class TestGenerateConfigs(PolicyGenTester):
                 'bar+defaults',
                 'cleanup1+defaults',
                 'cleanup2+defaults'
-                ]
+            ]
         }
         assert mocks['_write_custodian_configs'].mock_calls == [
             call(self.cls, exp_policies, 'region2')
