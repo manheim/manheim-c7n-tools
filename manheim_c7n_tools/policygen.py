@@ -144,7 +144,9 @@ class PolicyGen(object):
         acct_configs = {}
         # read the shared configs from all_accounts/ ; returns a dict of
         # region name to [dict of policy name to policy], for each region
-        all_accts = self._read_policy_directory('all_accounts')
+        all_accts = self._read_policy_directory(
+            os.path.join(path, 'all_accounts')
+        )
         # loop over all accounts in the config file
         for acctname in self._config.list_accounts(self._config.config_path):
             # start with the all_accts dict, for common config
