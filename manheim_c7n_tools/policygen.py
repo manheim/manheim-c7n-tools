@@ -125,20 +125,34 @@ class PolicyGen(object):
             for path in paths:
                 logger.info("Reading configs from %s", path)
                 configs = self._load_policy(path=path)
+                acct_configs = self._merge_configs(acct_configs, configs)
                 logger.info(
                     "Merging configs from %s into existing configs", path
                 )
-                for acctname in configs:
-                    if acctname in acct_configs:
-                        acct_configs[acctname].update(configs[acctname])
-                    else:
-                        acct_configs[acctname] = deepcopy(configs[acctname])
+
         except AttributeError:
             logger.info(
                 "No source paths defined, falling back to single source path"
             )
             acct_configs = self._load_policy()
         return acct_configs
+
+    def _merge_configs(self, target, source):
+        new_config = deepcopy(target)
+        for acctname in source:
+            if acctname in new_config:
+                for region in source[acctname]:
+                    if region in new_config[acctname]:
+                        for rule in source[acctname][region]:
+                            if rule in new_config[acctname][region]:
+                                new_config[acctname][region][rule].update(source[acctname][region][rule])
+                            else:
+                                new_config[acctname][region][rule] = deepcopy(source[acctname][region][rule])
+                    else:
+                        new_config[acctname][region] = deepcopy(source[acctname][region])
+            else:
+                new_config[acctname] = deepcopy(source[acctname])
+        return new_config
 
     def _load_policy(self, path=''):
         acct_configs = {}
