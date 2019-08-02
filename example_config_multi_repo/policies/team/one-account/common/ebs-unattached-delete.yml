@@ -1,0 +1,14 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: ebs-unattached-delete
+resource: ebs
+comments: Snapshot, notify about, then delete unattached EBS volumes
+filters:
+  - Attachments: []
+  - State: available
+actions:
+  - snapshot
+  - delete
+  - type: notify
+    violation_desc: EBS volumes were found unattached
+    action_desc: These EBS volumes were snapshotted and then deleted
+    subject: '[cloud-custodian {{ account }}] unattached EBS volumes snapshotted and deleted in {{ region }}'

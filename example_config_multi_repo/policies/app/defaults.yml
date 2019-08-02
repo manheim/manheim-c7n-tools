@@ -1,0 +1,31 @@
+mode:
+  type: periodic
+  # This will trigger our rules at 20:20 UTC (11:20 EDT / 10:20 EST)
+  # This file will take precedence over the one in the top-level policies
+  # folder
+  schedule: 'cron(20 20 * * ? *)'
+  timeout: 500
+  execution-options:
+    log_group: '%%LOG_GROUP%%'
+    output_dir: 's3://%%BUCKET_NAME%%/logs'
+  dead_letter_config:
+    TargetArn: '%%DLQ_ARN%%'
+  role: '%%ROLE_ARN%%'
+  tags:
+    Project: cloud-custodian
+    Environment: '%%ACCOUNT_NAME%%'
+    OwnerEmail: our-team@example.com
+actions:
+  - type: notify
+    questions_email: our-team@example.com
+    questions_slack: releaseengineering
+    template: our-custom-template.html
+    to:
+      - resource-owner
+      - 'splunkhec://%%POLICYGEN_ENV_SPLUNK_INDEX%%'
+    owner_absent_contact:
+      - our-team@example.com
+      - aws-users-distro@example.com
+    transport:
+      type: sqs
+      queue: '%%MAILER_QUEUE_URL%%'
