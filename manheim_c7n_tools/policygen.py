@@ -145,11 +145,14 @@ class PolicyGen(object):
                     if region in new_config[acctname]:
                         for rule in source[acctname][region]:
                             if rule in new_config[acctname][region]:
-                                new_config[acctname][region][rule].update(source[acctname][region][rule])
+                                new_config[acctname][region][rule] \
+                                    .update(source[acctname][region][rule])
                             else:
-                                new_config[acctname][region][rule] = deepcopy(source[acctname][region][rule])
+                                new_config[acctname][region][rule] = \
+                                    deepcopy(source[acctname][region][rule])
                     else:
-                        new_config[acctname][region] = deepcopy(source[acctname][region])
+                        new_config[acctname][region] = \
+                            deepcopy(source[acctname][region])
             else:
                 new_config[acctname] = deepcopy(source[acctname])
         return new_config
