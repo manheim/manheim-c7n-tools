@@ -1089,6 +1089,135 @@ class TestLoadDefaults(PolicyGenTester):
             assert d == 'default2'
 
 
+class TestMergeConfigs(PolicyGenTester):
+    def test_new_account(self):
+        source = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            },
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['myAccount'] is not None
+        assert res['otherAccount'] is not None
+
+    def test_new_region(self):
+        source = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region2': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region2'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['otherAccount']['region1'] is not None
+        assert res['otherAccount']['region2'] is not None
+
+    def test_new_rule(self):
+        source = {
+            'otherAccount': {
+                'region1': {
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region2'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['otherAccount']['region1']['rule1'] is not None
+        assert res['otherAccount']['region1']['rule2'] is not None
+
+    def test_rule_overrides(self):
+        source = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'bang'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['myAccount']['region1']['rule2']['baz'] == 'blam'
+
+
 class TestLoadAllPolicies(PolicyGenTester):
     def test_no_source_paths(self):
         with patch(
