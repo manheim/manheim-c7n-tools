@@ -76,3 +76,29 @@ Array merging is somewhat special, to let us set defaults for actions:
 -  Any defaults dictionaries not handled under the previous condition
    will be appended to the result, with the exception of a
    ``type: notify`` dictionary in the ``['actions']`` path.
+
+Mutiple Repository Layout
+=========================
+
+In order to facilitate separation of organizational rules from team or account specific rules, the policies directory can contain subdirectories to be merged into a single ruleset. Directories will be merged using the same logic described in the defaults merging documentation. An example of a multi-repository layout is at :ref:`policies.repo_layout`
+
+Config changes for Multiple Repositories
+----------------------------------------
+
+To use multiple subdirectories, the configuration file must be updated with a list of directories that should be considered. Order matters, as preference will be given to repositories lower in the list in the case of conflicting configurations. A new ``policy_source_paths`` configuration option has been added, and should contain a list of subdirectories to consider in the order of least to most specific.
+
+.. code-block:: yaml
+    policy_source_paths:
+      - shared
+      - team
+      - app
+
+Defaults with Multiple Repositories
+-----------------------------------
+
+There can be only one ``defaults.yaml`` file in use. The tool will search all configured repository paths for a ``defaults.yaml`` file at the root of each path in the order specified in the ``policy_source_paths`` option. The last file found will be used. If no ``defaults.yaml`` file is found in the repository paths, it will look in the ``policies`` directory itself. At least one ``defaults.yaml`` must be present.
+
+Overriding rules
+----------------
+
+Overriding rules is based on naming. **Rules will not be merged, only replaced.** If a rule appears in a lower repository it will replace a rule with the same name in a higher repository.
