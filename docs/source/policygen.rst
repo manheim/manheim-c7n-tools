@@ -88,6 +88,7 @@ Config changes for Multiple Repositories
 To use multiple subdirectories, the configuration file must be updated with a list of directories that should be considered. Order matters, as preference will be given to repositories lower in the list in the case of conflicting configurations. A new ``policy_source_paths`` configuration option has been added, and should contain a list of subdirectories to consider in the order of least to most specific.
 
 .. code-block:: yaml
+
     policy_source_paths:
       - shared
       - team
