@@ -120,9 +120,11 @@ class PolicyGen(object):
         # dict to hold account_name -> config for that account
         acct_configs = {}
         try:
-            paths = self._config.policy_source_paths
-            logger.info("Reading from multiple source paths: %s", paths)
-            for path in paths:
+            logger.info(
+                "Reading from multiple source paths: %s",
+                self._config.policy_source_paths
+            )
+            for path in self._config.policy_source_paths:
                 logger.info("Reading configs from %s", path)
                 configs = self._load_policy(path=path)
                 acct_configs = self._merge_configs(acct_configs, configs)
