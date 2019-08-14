@@ -98,7 +98,7 @@ Multiple Repository Layout
             └── us-west-2
                 └── policy-four-us-west-2.yml
 
-An example configuration for a multiple repository setup can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo>`_.
+.. An example configuration for a multiple repository setup can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo>`_.
 
 .. _`policies.region_interpolation`:
 
