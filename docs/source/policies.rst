@@ -53,6 +53,53 @@ When building the final configuration, policies from the account-specific direct
 
 An example configuration repository can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_repo>`_.
 
+.. _`policies.repo_layout_multi`:
+
+Multiple Repository Layout
+--------------------------
+
+::
+
+    manheim-c7n-tools.yml
+    policies/
+    ├── app
+    │   ├── defaults.yml
+    │   └── ACCOUNT-NAME
+    │       ├── us-east-1
+    │       │   ├── policy-five-us-east-1.yml
+    │       │   └── policy-six-us-east-1.yml
+    │       ├── us-east-2
+    │       │   └── policy-six-us-east-2.yml
+    │       ├── us-west-1
+    │       │   └── policy-six-us-west-1.yml
+    │       └── us-west-2
+    │           └── policy-six-us-west-2.yml
+    ├── common
+    │   ├── all_accounts
+    │   │   └── common
+    │   │       └── policy-one.yml
+    │   ├── defaults.yml
+    │   └── ACCOUNT-NAME
+    │       └── common
+    │           ├── policy-three.yml
+    │           └── policy-two.yml
+    └── team
+        ├── all_accounts
+        │   └── common
+        │       └── policy-six.yml
+        └── ACCOUNT-NAME
+            ├── us-east-1
+            │   ├── policy-five-us-east-1.yml
+            │   └── policy-four-us-east-1.yml
+            ├── us-east-2
+            │   └── policy-four-us-east-2.yml
+            ├── us-west-1
+            │   └── policy-four-us-west-1.yml
+            └── us-west-2
+                └── policy-four-us-west-2.yml
+
+.. An example configuration for a multiple repository setup can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo>`_.
+
 .. _`policies.region_interpolation`:
 
 Policy Interpolation

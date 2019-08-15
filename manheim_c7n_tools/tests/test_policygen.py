@@ -47,7 +47,7 @@ class TestInit(object):
 
 class PolicyGenTester(object):
 
-    def setup(self):
+    def setup_method(self):
         self.m_conf = Mock(spec_set=ManheimConfig)
         type(self.m_conf).regions = PropertyMock(
             return_value=['region1', 'region2', 'region3']
@@ -932,12 +932,14 @@ class TestRun(PolicyGenTester):
             _policy_rst=DEFAULT,
             _write_file=DEFAULT,
             _regions_rst=DEFAULT,
+            _load_defaults=DEFAULT,
             _read_file_yaml=DEFAULT
         ) as mocks:
             mocks['_read_policy_directory'].side_effect = se_read_pol_dir
             mocks['_policy_rst'].return_value = 'polMD'
             mocks['_regions_rst'].return_value = 'regionsRST'
             mocks['_read_file_yaml'].return_value = 'DEFAULTS'
+            mocks['_load_defaults'].return_value = 'DEFAULTS'
             self.cls.run()
         assert mocks['_read_policy_directory'].mock_calls == [
             call(self.cls, 'all_accounts'),
@@ -1040,8 +1042,295 @@ class TestRun(PolicyGenTester):
             call(self.cls, 'policies.rst', 'polMD'),
             call(self.cls, 'regions.rst', 'regionsRST')
         ]
-        assert mocks['_read_file_yaml'].mock_calls == [
-            call(self.cls, 'policies/defaults.yml')
+        assert mocks['_load_defaults'].mock_calls == [call(self.cls)]
+
+
+class TestLoadDefaults(PolicyGenTester):
+    @patch('os.path.exists', return_value=True)
+    def test_load_defaults_top_level(self, mock_exists):
+        m = mock_open(read_data="defaults")
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
+            self.cls._load_defaults()
+            mock_exists.assert_called_once_with('policies/defaults.yml')
+            m_open.assert_called_once_with('policies/defaults.yml', 'r')
+
+    @patch('os.path.exists', side_effect=(True, True, False, True))
+    def test_load_defaults_with_source_paths(self, mock_exists):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['path1', 'path2', 'path3']
+        )
+        contents = [
+            'default',
+            'default1',
+            'default2'
+        ]
+        mock_files = [
+            mock_open(read_data=content).return_value for content in contents
+        ]
+        m = mock_open()
+        m.side_effect = mock_files
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
+            d = self.cls._load_defaults()
+            assert mock_exists.mock_calls == [
+                call('policies/defaults.yml'),
+                call('policies/path1/defaults.yml'),
+                call('policies/path2/defaults.yml'),
+                call('policies/path3/defaults.yml')
+            ]
+            assert m_open.mock_calls == [
+                call('policies/defaults.yml', 'r'),
+                call('policies/path1/defaults.yml', 'r'),
+                call('policies/path3/defaults.yml', 'r')
+            ]
+            assert d == 'default2'
+
+
+class TestMergeConfigs(PolicyGenTester):
+    def test_new_account(self):
+        source = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            },
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['myAccount'] is not None
+        assert res['otherAccount'] is not None
+
+    def test_new_region(self):
+        source = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region2': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region2'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['otherAccount']['region1'] is not None
+        assert res['otherAccount']['region2'] is not None
+
+    def test_new_rule(self):
+        source = {
+            'otherAccount': {
+                'region1': {
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'otherAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region2'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['otherAccount']['region1']['rule1'] is not None
+        assert res['otherAccount']['region1']['rule2'] is not None
+
+    def test_rule_overrides(self):
+        source = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'blam'
+                    }
+                }
+            }
+        }
+
+        target = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'bang'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert res['myAccount']['region1']['rule2']['baz'] == 'blam'
+
+
+class TestLoadAllPolicies(PolicyGenTester):
+    def test_no_source_paths(self):
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._load_policy', autospec=True
+        ) as m_load:
+            self.cls._load_all_policies()
+            m_load.assert_called_once_with(self.cls)
+
+    def test_source_paths(self):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['path1', 'path2', 'path3']
+        )
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._load_policy',
+            autospec=True, return_value={}
+        ) as m_load:
+            self.cls._load_all_policies()
+            m_load.assert_has_calls([
+                call(self.cls, path='path1'),
+                call(self.cls, path='path2'),
+                call(self.cls, path='path3'),
+            ])
+
+
+class TestLoadPolicy(PolicyGenTester):
+    def test_policies(self, prefix=''):
+        return {
+            "%smyAccount" % prefix: {
+                'region1': {
+                    'foo': 'bar-myAccount/region1',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-myAccount/region2',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-myAccount/region3',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                }
+            },
+            "%sall_accounts" % prefix: {
+                'region1': {
+                    'all_r1': 'region1',
+                    'all_common': 'region1'
+                },
+                'region2': {
+                    'all_r2': 'region2',
+                    'all_common': 'region2'
+                },
+                'region3': {
+                    'all_r3': 'region3',
+                    'all_common': 'region3'
+                }
+            },
+            "%sotherAccount" % prefix: {
+                'region1': {
+                    'foo': 'bar-otherAccount/region1',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-otherAccount/region2',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-otherAccount/region3',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                }
+            }
+        }
+
+    def test_default_path(self):
+        policies = self.test_policies()
+
+        def se_read_pol_dir(_, dirname):
+            return policies[dirname]
+
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _read_policy_directory=DEFAULT,
+        ) as mocks:
+            mocks['_read_policy_directory'].side_effect = se_read_pol_dir
+            self.cls._load_policy()
+        assert mocks['_read_policy_directory'].mock_calls == [
+            call(self.cls, 'all_accounts'),
+            call(self.cls, 'myAccount'),
+            call(self.cls, 'otherAccount')
+        ]
+
+    def test_with_path(self):
+        policies = self.test_policies('foo/')
+
+        def se_read_pol_dir(_, dirname):
+            return policies[dirname]
+
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _read_policy_directory=DEFAULT,
+        ) as mocks:
+            mocks['_read_policy_directory'].side_effect = se_read_pol_dir
+            self.cls._load_policy(path='foo')
+        assert mocks['_read_policy_directory'].mock_calls == [
+            call(self.cls, 'foo/all_accounts'),
+            call(self.cls, 'foo/myAccount'),
+            call(self.cls, 'foo/otherAccount')
         ]
 
 
@@ -1137,7 +1426,7 @@ class TestGenerateConfigs(PolicyGenTester):
                 'bar+defaults',
                 'cleanup1+defaults',
                 'cleanup2+defaults'
-                ]
+            ]
         }
         assert mocks['_write_custodian_configs'].mock_calls == [
             call(self.cls, exp_policies, 'region2')

@@ -1,0 +1,13 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: ebs-attachment-info-tag
+resource: ebs
+comments: Copy tags from EC2 attachments to EBS volume
+filters:
+  - type: value
+    key: "Attachments[0].Device"
+    value: not-null
+actions:
+  - type: copy-instance-tags
+    tags:
+      - Name
+      - ownerEmail

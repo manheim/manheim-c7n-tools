@@ -1,0 +1,64 @@
+# This file configures manheim-c7n-tools for one or more AWS accounts.
+# The file itself is an array of one or more per-account maps
+- # Account name, used for output naming and for performing actions on the account
+  account_name: one-account
+  # Account ID / Number
+  account_id: 123456789012
+  # Regions to run custodian and other tooling in for this account
+  regions:
+    - us-east-1
+    - us-east-2
+    - us-west-1
+    - us-west-2
+  policy_source_paths:
+    - shared
+    - team
+    - app
+  # Name of c7n output S3 bucket
+  output_s3_bucket_name: c7n-123456789012-%%AWS_REGION%%
+  # Name of c7n CloudWatch Log Group
+  custodian_log_group: /cloud-custodian/123456789012/%%AWS_REGION%%
+  # ARN of the Dead Letter Queue for the c7n Lambda functions
+  # note the "&foo" syntax is a YAML "Node Anchor"/variable/alias;
+  # we can then use "*foo" later in the document to reference what follows
+  # that anchor/variable
+  dead_letter_queue_arn: &dev_dlq_arn arn:aws:sqs:%%AWS_REGION%%:123456789012:c7n-123456789012-deadletter
+  # IAM Role ARN to run custodian and mailer Lambdas under
+  role_arn: &dev_role_arn arn:aws:iam::123456789012:role/c7n-123456789012
+  # Regions to deploy c7n-mailer into. We generally only deploy it to us-east-1,
+  # since not all regions have SES support.
+  mailer_regions:
+    - us-east-1
+  # Configuration for c7n-mailer; this exactly matches the c7n-mailer YAML config format.
+  mailer_config:
+    # NOTE: mailer only runs in us-east-1, so the queue URL should only be for that region
+    queue_url: https://sqs.us-east-1.amazonaws.com/123456789012/c7n-123456789012
+    role: *dev_role_arn
+    from_address: our-team@example.com
+    region: '%%AWS_REGION%%'
+    dead_letter_config:
+      TargetArn: *dev_dlq_arn
+    contact_tags:
+      - OwnerEmail
+      - ownerEmail
+      - owneremail
+    splunk_hec_url: '%%POLICYGEN_ENV_SPLUNK_URL%%'
+    splunk_hec_token: '%%POLICYGEN_ENV_SPLUNK_TOKEN%%'
+    splunk_remove_paths:
+      - /event/detail/invokingEvent
+      - /event/detail/resultToken
+      - /event/detail/requestParameters
+      - /event/detail/responseElements
+      - /resource/c7n.metrics
+    splunk_actions_list: true
+    splunk_max_attempts: 4
+    splunk_hec_max_length: 10000
+  # Optional setting that ensures EVERY policy has a notify action with this
+  # transport and **at least** these recipients. Used to ensure that EVERY
+  # policy sends logs to the Splunk HEC.
+  always_notify:
+    to:
+      - 'splunkhec://%%POLICYGEN_ENV_SPLUNK_INDEX%%'
+    transport:
+      type: sqs
+      queue: '%%MAILER_QUEUE_URL%%'

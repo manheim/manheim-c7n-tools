@@ -54,6 +54,9 @@ MANHEIM_CONFIG_SCHEMA = {
                 'duration_seconds': {'type': 'number'}
             }
         },
+        # Optional policy source paths. If not specified, uses the current
+        # directory
+        'policy_source_paths': {'type': 'array', 'items': {'type': 'string'}},
         # A list of region names that custodian should run in for this account
         'regions': {'type': 'array', 'items': {'type': 'string'}},
         # Name of the S3 bucket for storing Custodian output; should include

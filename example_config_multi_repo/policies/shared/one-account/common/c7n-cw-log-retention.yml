@@ -1,0 +1,18 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: c7n-cw-log-retention
+comments: Ensure CloudWatch Log groups for cloud-custodian have 30-day retention.
+resource: log-group
+filters:
+  # custodian- or cloud-custodian- lambda log groups
+  - type: value
+    key: logGroupName
+    op: regex
+    value: "^/aws/lambda/(cloud-custodian-|custodian-)"
+  - type: value
+    key: retentionInDays
+    op: ne
+    value: 30
+actions:
+  # set Log Group retention to 30 days
+  - type: retention
+    days: 30
