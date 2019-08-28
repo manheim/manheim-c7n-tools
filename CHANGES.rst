@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.8.0 (2019-08-28)
+------------------
+
+* Add new config option ``policy_source_paths`` for merging separate policy repos into a single ruleset
+* Update ``policygen`` to read from the source paths if the new config option is present
+
 0.7.3 (2019-06-25)
 ------------------
 
