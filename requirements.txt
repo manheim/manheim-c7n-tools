@@ -5,6 +5,3 @@ tabulate>=0.8.0,<0.9.0
 pyyaml
 # for building generated policy docs
 sphinx>=1.8.0,<1.9.0
-# use c7n pinned to e316a95eae04f39bd73a27409ff4ab186795b1d7 (release 0.8.45.0)
--e git+https://github.com/cloud-custodian/cloud-custodian.git@e316a95eae04f39bd73a27409ff4ab186795b1d7#egg=c7n
--e git+https://github.com/cloud-custodian/cloud-custodian.git@e316a95eae04f39bd73a27409ff4ab186795b1d7#egg=c7n-mailer&subdirectory=tools/c7n_mailer
