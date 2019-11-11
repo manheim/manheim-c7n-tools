@@ -4,7 +4,8 @@ Changelog
 0.8.1 (2019-11-08)
 ------------------
 
-* Bump c7n and c7n-mailer versions to 945d5fcf19f9c8e45117911755461e84151a28f1 master hash
+* Bump c7n to release 0.8.45.2
+* Bump c7n-mailer release to 0.5.6
 
 0.8.0 (2019-08-28)
 ------------------
