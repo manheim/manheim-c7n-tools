@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.8.2 (2020-03-20)
+------------------
+
+* Bump c7n to release 0.8.46.0
+* Bump c7n-mailer release to 0.5.7
+* Pin mock package to 3.0.5
+* Remove python2
+
 0.8.1 (2019-11-08)
 ------------------
 
