@@ -30,16 +30,22 @@ class TestManheimConfig(object):
             ) as mock_validate:
                 cls = ManheimConfig(
                     foo='bar', baz=2, regions=['us-east-1'],
-                    config_path='manheim-c7n-tools.yml'
+                    config_path='manheim-c7n-tools.yml', account_id='1234'
                 )
-        assert cls._config == {'foo': 'bar', 'baz': 2, 'regions': ['us-east-1']}
+        assert cls._config == {
+            'foo': 'bar', 'baz': 2, 'regions': ['us-east-1'],
+            'account_id': '1234'
+        }
         assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
             call.debug('Validating configuration...')
         ]
         assert mock_validate.mock_calls == [
             call(
-                {'foo': 'bar', 'baz': 2, 'regions': ['us-east-1']},
+                {
+                    'foo': 'bar', 'baz': 2, 'regions': ['us-east-1'],
+                    'account_id': '1234'
+                },
                 MANHEIM_CONFIG_SCHEMA
             )
         ]
@@ -52,7 +58,7 @@ class TestManheimConfig(object):
                 with pytest.raises(RuntimeError) as exc:
                     ManheimConfig(
                         foo='bar', baz=2, regions=['us-east-2'],
-                        config_path='manheim-c7n-tools.yml'
+                        config_path='manheim-c7n-tools.yml', account_id=1234
                     )
         assert str(exc.value) == 'ERROR: the first configured region must be ' \
                                  'us-east-1'
@@ -61,7 +67,10 @@ class TestManheimConfig(object):
         ]
         assert mock_validate.mock_calls == [
             call(
-                {'foo': 'bar', 'baz': 2, 'regions': ['us-east-2']},
+                {
+                    'foo': 'bar', 'baz': 2, 'regions': ['us-east-2'],
+                    'account_id': 1234
+                },
                 MANHEIM_CONFIG_SCHEMA
             )
         ]
@@ -70,11 +79,13 @@ class TestManheimConfig(object):
         with patch('%s.logger' % pbm, autospec=True):
             with patch('%s.jsonschema.validate' % pbm, autospec=True):
                 cls = ManheimConfig(
-                    foo='bar', baz=2, regions=['us-east-1'], config_path='foo'
+                    foo='bar', baz=2, regions=['us-east-1'], config_path='foo',
+                    account_id='012345'
                 )
         assert cls.foo == 'bar'
         assert cls.baz == 2
         assert cls.config_path == 'foo'
+        assert cls.account_id == '012345'
         with pytest.raises(AttributeError):
             cls.missingAttr
 
@@ -179,7 +190,7 @@ class TestManheimConfig(object):
                         mock_load.return_value = [
                             {
                                 'account_name': 'a1',
-                                'account_id': 1111,
+                                'account_id': '1111',
                                 'foo': 'bar',
                                 'baz': 2,
                                 'regions': ['us-east-1']
@@ -193,7 +204,7 @@ class TestManheimConfig(object):
                             }
                         ]
                         res = ManheimConfig.list_accounts('/tmp/conf.yml')
-        assert res == {'a1': 1111, 'a2': 2222}
+        assert res == {'a1': '1111', 'a2': '2222'}
         assert mock_logger.mock_calls == [
             call.info('Loading config from: %s', '/tmp/conf.yml')
         ]
@@ -225,6 +236,7 @@ class TestManheimConfig(object):
                 }
             },
             'regions': ['us-east-1', 'us-east-2'],
+            'account_id': '012345',
             'config_path': '/tmp/baz.yml'
         }
         expected = {
@@ -242,6 +254,7 @@ class TestManheimConfig(object):
                     'blargus-east-2xx': 'xxxus-east-2xxx'
                 }
             },
+            'account_id': '012345',
             'regions': ['us-east-1', 'us-east-2']
         }
         with patch('%s.jsonschema.validate' % pbm, autospec=True):

@@ -39,8 +39,8 @@ MANHEIM_CONFIG_SCHEMA = {
         'cleanup_notify'
     ],
     'properties': {
-        # The AWS Account ID number
-        'account_id': {'type': 'number'},
+        # The AWS Account ID
+        'account_id': {'type': ['number', 'string']},
         # The AWS account name (should be the official Account Alias)
         'account_name': {'type': 'string'},
         # Optional configuration for a role to assume when running this
@@ -122,6 +122,7 @@ class ManheimConfig(object):
                 'ERROR: the first configured region must be us-east-1'
             )
         self._config = kwargs
+        self._config['account_id'] = str(self._config['account_id'])
 
     @staticmethod
     def from_file(path, account_name):
@@ -164,7 +165,7 @@ class ManheimConfig(object):
         logger.info('Loading config from: %s', path)
         with open(path, 'r') as fh:
             config_list = yaml.load(fh.read(), Loader=yaml.SafeLoader)
-        return {x['account_name']: x['account_id'] for x in config_list}
+        return {x['account_name']: str(x['account_id']) for x in config_list}
 
     def config_for_region(self, region_name):
         """

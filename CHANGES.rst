@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.8.3 (2020-03-26)
+------------------
+
+* **Bug Fix:** Handle all ``account_id`` fields as strings. These were previously incorrectly handled as numeric fields, which prevented working with accounts having IDs that start with zero. The ``account_id`` field in your ``manheim-c7n-tools.yml`` file should be quoted as a string.
+* Stop building c7n API docs ourselves, now that upstream API docs are fixed.
+
 0.8.2 (2020-03-20)
 ------------------
 

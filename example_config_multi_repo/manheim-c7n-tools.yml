@@ -2,8 +2,8 @@
 # The file itself is an array of one or more per-account maps
 - # Account name, used for output naming and for performing actions on the account
   account_name: one-account
-  # Account ID / Number
-  account_id: 123456789012
+  # Account ID
+  account_id: '123456789012'
   # Regions to run custodian and other tooling in for this account
   regions:
     - us-east-1

@@ -494,7 +494,7 @@ class CustodianRunner(object):
         sts = boto3.client('sts', region_name='us-east-1')
         cid = sts.get_caller_identity()
         logger.debug('Caller Identity: %s', cid)
-        if cid['Account'] != str(self.config.account_id):
+        if cid['Account'] != self.config.account_id:
             raise RuntimeError(
                 'ERROR: Using configuration for account %s (%s), but '
                 'sts:GetCallerIdentity reports connected to account %s' % (
