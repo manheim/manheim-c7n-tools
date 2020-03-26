@@ -40,7 +40,7 @@ class TestInit(object):
     def test_init(self):
         m_conf = Mock()
         type(m_conf).account_name = PropertyMock(return_value='myAccount')
-        type(m_conf).account_id = PropertyMock(return_value=1234567890)
+        type(m_conf).account_id = PropertyMock(return_value='1234567890')
         cls = policygen.PolicyGen(m_conf)
         assert cls._config == m_conf
 
@@ -68,7 +68,7 @@ class PolicyGenTester(object):
             return_value={'queue_url': 'MailerUrl'}
         )
         type(self.m_conf).account_name = PropertyMock(return_value='myAccount')
-        type(self.m_conf).account_id = PropertyMock(return_value=1234567890)
+        type(self.m_conf).account_id = PropertyMock(return_value='1234567890')
         self.m_conf.list_accounts.return_value = ['myAccount', 'otherAccount']
         type(self.m_conf).config_path = PropertyMock(
             return_value='/tmp/conf.yml'
@@ -2304,7 +2304,7 @@ class TestRegionsRst(PolicyGenTester):
             return_value=['region1', 'region2', 'region3']
         )
         type(m_confA).account_name = PropertyMock(return_value='myAccount')
-        type(m_confA).account_id = PropertyMock(return_value=1234567890)
+        type(m_confA).account_id = PropertyMock(return_value='1234567890')
         type(m_confA).config_path = PropertyMock(
             return_value='/tmp/conf.yml'
         )
@@ -2313,7 +2313,7 @@ class TestRegionsRst(PolicyGenTester):
             return_value=['region2', 'region3']
         )
         type(m_confB).account_name = PropertyMock(return_value='otherAccount')
-        type(m_confB).account_id = PropertyMock(return_value=987654321)
+        type(m_confB).account_id = PropertyMock(return_value='0987654321')
         type(m_confB).config_path = PropertyMock(
             return_value='/tmp/conf.yml'
         )
@@ -2327,7 +2327,7 @@ class TestRegionsRst(PolicyGenTester):
         res = self.cls._regions_rst()
         assert res == "  * myAccount (1234567890)\n\n" \
                       "    * region1\n    * region2\n    * region3\n\n" \
-                      "  * otherAccount (987654321)\n\n" \
+                      "  * otherAccount (0987654321)\n\n" \
                       "    * region2\n    * region3\n\n"
 
 

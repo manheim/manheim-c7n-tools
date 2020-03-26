@@ -702,13 +702,13 @@ class TestCustodianRunner(object):
         type(m_conf).account_name = PropertyMock(
             return_value='myAcct'
         )
-        type(m_conf).account_id = PropertyMock(return_value=1234567890)
+        type(m_conf).account_id = PropertyMock(return_value='0234567890')
 
         with patch('%s.boto3.client' % pbm) as mock_client:
             mock_client.return_value.get_caller_identity.return_value = {
                 'UserId': 'MyUID',
                 'Arn': 'myARN',
-                'Account': '1234567890'
+                'Account': '0234567890'
             }
             with patch('%s.ManheimConfig.from_file' % pbm) as mock_cff:
                 mock_cff.return_value = m_conf
@@ -727,7 +727,7 @@ class TestCustodianRunner(object):
         type(m_conf).account_name = PropertyMock(
             return_value='myAcct'
         )
-        type(m_conf).account_id = PropertyMock(return_value=1234567890)
+        type(m_conf).account_id = PropertyMock(return_value='1234567890')
 
         with patch('%s.boto3.client' % pbm) as mock_client:
             mock_client.return_value.get_caller_identity.return_value = {
