@@ -21,7 +21,6 @@ Contents
    API <modules>
    Development <development>
    Changelog <changes>
-   Upstream c7n API <c7n_api>
 
 Indices and tables
 ==================
