@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.8.4 (2020-04-01)
+------------------
+
+* ``errorscan`` - Warn on missing SQS dead letter queue instead of failing, to support deployments that only run mailer in one region.
+
 0.8.3 (2020-03-26)
 ------------------
 

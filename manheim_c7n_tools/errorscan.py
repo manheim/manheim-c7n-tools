@@ -401,11 +401,15 @@ class CustodianErrorReporter(object):
             'Looking up SQS Queue URL for ARN %s (owner=%s name=%s)',
             arn, acct_id, queue_name
         )
-        url = self._sqs.get_queue_url(
-            QueueName=queue_name, QueueOwnerAWSAccountId=acct_id
-        )['QueueUrl']
-        logger.info('Found SQS Queue URL as %s for %s', url, arn)
-        return url
+        try:
+            url = self._sqs.get_queue_url(
+                QueueName=queue_name, QueueOwnerAWSAccountId=acct_id
+            )['QueueUrl']
+            logger.info('Found SQS Queue URL as %s for %s', url, arn)
+            return url
+        except self._sqs.exceptions.QueueDoesNotExist:
+            logger.info('SQS Queue %s does not exist', arn)
+            return None
 
     def run(self):
         """ collect and report on all cloud-custodian Lambda errors """
@@ -458,6 +462,9 @@ class CustodianErrorReporter(object):
         RequestIDs to `self._failed_request_ids` and the SQS Reciept Handles
         to `self._sqs_rcpts`.
         """
+        if self._dlq_url is None:
+            logger.warning('Dead-letter SQS queue could not be found; skipping')
+            return
         count = 0
         msgs = [None]
         logger.info('Polling SQS queue: %s', self._dlq_url)
