@@ -1,0 +1,1 @@
+This would be a common c7n-mailer custom template.

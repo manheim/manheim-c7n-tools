@@ -1,0 +1,1 @@
+This would be an app-specific c7n-mailer template.

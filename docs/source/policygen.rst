@@ -103,3 +103,8 @@ Overriding rules
 ----------------
 
 Overriding rules is based on naming. **Rules will not be merged, only replaced.** If a rule appears in a lower repository it will replace a rule with the same name in a higher repository.
+
+Mailer Templates
+----------------
+
+``policygen`` can also handle populating the ``./mailer-templates`` directory, for c7n-mailer custom templates, from a layered multi-repository layout. If a ``mailer-templates`` subdirectory exists in any of the ``policy_source_paths`` directories, any files in it will be copied to ``./mailer-templates/``. If files with the same name exist in multiple ``policy_source_paths``, the last one in ``policy_source_paths`` order will win. If ``./mailer-templates`` already exists, any files in it will not be overridden.

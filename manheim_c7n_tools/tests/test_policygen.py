@@ -20,6 +20,9 @@ from freezegun import freeze_time
 import manheim_c7n_tools.policygen as policygen
 from manheim_c7n_tools.config import ManheimConfig
 
+pbm = 'manheim_c7n_tools.policygen'
+pb = f'{pbm}.PolicyGen'
+
 
 class TestStripDoc(object):
 
@@ -933,7 +936,8 @@ class TestRun(PolicyGenTester):
             _write_file=DEFAULT,
             _regions_rst=DEFAULT,
             _load_defaults=DEFAULT,
-            _read_file_yaml=DEFAULT
+            _read_file_yaml=DEFAULT,
+            _setup_mailer_templates=DEFAULT
         ) as mocks:
             mocks['_read_policy_directory'].side_effect = se_read_pol_dir
             mocks['_policy_rst'].return_value = 'polMD'
@@ -1043,11 +1047,97 @@ class TestRun(PolicyGenTester):
             call(self.cls, 'regions.rst', 'regionsRST')
         ]
         assert mocks['_load_defaults'].mock_calls == [call(self.cls)]
+        assert mocks['_setup_mailer_templates'].mock_calls == [call(self.cls)]
+
+    def test_no_defaults(self):
+
+        policies = {
+            'myAccount': {
+                'region1': {
+                    'foo': 'bar-myAccount/region1',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-myAccount/region2',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-myAccount/region3',
+                    'baz': 'blam',
+                    'myAccount/common': 'c'
+                }
+            },
+            'all_accounts': {
+                'region1': {
+                    'all_r1': 'region1',
+                    'all_common': 'region1'
+                },
+                'region2': {
+                    'all_r2': 'region2',
+                    'all_common': 'region2'
+                },
+                'region3': {
+                    'all_r3': 'region3',
+                    'all_common': 'region3'
+                }
+            },
+            'otherAccount': {
+                'region1': {
+                    'foo': 'bar-otherAccount/region1',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region2': {
+                    'foo': 'bar-otherAccount/region2',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                },
+                'region3': {
+                    'foo': 'bar-otherAccount/region3',
+                    'baz': 'blam',
+                    'otherAccount/common': 'c'
+                }
+            }
+        }
+
+        def se_read_pol_dir(_, dirname):
+            return policies[dirname]
+
+        with patch.multiple(
+            'manheim_c7n_tools.policygen.PolicyGen',
+            autospec=True,
+            _read_policy_directory=DEFAULT,
+            _generate_configs=DEFAULT,
+            _policy_rst=DEFAULT,
+            _write_file=DEFAULT,
+            _regions_rst=DEFAULT,
+            _load_defaults=DEFAULT,
+            _read_file_yaml=DEFAULT,
+            _setup_mailer_templates=DEFAULT
+        ) as mocks:
+            mocks['_read_policy_directory'].side_effect = se_read_pol_dir
+            mocks['_policy_rst'].return_value = 'polMD'
+            mocks['_regions_rst'].return_value = 'regionsRST'
+            mocks['_read_file_yaml'].return_value = 'DEFAULTS'
+            mocks['_load_defaults'].return_value = None
+            with pytest.raises(SystemExit) as exc:
+                self.cls.run()
+        assert exc.value.code == 1
+        assert mocks['_read_policy_directory'].mock_calls == []
+        assert mocks['_generate_configs'].mock_calls == []
+        assert mocks['_policy_rst'].mock_calls == []
+        assert mocks['_regions_rst'].mock_calls == []
+        assert mocks['_write_file'].mock_calls == []
+        assert mocks['_load_defaults'].mock_calls == [call(self.cls)]
+        assert mocks['_setup_mailer_templates'].mock_calls == []
 
 
 class TestLoadDefaults(PolicyGenTester):
+
     @patch('os.path.exists', return_value=True)
-    def test_load_defaults_top_level(self, mock_exists):
+    def test_top_level(self, mock_exists):
         m = mock_open(read_data="defaults")
         with patch(
             'manheim_c7n_tools.policygen.open', m, create=True
@@ -1057,7 +1147,7 @@ class TestLoadDefaults(PolicyGenTester):
             m_open.assert_called_once_with('policies/defaults.yml', 'r')
 
     @patch('os.path.exists', side_effect=(True, True, False, True))
-    def test_load_defaults_with_source_paths(self, mock_exists):
+    def test_with_source_paths(self, mock_exists):
         type(self.m_conf).policy_source_paths = PropertyMock(
             return_value=['path1', 'path2', 'path3']
         )
@@ -1087,6 +1177,17 @@ class TestLoadDefaults(PolicyGenTester):
                 call('policies/path3/defaults.yml', 'r')
             ]
             assert d == 'default2'
+
+    @patch('os.path.exists', return_value=False)
+    def test_does_not_exist(self, mock_exists):
+        m = mock_open(read_data="defaults")
+        with patch(
+            'manheim_c7n_tools.policygen.open', m, create=True
+        ) as m_open:
+            res = self.cls._load_defaults()
+            mock_exists.assert_called_once_with('policies/defaults.yml')
+        assert res is None
+        assert m_open.mock_calls == []
 
 
 class TestMergeConfigs(PolicyGenTester):
@@ -2462,6 +2563,172 @@ class TestReadFileYaml(PolicyGenTester):
             call().read(),
             call().__exit__(None, None, None)
         ]
+
+
+class TestSetupMailerTemplates(PolicyGenTester):
+
+    def test_happy_path(self):
+        # policy_source_paths: [one/, two/, three/]
+        paths = {
+            'foo.tpl': 'one/foo.tpl',
+            'bar.tpl': 'two/bar.tpl',
+            'baz.tpl': 'three/baz.tpl'
+        }
+
+        def se_exists(path):
+            if path in ['mailer-templates', 'mailer-templates/foo.tpl']:
+                return True
+            return False
+
+        with patch(f'{pb}._mailer_template_paths', autospec=True) as m_mtp:
+            m_mtp.return_value = paths
+            with patch(f'{pbm}.os.path.exists') as m_ope:
+                m_ope.side_effect = se_exists
+                with patch(f'{pbm}.os.mkdir') as m_mkdir:
+                    with patch(f'{pbm}.shutil.copyfile') as m_copy:
+                        self.cls._setup_mailer_templates()
+        assert m_mtp.mock_calls == [call(self.cls)]
+        assert m_ope.mock_calls == [
+            call('mailer-templates'),
+            call('mailer-templates/foo.tpl'),
+            call('mailer-templates/bar.tpl'),
+            call('mailer-templates/baz.tpl'),
+        ]
+        assert m_mkdir.mock_calls == []
+        assert m_copy.mock_calls == [
+            call('two/bar.tpl', 'mailer-templates/bar.tpl'),
+            call('three/baz.tpl', 'mailer-templates/baz.tpl')
+        ]
+
+    def test_no_mailer_templates_dir(self):
+        # policy_source_paths: [one/, two/, three/]
+        paths = {
+            'foo.tpl': 'one/foo.tpl',
+            'bar.tpl': 'two/bar.tpl',
+            'baz.tpl': 'three/baz.tpl'
+        }
+
+        def se_exists(path):
+            return False
+
+        with patch(f'{pb}._mailer_template_paths', autospec=True) as m_mtp:
+            m_mtp.return_value = paths
+            with patch(f'{pbm}.os.path.exists') as m_ope:
+                m_ope.side_effect = se_exists
+                with patch(f'{pbm}.os.mkdir') as m_mkdir:
+                    with patch(f'{pbm}.shutil.copyfile') as m_copy:
+                        self.cls._setup_mailer_templates()
+        assert m_mtp.mock_calls == [call(self.cls)]
+        assert m_ope.mock_calls == [
+            call('mailer-templates'),
+            call('mailer-templates/foo.tpl'),
+            call('mailer-templates/bar.tpl'),
+            call('mailer-templates/baz.tpl'),
+        ]
+        assert m_mkdir.mock_calls == [
+            call('mailer-templates')
+        ]
+        assert m_copy.mock_calls == [
+            call('one/foo.tpl', 'mailer-templates/foo.tpl'),
+            call('two/bar.tpl', 'mailer-templates/bar.tpl'),
+            call('three/baz.tpl', 'mailer-templates/baz.tpl')
+        ]
+
+    def test_no_paths(self):
+        paths = {}
+
+        def se_exists(path):
+            return False
+
+        with patch(f'{pb}._mailer_template_paths', autospec=True) as m_mtp:
+            m_mtp.return_value = paths
+            with patch(f'{pbm}.os.path.exists') as m_ope:
+                m_ope.side_effect = se_exists
+                with patch(f'{pbm}.os.mkdir') as m_mkdir:
+                    with patch(f'{pbm}.shutil.copyfile') as m_copy:
+                        self.cls._setup_mailer_templates()
+        assert m_mtp.mock_calls == [call(self.cls)]
+        assert m_ope.mock_calls == []
+        assert m_mkdir.mock_calls == []
+        assert m_copy.mock_calls == []
+
+
+class TestMailerTemplatePaths(PolicyGenTester):
+
+    def test_happy_path(self):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['one', 'two', 'three']
+        )
+
+        def se_ope(path):
+            if path == 'two/mailer-templates':
+                return False
+            return True
+
+        def se_isfile(path):
+            if path in [
+                'one/mailer-templates/notfile.tpl',
+                'three/mailer-templates/no.tpl'
+            ]:
+                return False
+            return True
+
+        def se_listdir(path):
+            if path == 'one/mailer-templates':
+                return ['foo.tpl', 'bar.tpl', 'notfile.tpl']
+            return ['foo.tpl', 'baz.tpl', 'no.tpl']
+
+        with patch(f'{pbm}.os.path.exists') as m_ope:
+            m_ope.side_effect = se_ope
+            with patch(f'{pbm}.os.listdir') as m_listdir:
+                m_listdir.side_effect = se_listdir
+                with patch(f'{pbm}.os.path.isfile') as m_isfile:
+                    m_isfile.side_effect = se_isfile
+                    res = self.cls._mailer_template_paths()
+        assert res == {
+            'foo.tpl': 'three/mailer-templates/foo.tpl',
+            'bar.tpl': 'one/mailer-templates/bar.tpl',
+            'baz.tpl': 'three/mailer-templates/baz.tpl'
+        }
+        assert m_ope.mock_calls == [
+            call('one/mailer-templates'),
+            call('two/mailer-templates'),
+            call('three/mailer-templates')
+        ]
+        assert m_listdir.mock_calls == [
+            call('one/mailer-templates'),
+            call('three/mailer-templates')
+        ]
+        assert m_isfile.mock_calls == [
+            call('one/mailer-templates/foo.tpl'),
+            call('one/mailer-templates/bar.tpl'),
+            call('one/mailer-templates/notfile.tpl'),
+            call('three/mailer-templates/foo.tpl'),
+            call('three/mailer-templates/baz.tpl'),
+            call('three/mailer-templates/no.tpl'),
+        ]
+
+    def test_no_policy_source_paths(self):
+        def se_ope(path):
+            return False
+
+        def se_isfile(path):
+            return False
+
+        def se_listdir(path):
+            return []
+
+        with patch(f'{pbm}.os.path.exists') as m_ope:
+            m_ope.side_effect = se_ope
+            with patch(f'{pbm}.os.listdir') as m_listdir:
+                m_listdir.side_effect = se_listdir
+                with patch(f'{pbm}.os.path.isfile') as m_isfile:
+                    m_isfile.side_effect = se_isfile
+                    res = self.cls._mailer_template_paths()
+        assert res == {}
+        assert m_ope.mock_calls == []
+        assert m_listdir.mock_calls == []
+        assert m_isfile.mock_calls == []
 
 
 class TestTimestr(object):

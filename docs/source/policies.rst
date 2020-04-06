@@ -21,6 +21,7 @@ The overall layout of the configuration repository must be as follows:
 
 ::
 
+    mailer-templates/  (optional)
     manheim-c7n-tools.yml
     policies/
     ├── all_accounts
@@ -60,10 +61,12 @@ Multiple Repository Layout
 
 ::
 
+    mailer-templates/  (optional)
     manheim-c7n-tools.yml
     policies/
     ├── app
     │   ├── defaults.yml
+    │   ├── mailer-templates/  (optional)
     │   └── ACCOUNT-NAME
     │       ├── us-east-1
     │       │   ├── policy-five-us-east-1.yml
@@ -79,6 +82,7 @@ Multiple Repository Layout
     │   │   └── common
     │   │       └── policy-one.yml
     │   ├── defaults.yml
+    │   ├── mailer-templates/  (optional)
     │   └── ACCOUNT-NAME
     │       └── common
     │           ├── policy-three.yml
@@ -87,6 +91,7 @@ Multiple Repository Layout
         ├── all_accounts
         │   └── common
         │       └── policy-six.yml
+        ├── mailer-templates/  (optional)
         └── ACCOUNT-NAME
             ├── us-east-1
             │   ├── policy-five-us-east-1.yml
@@ -99,6 +104,8 @@ Multiple Repository Layout
                 └── policy-four-us-west-2.yml
 
 An example configuration for a multiple repository setup can be seen at `https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo <https://github.com/manheim/manheim-c7n-tools/tree/master/example_config_multi_repo>`_.
+
+If ``mailer-templates/`` directories are present in one or more of the subdirectories, their contents will be combined into ``./mailer-templates/``, with later files of the same name overwriting earlier ones according to the order defined in the ``policy_source_paths`` configuration item.
 
 .. _`policies.region_interpolation`:
 
