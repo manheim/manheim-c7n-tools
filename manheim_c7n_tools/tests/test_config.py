@@ -56,13 +56,16 @@ class TestManheimConfig(object):
             with patch(
                 '%s.jsonschema.validate' % pbm, autospec=True
             ) as mock_validate:
-                with pytest.raises(RuntimeError) as exc:
-                    ManheimConfig(
-                        foo='bar', baz=2, regions=['us-east-2'],
-                        config_path='manheim-c7n-tools.yml', account_id=1234
-                    )
-        assert str(exc.value) == 'ERROR: the first configured region must be ' \
-                                 'us-east-1'
+                cls = ManheimConfig(
+                    foo='bar', baz=2, regions=['us-east-2'],
+                    config_path='manheim-c7n-tools.yml', account_id='1234',
+                    cleanup_notify=['foo@bar.com']
+                )
+        assert cls._config == {
+            'foo': 'bar', 'baz': 2, 'regions': ['us-east-2'],
+            'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
+        }
+        assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
             call.debug('Validating configuration...')
         ]
@@ -70,7 +73,7 @@ class TestManheimConfig(object):
             call(
                 {
                     'foo': 'bar', 'baz': 2, 'regions': ['us-east-2'],
-                    'account_id': 1234
+                    'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
                 },
                 MANHEIM_CONFIG_SCHEMA
             )

@@ -5,7 +5,8 @@ Unreleased
 ----------
 
 * Update ``policygen`` to also handle layering of ``mailer-templates`` directory contents from ``policy_source_paths`` into ``./mailer-templates``.
-* Document ``cleanup_notify`` config parameter in example ``manheim-c7n-tools.yml`` files and default it to an empty list.
+* Fixes `#23 <https://github.com/manheim/manheim-c7n-tools/issues/23>`_ - Document ``cleanup_notify`` config parameter in example ``manheim-c7n-tools.yml`` files and default it to an empty list.
+* Fixes `#24 <https://github.com/manheim/manheim-c7n-tools/issues/24>`_ - Remove requirement that us-east-1 must be first configured region, or configured at all.
 
 0.8.4 (2020-04-01)
 ------------------
