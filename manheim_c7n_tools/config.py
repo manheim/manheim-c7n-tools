@@ -35,8 +35,7 @@ MANHEIM_CONFIG_SCHEMA = {
         'output_s3_bucket_name',
         'custodian_log_group',
         'dead_letter_queue_arn',
-        'role_arn',
-        'cleanup_notify'
+        'role_arn'
     ],
     'properties': {
         # The AWS Account ID
@@ -117,12 +116,10 @@ class ManheimConfig(object):
         self.config_path = kwargs.pop('config_path')
         logger.debug('Validating configuration...')
         jsonschema.validate(kwargs, MANHEIM_CONFIG_SCHEMA)
-        if kwargs['regions'][0] != 'us-east-1':
-            raise RuntimeError(
-                'ERROR: the first configured region must be us-east-1'
-            )
         self._config = kwargs
         self._config['account_id'] = str(self._config['account_id'])
+        if 'cleanup_notify' not in self._config:
+            self._config['cleanup_notify'] = []
 
     @staticmethod
     def from_file(path, account_name):

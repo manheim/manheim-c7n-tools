@@ -140,8 +140,9 @@ class PolicygenStep(BaseStep):
         self._do_policygen()
 
     @staticmethod
-    def run_in_region(region_name, _):
-        return region_name == 'us-east-1'
+    def run_in_region(region_name, conf):
+        # only run in the first-configured region
+        return region_name == conf.regions[0]
 
 
 class ValidateStep(BaseStep):
@@ -378,8 +379,9 @@ class DocsBuildStep(BaseStep):
         self._run_sphinx_build()
 
     @staticmethod
-    def run_in_region(region_name, _):
-        return region_name == 'us-east-1'
+    def run_in_region(region_name, conf):
+        # only run in the first-configured region
+        return region_name == conf.regions[0]
 
 
 class CustodianRunner(object):

@@ -47,6 +47,12 @@ ALL_REGIONS = [
 ]
 
 
+class FakeConfig:
+
+    def __init__(self, regions):
+        self.regions = regions
+
+
 class StepTester(object):
 
     def setup(self):
@@ -72,11 +78,12 @@ class TestPolicygenStep(StepTester):
         ]
 
     def test_run_in_region(self):
+        conf = FakeConfig(ALL_REGIONS)
         for rname in ALL_REGIONS:
-            if rname == 'us-east-1':
-                assert runner.PolicygenStep.run_in_region(rname, None) is True
+            if rname == ALL_REGIONS[0]:
+                assert runner.PolicygenStep.run_in_region(rname, conf) is True
             else:
-                assert runner.PolicygenStep.run_in_region(rname, None) is False
+                assert runner.PolicygenStep.run_in_region(rname, conf) is False
 
 
 class TestValidateStep(StepTester):
@@ -505,11 +512,12 @@ class TestDocsBuildStep(StepTester):
         ]
 
     def test_run_in_region(self):
+        conf = FakeConfig(ALL_REGIONS)
         for rname in ALL_REGIONS:
-            if rname == 'us-east-1':
-                assert runner.DocsBuildStep.run_in_region(rname, None) is True
+            if rname == ALL_REGIONS[0]:
+                assert runner.DocsBuildStep.run_in_region(rname, conf) is True
             else:
-                assert runner.DocsBuildStep.run_in_region(rname, None) is False
+                assert runner.DocsBuildStep.run_in_region(rname, conf) is False
 
 
 class TestStepClasses(object):
