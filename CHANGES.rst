@@ -5,6 +5,7 @@ Unreleased
 ----------
 
 * Update ``policygen`` to also handle layering of ``mailer-templates`` directory contents from ``policy_source_paths`` into ``./mailer-templates``.
+* Document ``cleanup_notify`` config parameter in example ``manheim-c7n-tools.yml`` files and default it to an empty list.
 
 0.8.4 (2020-04-01)
 ------------------

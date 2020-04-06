@@ -35,8 +35,7 @@ MANHEIM_CONFIG_SCHEMA = {
         'output_s3_bucket_name',
         'custodian_log_group',
         'dead_letter_queue_arn',
-        'role_arn',
-        'cleanup_notify'
+        'role_arn'
     ],
     'properties': {
         # The AWS Account ID
@@ -123,6 +122,8 @@ class ManheimConfig(object):
             )
         self._config = kwargs
         self._config['account_id'] = str(self._config['account_id'])
+        if 'cleanup_notify' not in self._config:
+            self._config['cleanup_notify'] = []
 
     @staticmethod
     def from_file(path, account_name):

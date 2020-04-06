@@ -30,11 +30,12 @@ class TestManheimConfig(object):
             ) as mock_validate:
                 cls = ManheimConfig(
                     foo='bar', baz=2, regions=['us-east-1'],
-                    config_path='manheim-c7n-tools.yml', account_id='1234'
+                    config_path='manheim-c7n-tools.yml', account_id='1234',
+                    cleanup_notify=['foo@bar.com']
                 )
         assert cls._config == {
             'foo': 'bar', 'baz': 2, 'regions': ['us-east-1'],
-            'account_id': '1234'
+            'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
         }
         assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
@@ -44,7 +45,7 @@ class TestManheimConfig(object):
             call(
                 {
                     'foo': 'bar', 'baz': 2, 'regions': ['us-east-1'],
-                    'account_id': '1234'
+                    'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
                 },
                 MANHEIM_CONFIG_SCHEMA
             )
@@ -255,7 +256,8 @@ class TestManheimConfig(object):
                 }
             },
             'account_id': '012345',
-            'regions': ['us-east-1', 'us-east-2']
+            'regions': ['us-east-1', 'us-east-2'],
+            'cleanup_notify': []
         }
         with patch('%s.jsonschema.validate' % pbm, autospec=True):
             with patch.dict(

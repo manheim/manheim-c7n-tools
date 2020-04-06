@@ -10,6 +10,16 @@
     - us-east-2
     - us-west-1
     - us-west-2
+  # List of email addresses to notify for orphaned resources. If this list is
+  # non-empty, then policygen will inject two daily-run policies that identify
+  # cloud-custodian Lambdas and CloudWatch Event Rules that don't match the
+  # configured policies (i.e. left behind by manual testing or deleted policies)
+  # and send a notification about them to the listed c7n-mailer targets.
+  # IMPORTANT: Some aspects of the tags expected by this feature may be
+  # overly Manheim-specific.
+  # Defaults to an empty list, which disables this feature.
+  cleanup_notify:
+    - us@example.com
   # Name of c7n output S3 bucket
   output_s3_bucket_name: c7n-123456789012-%%AWS_REGION%%
   # Name of c7n CloudWatch Log Group
