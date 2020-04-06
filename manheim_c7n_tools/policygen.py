@@ -21,6 +21,7 @@ from datetime import datetime
 from tabulate import tabulate
 import argparse
 import logging
+import shutil
 
 import yaml
 
@@ -84,6 +85,7 @@ class PolicyGen(object):
         self._write_file('policies.rst', self._policy_rst(acct_configs))
         logger.info('Writing region list to regions.rst...')
         self._write_file('regions.rst', self._regions_rst())
+        self._setup_mailer_templates()
 
     def _load_defaults(self):
         """
@@ -728,6 +730,75 @@ class PolicyGen(object):
             sys.stderr.write("Exception loading YAML: %s\n" % path)
             raise
 
+    def _setup_mailer_templates(self):
+        """
+        Call :py:meth:`~._mailer_template_paths`. If it returns an empty dict,
+        do nothing. Otherwise, create ``./mailer-templates`` if it does not
+        already exist. For each template filename that does not already exist
+        in that directory, copy it from the source path specified by
+        :py:meth:`~._mailer_template_paths`.
+        """
+        paths = self._mailer_template_paths()
+        if not paths:
+            logger.info(
+                'No mailer-templates directories found in policy_source_paths; '
+                'not setting up mailer templates.'
+            )
+            return
+        if not os.path.exists('mailer-templates'):
+            logger.info('Creating directory: mailer-templates')
+            os.mkdir('mailer-templates')
+        for fname, srcpath in paths.items():
+            destpath = os.path.join('mailer-templates', fname)
+            if os.path.exists(destpath):
+                logger.info(
+                    '%s already exists in pwd; not overwriting', destpath
+                )
+            else:
+                logger.info(
+                    'Setting up %s from source at %s', destpath, srcpath
+                )
+                shutil.copyfile(srcpath, destpath)
+        logger.info('Done setting up mailer-templates')
+
+    def _mailer_template_paths(self):
+        """
+        Find all files in the ``mailer-templates`` subdirectory of each
+        ``policy_source_paths`` directory, if present. Return a dictionary of
+        file name to file path. If a file with the same name is found in
+        multiple directories, the last one in ``policy_source_paths`` order
+        wins.
+
+        :return: Mailer template names to their source paths
+        :rtype: dict
+        """
+        templates = {}
+        try:
+            logger.debug(
+                "Finding mailer-templates in: %s",
+                self._config.policy_source_paths
+            )
+            for path in self._config.policy_source_paths:
+                mailerdir = os.path.join(path, 'mailer-templates')
+                if not os.path.exists(mailerdir):
+                    logger.debug('%s does not exist; skipping', mailerdir)
+                    continue
+                logger.info('Finding mailer templates in %s', mailerdir)
+                for f in os.listdir(mailerdir):
+                    fpath = os.path.join(mailerdir, f)
+                    if not os.path.isfile(fpath):
+                        continue
+                    logger.debug(
+                        'Using mailer template %s from %s', f, fpath
+                    )
+                    templates[f] = fpath
+        except AttributeError:
+            logger.debug(
+                "No policy_source_paths defined; not setting up "
+                "mailer-templates."
+            )
+        return templates
+
 
 def main():
     # setup logging for direct command-line use
@@ -768,3 +839,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+AZxz

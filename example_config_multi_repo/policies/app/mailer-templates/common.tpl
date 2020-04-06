@@ -1,0 +1,1 @@
+This would be a custom c7n-mailer template, which overrides the template of the same name in the ``shared`` configuration source directory.
