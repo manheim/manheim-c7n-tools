@@ -2661,20 +2661,20 @@ class TestMailerTemplatePaths(PolicyGenTester):
         )
 
         def se_ope(path):
-            if path == 'two/mailer-templates':
+            if path == 'policies/two/mailer-templates':
                 return False
             return True
 
         def se_isfile(path):
             if path in [
-                'one/mailer-templates/notfile.tpl',
-                'three/mailer-templates/no.tpl'
+                'policies/one/mailer-templates/notfile.tpl',
+                'policies/three/mailer-templates/no.tpl'
             ]:
                 return False
             return True
 
         def se_listdir(path):
-            if path == 'one/mailer-templates':
+            if path == 'policies/one/mailer-templates':
                 return ['foo.tpl', 'bar.tpl', 'notfile.tpl']
             return ['foo.tpl', 'baz.tpl', 'no.tpl']
 
@@ -2686,26 +2686,26 @@ class TestMailerTemplatePaths(PolicyGenTester):
                     m_isfile.side_effect = se_isfile
                     res = self.cls._mailer_template_paths()
         assert res == {
-            'foo.tpl': 'three/mailer-templates/foo.tpl',
-            'bar.tpl': 'one/mailer-templates/bar.tpl',
-            'baz.tpl': 'three/mailer-templates/baz.tpl'
+            'foo.tpl': 'policies/three/mailer-templates/foo.tpl',
+            'bar.tpl': 'policies/one/mailer-templates/bar.tpl',
+            'baz.tpl': 'policies/three/mailer-templates/baz.tpl'
         }
         assert m_ope.mock_calls == [
-            call('one/mailer-templates'),
-            call('two/mailer-templates'),
-            call('three/mailer-templates')
+            call('policies/one/mailer-templates'),
+            call('policies/two/mailer-templates'),
+            call('policies/three/mailer-templates')
         ]
         assert m_listdir.mock_calls == [
-            call('one/mailer-templates'),
-            call('three/mailer-templates')
+            call('policies/one/mailer-templates'),
+            call('policies/three/mailer-templates')
         ]
         assert m_isfile.mock_calls == [
-            call('one/mailer-templates/foo.tpl'),
-            call('one/mailer-templates/bar.tpl'),
-            call('one/mailer-templates/notfile.tpl'),
-            call('three/mailer-templates/foo.tpl'),
-            call('three/mailer-templates/baz.tpl'),
-            call('three/mailer-templates/no.tpl'),
+            call('policies/one/mailer-templates/foo.tpl'),
+            call('policies/one/mailer-templates/bar.tpl'),
+            call('policies/one/mailer-templates/notfile.tpl'),
+            call('policies/three/mailer-templates/foo.tpl'),
+            call('policies/three/mailer-templates/baz.tpl'),
+            call('policies/three/mailer-templates/no.tpl'),
         ]
 
     def test_no_policy_source_paths(self):

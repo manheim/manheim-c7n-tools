@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.8.6 (2020-04-07)
+------------------
+
+* Fix bug in 0.8.5 - mailer template loading logic was missing ``policies/`` directory prefix.
+
 0.8.5 (2020-04-06)
 ------------------
 
