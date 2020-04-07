@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.8.7 (2020-04-08)
+0.9.0 (2020-04-08)
 ------------------
 
 * Previously, manheim-c7n-tools set c7n-mailer's ``templates_folders`` configuration option to ``/manheim_c7n_tools/manheim_c7n_tools/mailer-templates`` if that directory exists, or to the absolute path to a ``mailer-templates`` directory inside the ``manheim_c7n_tools`` installation otherwise. This behavior was largely based on the legacy hard-coded templates directory. Now that c7n-mailer template locations are more flexible, this behavior has been updated to (in order of evaluation):
