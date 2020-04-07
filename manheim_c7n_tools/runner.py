@@ -291,6 +291,7 @@ class MailerStep(BaseStep):
         if 'templates_folders' not in conf:
             conf['templates_folders'] = []
         for d in [
+            os.path.abspath('./mailer-templates'),
             '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates',
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
