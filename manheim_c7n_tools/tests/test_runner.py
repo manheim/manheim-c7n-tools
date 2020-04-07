@@ -251,6 +251,7 @@ class TestCustodianStep(StepTester):
 
 class TestMailerStep(StepTester):
 
+    @patch(f'{pbm}.__file__', 'path/to/runner.py')
     def test_mailer_config_docker(self):
         m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).mailer_config = PropertyMock(
@@ -259,6 +260,16 @@ class TestMailerStep(StepTester):
 
         def se_mailer_setup_defaults(d):
             d['defaults'] = 'set'
+
+        def se_isdir(d):
+            if d == '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates':
+                return True
+            if d == '/abspath/path/to/mailer-templates':
+                return False
+            return False
+
+        def se_abspath(p):
+            return f'/abspath/{p}'
 
         with patch(
             '%s.jsonschema.validate' % pbm, autospec=True
@@ -270,11 +281,11 @@ class TestMailerStep(StepTester):
                 with patch(
                     '%s.os.path.isdir' % pbm
                 ) as mock_isdir:
-                    mock_isdir.return_value = True
+                    mock_isdir.side_effect = se_isdir
                     with patch(
                         '%s.os.path.abspath' % pbm
                     ) as mock_abspath:
-                        mock_abspath.return_value = '/foo/bar'
+                        mock_abspath.side_effect = se_abspath
                         res = runner.MailerStep(
                             'rName', m_conf
                         ).mailer_config
@@ -293,6 +304,7 @@ class TestMailerStep(StepTester):
             call(expected)
         ]
 
+    @patch(f'{pbm}.__file__', 'path/to/runner.py')
     def test_mailer_config_nondocker(self):
         m_conf = Mock(spec_set=ManheimConfig)
         type(m_conf).mailer_config = PropertyMock(
@@ -301,6 +313,17 @@ class TestMailerStep(StepTester):
 
         def se_mailer_setup_defaults(d):
             d['defaults'] = 'set'
+            d['templates_folders'] = []
+
+        def se_isdir(d):
+            if d == '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates':
+                return False
+            if d == '/abspath/path/to/mailer-templates':
+                return True
+            return False
+
+        def se_abspath(p):
+            return f'/abspath/{p}'
 
         with patch(
             '%s.jsonschema.validate' % pbm, autospec=True
@@ -312,18 +335,18 @@ class TestMailerStep(StepTester):
                 with patch(
                     '%s.os.path.isdir' % pbm
                 ) as mock_isdir:
-                    mock_isdir.return_value = False
+                    mock_isdir.side_effect = se_isdir
                     with patch(
                         '%s.os.path.abspath' % pbm
                     ) as mock_abspath:
-                        mock_abspath.return_value = '/foo/bar/file.py'
+                        mock_abspath.side_effect = se_abspath
                         res = runner.MailerStep(
                             'rName', m_conf
                         ).mailer_config
         expected = {
             'mailer': 'config',
             'defaults': 'set',
-            'templates_folders': ['/foo/bar/mailer-templates']
+            'templates_folders': ['/abspath/path/to/mailer-templates']
         }
         assert res == expected
         assert mock_validate.mock_calls == [

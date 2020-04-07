@@ -287,20 +287,19 @@ class MailerStep(BaseStep):
         conf = deepcopy(self.config.mailer_config)
         jsonschema.validate(conf, MAILER_SCHEMA)
         mailer_setup_defaults(conf)
-        if os.path.isdir(
-            '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'
-        ):
-            conf['templates_folders'] = [
-                '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates'
-            ]
-        else:
-            # Running outside of Docker
-            conf['templates_folders'] = [
-                os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    'mailer-templates'
-                )
-            ]
+        logger.debug('Default mailer config: %s', conf)
+        if 'templates_folders' not in conf:
+            conf['templates_folders'] = []
+        for d in [
+            '/manheim_c7n_tools/manheim_c7n_tools/mailer-templates',
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                'mailer-templates'
+            )
+        ]:
+            if os.path.isdir(d):
+                conf['templates_folders'].insert(0, d)
+        logger.info('Generated mailer config: %s', conf)
         return conf
 
     def run(self):
