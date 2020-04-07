@@ -779,7 +779,7 @@ class PolicyGen(object):
                 self._config.policy_source_paths
             )
             for path in self._config.policy_source_paths:
-                mailerdir = os.path.join(path, 'mailer-templates')
+                mailerdir = os.path.join('policies', path, 'mailer-templates')
                 if not os.path.exists(mailerdir):
                     logger.debug('%s does not exist; skipping', mailerdir)
                     continue
