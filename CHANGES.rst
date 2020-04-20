@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.9.2 (2020-04-20)
+------------------
+
+* Add ``m2r`` package as dependency, for Sphinx docs builds.
+
 0.9.1 (2020-04-20)
 ------------------
 
