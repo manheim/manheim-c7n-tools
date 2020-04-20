@@ -16,6 +16,7 @@ from mock import patch, call, mock_open, DEFAULT, Mock, PropertyMock
 import pytest
 import os
 from freezegun import freeze_time
+from collections import defaultdict
 
 import manheim_c7n_tools.policygen as policygen
 from manheim_c7n_tools.config import ManheimConfig
@@ -46,6 +47,9 @@ class TestInit(object):
         type(m_conf).account_id = PropertyMock(return_value='1234567890')
         cls = policygen.PolicyGen(m_conf)
         assert cls._config == m_conf
+        assert isinstance(cls._policy_sources, defaultdict)
+        assert isinstance(cls._policy_sources['newKey'], type(set()))
+        assert list(cls._policy_sources.keys()) == ['newKey']
 
 
 class PolicyGenTester(object):
@@ -1320,14 +1324,83 @@ class TestMergeConfigs(PolicyGenTester):
 
 
 class TestLoadAllPolicies(PolicyGenTester):
+
     def test_no_source_paths(self):
+        assert self.cls._policy_sources == {}
         with patch(
             'manheim_c7n_tools.policygen.PolicyGen._load_policy', autospec=True
         ) as m_load:
+            m_load.return_value = {
+                'myAccount': {
+                    'region1': {
+                        'foo': {},
+                        'bar': {}
+                    },
+                    'region2': {
+                        'bar': {},
+                        'baz': {}
+                    },
+                    'region3': {
+                        'bar': {},
+                        'blam': {}
+                    }
+                }
+            }
             self.cls._load_all_policies()
             m_load.assert_called_once_with(self.cls)
+            assert self.cls._policy_sources == {}
 
     def test_source_paths(self):
+
+        def se_m_load(_, path):
+            if path == 'path1':
+                return {
+                    'myAccount': {
+                        'region1': {
+                            'r1all': {},
+                            'r1path1': {},
+                            'all': {}
+                        },
+                        'region2': {
+                            'r2path1': {},
+                            'all': {}
+                        },
+                        'region3': {
+                            'all': {}
+                        }
+                    }
+                }
+            if path == 'path2':
+                return {
+                    'myAccount': {
+                        'region1': {
+                            'r1all': {},
+                            'all': {}
+                        },
+                        'region2': {
+                            'all': {},
+                            'baz': {},
+                            'blam': {}
+                        }
+                    }
+                }
+            if path == 'path3':
+                return {
+                    'myAccount': {
+                        'region1': {
+                            'r1all': {},
+                            'r1path3': {},
+                            'all': {}
+                        },
+                        'region3': {
+                            'bar': {},
+                            'all': {},
+                            'blam': {}
+                        }
+                    }
+                }
+            raise RuntimeError(f'Unknown path: {path}')
+
         type(self.m_conf).policy_source_paths = PropertyMock(
             return_value=['path1', 'path2', 'path3']
         )
@@ -1335,12 +1408,24 @@ class TestLoadAllPolicies(PolicyGenTester):
             'manheim_c7n_tools.policygen.PolicyGen._load_policy',
             autospec=True, return_value={}
         ) as m_load:
+            m_load.side_effect = se_m_load
+            assert self.cls._policy_sources == {}
             self.cls._load_all_policies()
             m_load.assert_has_calls([
                 call(self.cls, path='path1'),
                 call(self.cls, path='path2'),
                 call(self.cls, path='path3'),
             ])
+            assert self.cls._policy_sources == {
+                'all': {'path1', 'path2', 'path3'},
+                'r1all': {'path1', 'path2', 'path3'},
+                'r1path1': {'path1'},
+                'r2path1': {'path1'},
+                'baz': {'path2'},
+                'r1path3': {'path3'},
+                'bar': {'path3'},
+                'blam': {'path2', 'path3'}
+            }
 
 
 class TestLoadPolicy(PolicyGenTester):
@@ -2204,6 +2289,9 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
 class TestPolicyRst(PolicyGenTester):
 
     def test_rst_jenkins(self):
+        type(self.m_conf).policy_source_paths = PropertyMock(
+            return_value=['path1', 'path2', 'path3']
+        )
         policies = {
             'foo': 'bar',
             'baz': 'blam'
@@ -2246,7 +2334,7 @@ class TestPolicyRst(PolicyGenTester):
                             res = self.cls._policy_rst(policies)
         assert res == expected
         assert m_prd.mock_calls == [
-            call(self.cls, {'foo': 'bar', 'baz': 'blam'})
+            call(self.cls, {'foo': 'bar', 'baz': 'blam'}, have_paths=True)
         ]
         assert m_tabulate.mock_calls == [
             call(
@@ -2258,6 +2346,7 @@ class TestPolicyRst(PolicyGenTester):
                 headers=[
                     'Policy Name',
                     'Account(s) / Region(s)',
+                    'Source Path(s)',
                     'Description/Comment'
                 ],
                 tablefmt='grid'
@@ -2265,6 +2354,7 @@ class TestPolicyRst(PolicyGenTester):
         ]
 
     def test_rst_local(self):
+        type(self.m_conf).policy_source_paths = PropertyMock(return_value=[])
         policies = {
             'foo': 'bar',
             'baz': 'blam'
@@ -2302,7 +2392,7 @@ class TestPolicyRst(PolicyGenTester):
                             res = self.cls._policy_rst(policies)
         assert res == expected
         assert m_prd.mock_calls == [
-            call(self.cls, {'foo': 'bar', 'baz': 'blam'})
+            call(self.cls, {'foo': 'bar', 'baz': 'blam'}, have_paths=False)
         ]
         assert m_tabulate.mock_calls == [
             call(
@@ -2371,10 +2461,26 @@ class TestPolicyRstData(PolicyGenTester):
             }
         }
         assert self.cls._policy_rst_data(acct_policies) == [
-            ['all_common', '', 'region3'],
-            ['all_r1', 'myAccount (region1) otherAccount (region1)', 'region1'],
-            ['all_r2', 'myAccount (region2) otherAccount (region2)', 'region2'],
-            ['all_r3', 'myAccount (region3) otherAccount (region3)', 'region3'],
+            [
+                'all_common',
+                '',
+                'region3'
+            ],
+            [
+                'all_r1',
+                'myAccount (region1) otherAccount (region1)',
+                'region1'
+            ],
+            [
+                'all_r2',
+                'myAccount (region2) otherAccount (region2)',
+                'region2'
+            ],
+            [
+                'all_r3',
+                'myAccount (region3) otherAccount (region3)',
+                'region3'
+            ],
             [
                 'baz',
                 'myAccount (region1 region2) otherAccount (region2 region3)',
@@ -2385,14 +2491,148 @@ class TestPolicyRstData(PolicyGenTester):
                 'myAccount (region3) otherAccount (region1)',
                 'bar-otherAccount/region1'
             ],
-            ['fooA1', 'myAccount (region1 region2)', 'bar-myAccount/region2'],
+            [
+                'fooA1',
+                'myAccount (region1 region2)',
+                'bar-myAccount/region2'
+            ],
             [
                 'fooA2',
                 'otherAccount (region2 region3)',
                 'bar-otherAccount/region3'
             ],
-            ['myAccount/common', 'myAccount', 'c'],
-            ['otherAccount/common', 'otherAccount', 'c']
+            [
+                'myAccount/common',
+                'myAccount',
+                'c'
+            ],
+            [
+                'otherAccount/common',
+                'otherAccount',
+                'c'
+            ]
+        ]
+
+    def test_have_paths(self):
+        acct_policies = {
+            'myAccount': {
+                'region1': {
+                    'fooA1': {'comment': 'bar-myAccount/region1'},
+                    'baz': {'comment': 'blam'},
+                    'myAccount/common': {'comment': 'c'},
+                    'all_r1': {'comment': 'region1'},
+                    'all_common': {'comment': 'region1'}
+                },
+                'region2': {
+                    'fooA1': {'comment': 'bar-myAccount/region2'},
+                    'baz': {'comment': 'blam'},
+                    'myAccount/common': {'comment': 'c'},
+                    'all_r2': {'comment': 'region2'},
+                    'all_common': {'comment': 'region2'}
+                },
+                'region3': {
+                    'foo': {'comment': 'bar-myAccount/region3'},
+                    'myAccount/common': {'comment': 'c'},
+                    'all_r3': {'comment': 'region3'},
+                    'all_common': {'comment': 'region3'}
+                }
+            },
+            'otherAccount': {
+                'region1': {
+                    'foo': {'comment': 'bar-otherAccount/region1'},
+                    'otherAccount/common': {'comment': 'c'},
+                    'all_r1': {'comment': 'region1'},
+                    'all_common': {'comment': 'region1'}
+                },
+                'region2': {
+                    'fooA2': {'comment': 'bar-otherAccount/region2'},
+                    'baz': {'comment': 'blam'},
+                    'otherAccount/common': {'comment': 'c'},
+                    'all_r2': {'comment': 'region2'},
+                    'all_common': {'comment': 'region2'}
+                },
+                'region3': {
+                    'fooA2': {'comment': 'bar-otherAccount/region3'},
+                    'baz': {'comment': 'blam'},
+                    'otherAccount/common': {'comment': 'c'},
+                    'all_r3': {'comment': 'region3'},
+                    'all_common': {'comment': 'region3'}
+                }
+            }
+        }
+        self.cls._policy_sources = {
+            'all_common': {'path1'},
+            'all_r1': {'path2'},
+            'all_r2': {'path2'},
+            'all_r3': {'path3'},
+            'baz': {'path1', 'path2'},
+            'foo': {'path1', 'path2', 'path3'},
+            'fooA1': {'path1'},
+            'fooA2': {'path1'},
+            'myAccount/common': {'path2'},
+            'otherAccount/common': {'path3'}
+        }
+        assert self.cls._policy_rst_data(acct_policies, have_paths=True) == [
+            [
+                'all_common',
+                '',
+                'path1',
+                'region3'
+            ],
+            [
+                'all_r1',
+                'myAccount (region1) otherAccount (region1)',
+                'path2',
+                'region1'
+            ],
+            [
+                'all_r2',
+                'myAccount (region2) otherAccount (region2)',
+                'path2',
+                'region2'
+            ],
+            [
+                'all_r3',
+                'myAccount (region3) otherAccount (region3)',
+                'path3',
+                'region3'
+            ],
+            [
+                'baz',
+                'myAccount (region1 region2) otherAccount (region2 region3)',
+                'path1 path2',
+                'blam'
+            ],
+            [
+                'foo',
+                'myAccount (region3) otherAccount (region1)',
+                'path1 path2 path3',
+                'bar-otherAccount/region1'
+            ],
+            [
+                'fooA1',
+                'myAccount (region1 region2)',
+                'path1',
+                'bar-myAccount/region2'
+            ],
+            [
+                'fooA2',
+                'otherAccount (region2 region3)',
+                'path1',
+                'bar-otherAccount/region3'
+            ],
+            [
+                'myAccount/common',
+                'myAccount',
+                'path2',
+                'c'
+            ],
+            [
+                'otherAccount/common',
+                'otherAccount',
+                'path3',
+                'c'
+            ]
         ]
 
 

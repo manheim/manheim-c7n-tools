@@ -67,6 +67,7 @@ class PolicyGen(object):
             'Initialized PolicyGen for account: %s (%s)',
             self._config.account_name, self._config.account_id
         )
+        self._policy_sources = defaultdict(set)
 
     def run(self):
         defaults = self._load_defaults()
@@ -129,11 +130,15 @@ class PolicyGen(object):
             for path in self._config.policy_source_paths:
                 logger.info("Reading configs from %s", path)
                 configs = self._load_policy(path=path)
+                # update self._policy_sources to track where each policy was
+                for aname, adata in configs.items():
+                    for rname, rdata in adata.items():
+                        for pname in rdata.keys():
+                            self._policy_sources[pname].add(path)
                 acct_configs = self._merge_configs(acct_configs, configs)
                 logger.info(
                     "Merging configs from %s into existing configs", path
                 )
-
         except AttributeError:
             logger.info(
                 "No source paths defined, falling back to single source path"
@@ -162,6 +167,16 @@ class PolicyGen(object):
         return new_config
 
     def _load_policy(self, path=''):
+        """
+        Load all policies in a given path; return a nested dict of account name
+        (str) to region name (str) to dict of policy names (str) to policies
+        (dict).
+
+        :param path: path to load policies from
+        :type path: str
+        :return: nested dict of policies
+        :rtype: dict
+        """
         acct_configs = {}
         # read the shared configs from all_accounts/ ; returns a dict of
         # region name to [dict of policy name to policy], for each region
@@ -619,16 +634,27 @@ class PolicyGen(object):
         s = "this page built %s from `%s <%s>`_ at %s\n\n" % (
             buildinfo, commit, gitlink, timestr()
         )
-        s += tabulate(
-            sorted(self._policy_rst_data(region_policies)),
-            headers=[
+        try:
+            assert len(self._config.policy_source_paths) > 0
+            headers = [
+                'Policy Name', 'Account(s) / Region(s)', 'Source Path(s)',
+                'Description/Comment'
+            ]
+            have_source_paths = True
+        except Exception:
+            headers = [
                 'Policy Name', 'Account(s) / Region(s)', 'Description/Comment'
-            ],
-            tablefmt='grid'
+            ]
+            have_source_paths = False
+        s += tabulate(
+            sorted(self._policy_rst_data(
+                region_policies, have_paths=have_source_paths
+            )),
+            headers=headers, tablefmt='grid'
         )
         return s
 
-    def _policy_rst_data(self, account_policies):
+    def _policy_rst_data(self, account_policies, have_paths=False):
         """
         Build the policy rST table data.
 
@@ -663,15 +689,20 @@ class PolicyGen(object):
                         acctname, ' '.join(regions)
                     ))
             if accts == acct_names:
+                apart = ''
+            else:
+                apart = ' '.join(accts)
+            if have_paths:
                 result.append([
                     pname,
-                    '',
+                    apart,
+                    ' '.join(sorted(self._policy_sources.get(pname, []))),
                     descriptions[pname]
                 ])
             else:
                 result.append([
                     pname,
-                    ' '.join(accts),
+                    apart,
                     descriptions[pname]
                 ])
         return result

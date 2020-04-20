@@ -232,6 +232,12 @@ class DryRunDiffer(object):
         )
         if response['IsTruncated']:
             raise RuntimeError('ERROR: S3 response was truncated!')
+        if 'CommonPrefixes' not in response:
+            logger.error(
+                'ERROR: "CommonPrefixes" element not in S3 ListObjects '
+                'response; bucket must be empty!'
+            )
+            return []
         result = []
         for pname in response['CommonPrefixes']:
             result.append(pname['Prefix'].replace('logs/', '').strip('/'))
