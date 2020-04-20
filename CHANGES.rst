@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 * If the ``policy_source_paths`` configuration option is specified, have policygen include a column showing which source(s) a policy came from in ``policies.rst``.
+* Fix bug in ``dryrun-diff`` step where it would fail on an initial, empty S3 bucket.
 
 0.9.0 (2020-04-08)
 ------------------
