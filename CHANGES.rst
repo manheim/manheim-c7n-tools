@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.9.1 (2020-04-20)
+------------------
+
+* If the ``policy_source_paths`` configuration option is specified, have policygen include a column showing which source(s) a policy came from in ``policies.rst``.
+
 0.9.0 (2020-04-08)
 ------------------
 
