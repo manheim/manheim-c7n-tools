@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.3.0/milligram.css">
+    <title>Report: {{ account_name }}</title>
+  </head>
+  <body style="padding: 20px;">
+    <h2>Difference Report</h2>
+    <h3>Account: {{ account_name }}</h3>
+    <p>
+      This document is a break-down of all of the resources that are affected by the changes made within a certain policy.
+    </p>
+    <p>
+      Each section of this document is broken down by policy name, the region in which the policy was ran against, and the list of all of the affected resources.
+    </p>
+    <p>
+      You might find that the list of affected resources are highlighted in certain colors, with a marker placed against them. The table outlined below will tell you what each color and marker represents:
+    </p>
+    <table>
+      <th>Color</th>
+      <th>Marker</th>
+      <th>Explaination</th>
+      <th>Example</th>
+      <tr>
+        <td>Green</td>
+        <td>+</td>
+        <td>This outlines a resource that has been added by changes under this PR against the last run on master</td>
+        <td style="background-color: #98e8736b;padding-left: 10px;padding-right: 10px;"><code style="background: none;">+ arn://hellotherewowthisisanarn.ohcool.amazing</code></td>
+      </tr>
+      <tr>
+        <td>Red</td>
+        <td>-</td>
+        <td>This outlines a resource that has been removed by changes under this PR against the last run on master</td>
+        <td style="background-color: #e873736b;padding-left: 10px;padding-right: 10px;"><code style="background: none;">- arn://hellotherewowthisisanarn.ohcool.amazing</code></td>
+      </tr>
+      <tr>
+        <td>Grey</td>
+        <td>=</td>
+        <td>This outlines a resource that has remained in changes under this PR against the last run on master</td>
+        <td style="background-color: #fafafa;padding-left: 10px;padding-right: 10px;"><code style="background: none;">= arn://hellotherewowthisisanarn.ohcool.amazing</code></td>
+      </tr>
+    </table>
+    {% for policy, entry in entries.items() -%}
+    <h4> {{ policy }} </h4>
+    <ul>
+      {% for region, item in entry.items() -%}
+      <li>
+        <strong>{{ region }}</strong>
+        <code style="background-color: #98e8736b;">+ {{ item.total_add }}</code>
+        <code style="background-color: #e873736b;">- {{ item.total_remove }}</code>
+        <code style="background-color: #fafafa;">= {{ item.total_untouch }}</code>
+        <div style="padding: 15px 15px 0 15px;">
+          <table>
+            {% for r in item.resources -%}
+            {% if r.type == 'added' -%}
+            <tr style="background-color: #98e8736b;"><td style="padding-left: 10px;padding-right: 10px;"><code style="background: none;"> + {{ r.id }} </code></td></tr>
+            {% elif r.type == 'removed' -%}
+            <tr style="background-color: #e873736b;"><td style="padding-left: 10px;padding-right: 10px;"><code style="background: none;"> - {{ r.id }} </code></td></tr>
+            {% elif r.type == 'unchanged' -%}
+            <tr style="background-color: #fafafa;"><td style="padding-left: 10px;padding-right: 10px;"><code style="background: none;"> = {{ r.id }} </code></td></tr>
+            {%- endif %}
+            {%- endfor %}
+          </table>
+        </div>
+      </li>
+      {%- endfor %}
+    </ul>
+    {%- endfor %}
+  </body>
+</html>

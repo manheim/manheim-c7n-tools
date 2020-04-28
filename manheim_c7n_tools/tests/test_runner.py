@@ -59,7 +59,9 @@ class FakeConfig:
 class StepTester(object):
 
     def setup(self):
-        self.m_conf = Mock(spec_set=ManheimConfig)
+        # in order to supplant __getattr__ calls
+        self.m_conf = Mock(spec=ManheimConfig)
+        self.m_conf.account_id = '01234567890'
 
 
 class TestPolicygenStep(StepTester):
