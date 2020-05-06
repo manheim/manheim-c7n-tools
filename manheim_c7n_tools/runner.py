@@ -188,7 +188,8 @@ class MugcStep(BaseStep):
             log_group=None,
             external_id=None,
             cache_period=0,
-            cache=None
+            cache=None,
+            present=False
         )
         # use cloud provider to initialize policies to get region expansion
         policies = AWS().initialize_policies(
@@ -219,6 +220,7 @@ class MugcStep(BaseStep):
             external_id=None,
             cache_period=0,
             cache=None,
+            present=False,
             dryrun=True
         )
         # use cloud provider to initialize policies to get region expansion

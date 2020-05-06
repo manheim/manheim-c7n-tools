@@ -152,7 +152,8 @@ class TestMugcStep(StepTester):
                 log_group=None,
                 external_id=None,
                 cache_period=0,
-                cache=None
+                cache=None,
+                present=False
             )
         ]
         assert mocks['load_policies'].mock_calls == [
@@ -204,6 +205,7 @@ class TestMugcStep(StepTester):
                 external_id=None,
                 cache_period=0,
                 cache=None,
+                present=False,
                 dryrun=True
             )
         ]
