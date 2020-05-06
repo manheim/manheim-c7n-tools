@@ -20,6 +20,7 @@ from functools import partial
 from c7n.config import Config
 from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 
+from manheim_c7n_tools.vendor.mugc import AWS
 import manheim_c7n_tools.runner as runner
 from manheim_c7n_tools.runner import BaseStep
 from manheim_c7n_tools.utils import bold
@@ -118,23 +119,34 @@ class TestValidateStep(StepTester):
 class TestMugcStep(StepTester):
 
     def test_run(self):
+        mock_pol1 = Mock(provider_name='foo')
+        mock_pol2 = Mock(provider_name='aws')
+        mock_pol3 = Mock(provider_name='azure')
         mock_conf = Mock(spec_set=ManheimConfig)
-        with patch(
-            '%s.resources.load_resources' % pbm, autospec=True
-        ) as mock_lr:
-            with patch('%s.Config.empty' % pbm) as mock_empty:
-                with patch('%s.load_policies' % pbm, autospec=True) as mock_lp:
-                    with patch(
-                        '%s.resources_gc_prefix' % pbm, autospec=True
-                    ) as mock_rgp:
-                        mock_empty.return_value = mock_conf
-                        mock_lp.return_value = {'my': 'policies'}
-                        runner.MugcStep('rName', self.m_conf).run()
+        mock_aws = Mock(spec_set=AWS)
+        mock_aws.initialize_policies.return_value = {'aws': 'policies'}
+        mock_pc = Mock()
+        with patch('%s.Config.empty' % pbm) as mock_empty:
+            mock_empty.return_value = mock_conf
+            with patch.multiple(
+                pbm,
+                AWS=DEFAULT,
+                load_policies=DEFAULT,
+                resources_gc_prefix=DEFAULT,
+                PolicyCollection=DEFAULT
+            ) as mocks:
+                mocks['AWS'].return_value = mock_aws
+                mocks['PolicyCollection'].return_value = mock_pc
+                mocks['load_policies'].return_value = [
+                    mock_pol1, mock_pol2, mock_pol3
+                ]
+                runner.MugcStep('rName', self.m_conf).run()
         assert mock_empty.mock_calls == [
             call(
                 config_files=['custodian_rName.yml'],
-                region='rName',
+                regions=['rName'],
                 prefix='custodian-',
+                policy_regex='^custodian-.*',
                 assume=None,
                 policy_filter=None,
                 log_group=None,
@@ -143,28 +155,49 @@ class TestMugcStep(StepTester):
                 cache=None
             )
         ]
-        assert mock_lr.mock_calls == [call()]
-        assert mock_lp.mock_calls == [call(mock_conf)]
-        assert mock_rgp.mock_calls == [call(mock_conf, {'my': 'policies'})]
+        assert mocks['load_policies'].mock_calls == [
+            call(mock_conf, mock_conf)
+        ]
+        assert mocks['PolicyCollection'].mock_calls == [
+            call([mock_pol2], mock_conf)
+        ]
+        assert mocks['AWS'].mock_calls == [
+            call(),
+            call().initialize_policies(mock_pc, mock_conf)
+        ]
+        assert mocks['resources_gc_prefix'].mock_calls == [
+            call(mock_conf, mock_conf, {'aws': 'policies'})
+        ]
 
     def test_dryrun(self):
+        mock_pol1 = Mock(provider_name='foo')
+        mock_pol2 = Mock(provider_name='aws')
+        mock_pol3 = Mock(provider_name='azure')
         mock_conf = Mock(spec_set=ManheimConfig)
-        with patch(
-            '%s.resources.load_resources' % pbm, autospec=True
-        ) as mock_lr:
-            with patch('%s.Config.empty' % pbm) as mock_empty:
-                with patch('%s.load_policies' % pbm, autospec=True) as mock_lp:
-                    with patch(
-                        '%s.resources_gc_prefix' % pbm, autospec=True
-                    ) as mock_rgp:
-                        mock_empty.return_value = mock_conf
-                        mock_lp.return_value = {'my': 'policies'}
-                        runner.MugcStep('rName', self.m_conf).dryrun()
+        mock_aws = Mock(spec_set=AWS)
+        mock_aws.initialize_policies.return_value = {'aws': 'policies'}
+        mock_pc = Mock()
+        with patch('%s.Config.empty' % pbm) as mock_empty:
+            mock_empty.return_value = mock_conf
+            with patch.multiple(
+                pbm,
+                AWS=DEFAULT,
+                load_policies=DEFAULT,
+                resources_gc_prefix=DEFAULT,
+                PolicyCollection=DEFAULT
+            ) as mocks:
+                mocks['AWS'].return_value = mock_aws
+                mocks['PolicyCollection'].return_value = mock_pc
+                mocks['load_policies'].return_value = [
+                    mock_pol1, mock_pol2, mock_pol3
+                ]
+                runner.MugcStep('rName', self.m_conf).dryrun()
         assert mock_empty.mock_calls == [
             call(
                 config_files=['custodian_rName.yml'],
-                region='rName',
+                regions=['rName'],
                 prefix='custodian-',
+                policy_regex='^custodian-.*',
                 assume=None,
                 policy_filter=None,
                 log_group=None,
@@ -174,9 +207,19 @@ class TestMugcStep(StepTester):
                 dryrun=True
             )
         ]
-        assert mock_lr.mock_calls == [call()]
-        assert mock_lp.mock_calls == [call(mock_conf)]
-        assert mock_rgp.mock_calls == [call(mock_conf, {'my': 'policies'})]
+        assert mocks['load_policies'].mock_calls == [
+            call(mock_conf, mock_conf)
+        ]
+        assert mocks['PolicyCollection'].mock_calls == [
+            call([mock_pol2], mock_conf)
+        ]
+        assert mocks['AWS'].mock_calls == [
+            call(),
+            call().initialize_policies(mock_pc, mock_conf)
+        ]
+        assert mocks['resources_gc_prefix'].mock_calls == [
+            call(mock_conf, mock_conf, {'aws': 'policies'})
+        ]
 
     def test_run_in_region(self):
         for rname in ALL_REGIONS:
