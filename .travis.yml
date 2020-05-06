@@ -27,11 +27,11 @@ stages:
 jobs:
   include:
     - stage: test
-      python: '3.6'
-      env: TOXENV=py36
-    - stage: test
       python: '3.7'
       env: TOXENV=py37
+    - stage: test
+      python: '3.8'
+      env: TOXENV=py38
     - stage: test
       python: '3.7'
       env: TOXENV=docs

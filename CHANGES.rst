@@ -8,6 +8,7 @@ Changelog
 
 * Upgrade `c7n-mailer <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer>`__ requirement from 0.5.7 to 0.6.0
 * Upgrade ``c7n`` requirement from 0.8.46.0 to 0.9.1.0
+* Switch TravisCI tests from py36 and py37 to py37 and py38
 
 0.9.2 (2020-04-20)
 ------------------
