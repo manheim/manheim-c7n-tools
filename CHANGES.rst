@@ -6,9 +6,10 @@ Changelog
 
 **Important:** In following upstream c7n's `0.9.1.0 release <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.1.0>`__, this release drops support for Python 2.7. A modern version of Python 3 is now required.
 
-* Upgrade `c7n-mailer <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer>`__ requirement from 0.5.7 to 0.6.0
-* Upgrade ``c7n`` requirement from 0.8.46.0 to 0.9.1.0
-* Switch TravisCI tests from py36 and py37 to py37 and py38
+* Upgrade `c7n-mailer <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer>`__ requirement from 0.5.7 to 0.6.0.
+* Upgrade ``c7n`` requirement from 0.8.46.0 to 0.9.1.0.
+* Switch TravisCI tests from py36 and py37 to py37 and py38.
+* Update vendored-in ``mugc`` with latest upstream version, for compatibility with above changes.
 
 0.9.2 (2020-04-20)
 ------------------
