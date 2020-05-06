@@ -38,6 +38,7 @@ import boto3
 
 from c7n.commands import validate, run
 from c7n.config import Config
+from c7n.policy import PolicyCollection
 from c7n_mailer.cli import session_factory
 from c7n_mailer.cli import CONFIG_SCHEMA as MAILER_SCHEMA
 from c7n_mailer.utils import setup_defaults as mailer_setup_defaults
@@ -49,7 +50,7 @@ from manheim_c7n_tools.utils import (
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.policygen import PolicyGen
 from manheim_c7n_tools.vendor.mugc import (
-    load_policies, resources_gc_prefix, resources
+    load_policies, resources_gc_prefix, AWS
 )
 from manheim_c7n_tools.dryrun_diff import DryRunDiffer
 from manheim_c7n_tools.s3_archiver import S3Archiver
@@ -173,41 +174,67 @@ class MugcStep(BaseStep):
     name = 'mugc'
 
     def run(self):
+        # This is largely based off of mugc.main()
         logging.getLogger('botocore').setLevel(logging.ERROR)
+        logging.getLogger('urllib3').setLevel(logging.ERROR)
         logging.getLogger('c7n.cache').setLevel(logging.WARNING)
         conf = Config.empty(
             config_files=['custodian_%s.yml' % self.region_name],
-            region=self.region_name,
+            regions=[self.region_name],
             prefix='custodian-',
-            assume=None,
-            policy_filter=None,
-            log_group=None,
-            external_id=None,
-            cache_period=0,
-            cache=None
-        )
-        resources.load_resources()
-        policies = load_policies(conf)
-        resources_gc_prefix(conf, policies)
-
-    def dryrun(self):
-        logging.getLogger('botocore').setLevel(logging.ERROR)
-        logging.getLogger('c7n.cache').setLevel(logging.WARNING)
-        conf = Config.empty(
-            config_files=['custodian_%s.yml' % self.region_name],
-            region=self.region_name,
-            prefix='custodian-',
+            policy_regex='^custodian-.*',
             assume=None,
             policy_filter=None,
             log_group=None,
             external_id=None,
             cache_period=0,
             cache=None,
+            present=False
+        )
+        # use cloud provider to initialize policies to get region expansion
+        policies = AWS().initialize_policies(
+            PolicyCollection(
+                [
+                    p for p in load_policies(conf, conf)
+                    if p.provider_name == 'aws'
+                ],
+                conf
+            ),
+            conf
+        )
+        resources_gc_prefix(conf, conf, policies)
+
+    def dryrun(self):
+        # This is largely based off of mugc.main()
+        logging.getLogger('botocore').setLevel(logging.ERROR)
+        logging.getLogger('urllib3').setLevel(logging.ERROR)
+        logging.getLogger('c7n.cache').setLevel(logging.WARNING)
+        conf = Config.empty(
+            config_files=['custodian_%s.yml' % self.region_name],
+            regions=[self.region_name],
+            prefix='custodian-',
+            policy_regex='^custodian-.*',
+            assume=None,
+            policy_filter=None,
+            log_group=None,
+            external_id=None,
+            cache_period=0,
+            cache=None,
+            present=False,
             dryrun=True
         )
-        resources.load_resources()
-        policies = load_policies(conf)
-        resources_gc_prefix(conf, policies)
+        # use cloud provider to initialize policies to get region expansion
+        policies = AWS().initialize_policies(
+            PolicyCollection(
+                [
+                    p for p in load_policies(conf, conf)
+                    if p.provider_name == 'aws'
+                ],
+                conf
+            ),
+            conf
+        )
+        resources_gc_prefix(conf, conf, policies)
 
 
 class CustodianStep(BaseStep):
