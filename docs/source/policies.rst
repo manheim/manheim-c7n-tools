@@ -6,7 +6,7 @@ Policy Language
 
 .. _`policies.ours`:
 
-The ``policies/`` directory in the configuration repository contains the c7n policies, one per file. Policies should have a name that matches their filename (``NAME.yml``) and should all have a "comment" or "comments" section that provides a human-readable summary of what the policy does (this comment is used to generate the Current Policies documentation).
+The ``policies/`` directory in the configuration repository contains the c7n policies, one per file. Policies **must have a name that matches their filename** (``NAME.yml``) and should all have a "comment" or "comments" section that provides a human-readable summary of what the policy does (this comment is used to generate the Current Policies documentation).
 
 All policies are built on top of ``defaults.yml``; see :ref:`policygen.defaults_merging` for further information.
 
