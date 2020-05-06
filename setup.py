@@ -5,7 +5,8 @@ with open('README.md') as f:
     long_description = f.read()
 
 requires = [
-    'boto3',
+    'boto3==1.12.47',
+    'botocore==1.15.47',
     'docutils>=0.10,<0.16',
     'tabulate>=0.8.0,<0.9.0',
     # In order to work with the "mu" Lambda function management tool,
