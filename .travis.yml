@@ -33,10 +33,10 @@ jobs:
       python: '3.8'
       env: TOXENV=py38
     - stage: test
-      python: '3.7'
+      python: '3.8'
       env: TOXENV=docs
     - stage: test
-      python: '3.7'
+      python: '3.8'
       env: TOXENV=docker
     - stage: deploy
       python: '3.7'
