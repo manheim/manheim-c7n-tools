@@ -10,6 +10,8 @@ RUN cd /manheim_c7n_tools \
       linux-headers \
       make \
       musl-dev \
+      libffi-dev \
+      openssl-dev \
   && pip install -r requirements.txt \
   && pip install -e . \
   # clean up build dependencies

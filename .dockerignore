@@ -1,0 +1,8 @@
+.git/
+.idea/
+.tox/
+assets/
+htmlcov/
+__pycache__
+venv/
+.coverage
