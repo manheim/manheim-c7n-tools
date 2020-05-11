@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.10.2 (2020-05-11)
+-------------------
+
+* Install c7n and c7n-mailer directly from github, instead of PyPI, to pull in unreleased-but-merged `b7178be <https://github.com/cloud-custodian/cloud-custodian/commit/b7178be718bd8c8bdb70b2376d3bb0d5eb6fa9a9>`__ / `PR #5708 <https://github.com/cloud-custodian/cloud-custodian/pull/5708>`__ which fixes `Issue #5707 <https://github.com/cloud-custodian/cloud-custodian/issues/5707>`__ for missing ``jsonpointer`` and ``jsonpatch`` dependencies.
+* Remove ``jsonpointer`` from requirements.
+
+0.10.1 (2020-05-08)
+-------------------
+
+* Add ``jsonpointer`` to requirements.
+
 0.10.0 (2020-05-06)
 -------------------
 

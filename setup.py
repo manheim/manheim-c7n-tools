@@ -12,6 +12,8 @@ requires = [
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
+    # @TODO Bump this to a released version once c7n-mailer > 0.6.0 is out.
+    # We're pulling in this git branch in order to pull in https://github.com/cloud-custodian/cloud-custodian/pull/5708
     'c7n==0.9.1.0',
     'c7n-mailer==0.6.0',
     # for building generated policy docs
