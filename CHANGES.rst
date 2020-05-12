@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+* Add unit test to ensure that the ``c7n-mailer`` Lambda package archive can be successfully generated.
+* Add ``pip freeze`` to the end of Docker image tests, to keep a record of the packages installed in Docker in the build logs.
+
 0.10.2 (2020-05-11)
 -------------------
 
