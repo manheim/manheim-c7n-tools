@@ -1,9 +1,10 @@
 Changelog
 =========
 
-Unreleased
-----------
+0.10.3 (2020-05-12)
+-------------------
 
+* Bump c7n and c7n-mailer installed version to `b62af99 <https://github.com/cloud-custodian/cloud-custodian/commit/b62af99171bf1163413d7f7411e4a0db8a50f27e>`__ in order to pull in `PR #5751 <https://github.com/cloud-custodian/cloud-custodian/pull/5751>`__, fix for `#5750 <https://github.com/cloud-custodian/cloud-custodian/issues/5750>`__ c7n-mailer critical bug.
 * Add unit test to ensure that the ``c7n-mailer`` Lambda package archive can be successfully generated.
 * Add ``pip freeze`` to the end of Docker image tests, to keep a record of the packages installed in Docker in the build logs.
 

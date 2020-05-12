@@ -7,5 +7,5 @@ pyyaml
 sphinx>=1.8.0,<1.9.0
 # @TODO Bump this to a released version once c7n-mailer > 0.6.0 is out.
 # We're pulling in this git branch in order to pull in https://github.com/cloud-custodian/cloud-custodian/pull/5708
--e git+https://github.com/cloud-custodian/cloud-custodian.git@b7178be718bd8c8bdb70b2376d3bb0d5eb6fa9a9#egg=c7n
--e git+https://github.com/cloud-custodian/cloud-custodian.git@b7178be718bd8c8bdb70b2376d3bb0d5eb6fa9a9#egg=c7n-mailer&subdirectory=tools/c7n_mailer
+-e git+https://github.com/cloud-custodian/cloud-custodian.git@b62af99171bf1163413d7f7411e4a0db8a50f27e#egg=c7n
+-e git+https://github.com/cloud-custodian/cloud-custodian.git@b62af99171bf1163413d7f7411e4a0db8a50f27e#egg=c7n-mailer&subdirectory=tools/c7n_mailer
