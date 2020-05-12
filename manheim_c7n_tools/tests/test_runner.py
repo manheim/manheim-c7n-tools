@@ -25,6 +25,8 @@ import manheim_c7n_tools.runner as runner
 from manheim_c7n_tools.runner import BaseStep
 from manheim_c7n_tools.utils import bold
 from manheim_c7n_tools.config import ManheimConfig
+from c7n_mailer.deploy import get_archive
+from c7n.mu import PythonPackageArchive
 
 pbm = 'manheim_c7n_tools.runner'
 
@@ -658,6 +660,18 @@ class TestMailerStep(StepTester):
                 assert runner.MailerStep.run_in_region(rname, m_conf) is True
             else:
                 assert runner.MailerStep.run_in_region(rname, m_conf) is False
+
+    def test_mailer_archive(self):
+        """
+        This is a test of ``c7n_mailer.deploy.get_archive()``. We've had a few
+        dependency issues in the past that aren't detected until actually
+        deploying mailer and generating the archive (zip) for the Lambda, so
+        this attempts to detect those issues.
+        """
+        arch = get_archive({'templates_folders': []})
+        assert isinstance(arch, PythonPackageArchive)
+        assert arch.size > 0
+        assert len(arch.get_filenames()) > 0
 
 
 class TestDryRunDiffStep(StepTester):
