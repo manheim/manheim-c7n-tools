@@ -27,6 +27,7 @@ import json
 import boto3
 import argparse
 import itertools
+import os
 from zlib import decompress
 import subprocess
 from jinja2 import Environment, FileSystemLoader
@@ -43,6 +44,9 @@ logger = logging.getLogger(__name__)
 
 
 class DryRunDiffer(object):
+    UNKNOWN_RESOURCE_TYPE = 'unknown_type'
+    RESOURCE_TYPE_KEY = 'resource_type'
+    UNKNOWN_RESOURCE_ID = 'unknown_id'
 
     def __init__(self, config):
         """
@@ -142,26 +146,28 @@ class DryRunDiffer(object):
             return ''
 
         for policy in all_policies:
-            policy_splits = policy.split('-', 1)
-            if len(policy_splits) <= 1:
-                logger.warning(
-                    "skipping policy: \
-                        %s from report - it is not prefixed correctly",
-                    policy)
-                continue
-            resource_type = policy_splits[0]
-            load_available()
-            _id = get_resource_class(resource_type) \
-                .resource_type() \
-                .id
             for region in self.config.regions:
+                dryrun_id = self._get_resource_id(dryrun, policy)
+                liverun_id = self._get_resource_id(self._live_results, policy)
+                dryrun_res = dryrun.get(policy, {}).get(region, [])
+                liverun_res = self._live_results.get(policy, {})\
+                    .get(region, [])
+                liverun_not_possible = \
+                    liverun_res and liverun_id == self.UNKNOWN_RESOURCE_ID
+                dryrun_not_possible = \
+                    dryrun_res and dryrun_id == self.UNKNOWN_RESOURCE_ID
+                if liverun_not_possible or dryrun_not_possible:
+                    logger.error(
+                        'unknown resource_id encountered for either \
+                            dryrun or liverun resources - policy: %s', policy)
+                    return ''
                 dry_ids = {
-                    '{}: {}'.format(_id, x[_id])
-                    for x in dryrun.get(policy, {}).get(region, [])
+                    '{}: {}'.format(dryrun_id, x[dryrun_id])
+                    for x in dryrun_res
                 }
                 live_ids = {
-                    '{}: {}'.format(_id, x[_id])
-                    for x in self._live_results.get(policy, {}).get(region, [])
+                    '{}: {}'.format(liverun_id, x[liverun_id])
+                    for x in liverun_res
                 }
                 additions = [
                     {'id': x, 'type': 'added'}
@@ -192,6 +198,29 @@ class DryRunDiffer(object):
             account_name=self.config.account_id,
             entries=entries
         )
+
+    def _get_resource_id(self, resource, policy):
+        """
+        Obtain the id for a given policy from a dict of resources.
+        :param resource: the dict of resources
+        :param policy: the name of the policy
+        :return: the resource_id the policy affects
+        :rtype: string
+        """
+        resource_type = resource.get(policy, {}).get(
+            self.RESOURCE_TYPE_KEY, self.UNKNOWN_RESOURCE_TYPE)
+        if resource_type == self.UNKNOWN_RESOURCE_TYPE:
+            return
+        load_available()
+        _id = self.UNKNOWN_RESOURCE_ID
+        try:
+            _id = get_resource_class(resource_type) \
+                .resource_type() \
+                .id
+        except Exception:
+            logger.warning(
+                'unable to get resource_id for %s - id: %s', policy, _id)
+        return _id
 
     def _make_diff_markdown(self, dryrun):
         """
@@ -271,18 +300,41 @@ class DryRunDiffer(object):
             if policy not in pol_names and 'defaults' not in pol_names:
                 # policy isn't changed
                 continue
-            logger.debug('Reading file: %s', f)
-            if policy not in res:
-                res[policy] = {}
+            _dir = os.path.dirname(f)
+            logger.debug('Reading files from directory: %s', _dir)
             try:
-                with open(f, 'r') as fh:
-                    resources = json.loads(fh.read())
+                self._read_dryrun_files(_dir, policy, region, res)
             except Exception:
-                logger.error('ERROR reading file: %s', f, exc_info=True)
+                logger.error('ERROR reading from dir: %s', _dir, exc_info=True)
                 continue
-            res[policy][region] = resources
         logger.debug('Got dryrun results for %d policies', len(res))
         return res
+
+    def _read_dryrun_files(self, directory, pol, region, res):
+        """
+        Read the directory for dryrun files, and attaches each resource to the
+        supplied result dict via their policy-name and region.
+        :param directory: the path where the dryrun files are located
+        :param pol: the name of the policy
+        :param region: the name of the region
+        :param res: the dict that will be mutated with the resources found.
+        :return: a dict of resources
+        :rtype: dict
+        """
+        if pol not in res:
+            res[pol] = {}
+        resources = os.path.join(directory, 'resources.json')
+        with open(resources, 'r') as fh:
+            logger.debug('Reading from file: %s', resources)
+            res[pol][region] = json.loads(fh.read())
+        if self.RESOURCE_TYPE_KEY not in res[pol]:
+            metadata = os.path.join(directory, 'metadata.json')
+            with open(metadata, 'r') as fh:
+                logger.debug('Reading from file: %s', metadata)
+                mj = json.loads(fh.read())
+                _type = mj.get('policy', {}).get(
+                    'resource', self.UNKNOWN_RESOURCE_TYPE)
+                res[pol][self.RESOURCE_TYPE_KEY] = _type
 
     def _get_s3_results_for_region(self, region_name, changed_pols):
         """
@@ -303,8 +355,12 @@ class DryRunDiffer(object):
                 continue
             if p not in self._live_results:
                 self._live_results[p] = {}
-            self._live_results[p][region_name] = \
-                self._get_latest_res_for_policy(bkt, p)
+            fetch_type = self.RESOURCE_TYPE_KEY not in self._live_results[p]
+            resource, _type = self._get_latest_res_for_policy(
+                bkt, p, fetch_type)
+            self._live_results[p][region_name] = resource
+            if fetch_type:
+                self._live_results[p][self.RESOURCE_TYPE_KEY] = _type
         logger.debug('Done getting resource counts for %s', region_name)
 
     def _get_s3_policy_prefixes(self, bucket):
@@ -336,42 +392,59 @@ class DryRunDiffer(object):
             result.append(pname['Prefix'].replace('logs/', '').strip('/'))
         return result
 
-    def _get_latest_res_for_policy(self, bucket, pol_name):
+    def _get_latest_res_for_policy(self, bucket, pol_name, get_res_type):
         """
         Given the S3 Bucket and a policy name, find the newest
-        ``resources.json`` file for that policy and return the count of
-        resources in it.
+        ``resources.json`` file for that policy and annotate it with it's
+        respective type from the ``metadata.json`` file.
 
         :param bucket: the bucket to look in
         :type bucket: ``boto3.S3.Bucket``
         :param pol_name: the name of the policy
         :type pol_name: str
-        :return: resource count from latest run of the policy
-        :rtype: int
+        :return: resource from latest run of the policy
+        :rtype: obj
         """
-        newest = None
+        newest_res = None
+        newest_meta = None
         for obj in bucket.objects.filter(Prefix='logs/%s/' % pol_name):
-            if not (
-                obj.key.endswith('/resources.json') or
-                obj.key.endswith('/resources.json.gz')
-            ):
-                continue
-            if newest is None or obj.last_modified > newest.last_modified:
-                newest = obj
-        if newest is None:
-            logger.warning('Found no resources.json objects for %s', pol_name)
-            return 0
-        logger.debug('Found newest key for %s in %s: %s', pol_name, bucket.name,
-                     newest.key)
+            if obj.key.endswith('/resources.json') or \
+                    obj.key.endswith('/resources.json.gz'):
+                if newest_res is None or \
+                        obj.last_modified > newest_res.last_modified:
+                    newest_res = obj
+            if obj.key.endswith('/metadata.json') or \
+                    obj.key.endswith('/metadata.json.gz'):
+                if newest_meta is None or \
+                        obj.last_modified > newest_meta.last_modified:
+                    newest_meta = obj
+        if newest_res is None or newest_meta is None:
+            logger.warning('Found no objects for %s', pol_name)
+            return {}, self.UNKNOWN_RESOURCE_TYPE
+        logger.debug(
+            'Found newest key for %s in %s: resource: %s, metadata: %s',
+            pol_name, bucket.name, newest_res.key, newest_meta.key
+        )
         # ok, ``newest`` is the newest resource.json for the policy; read it
-        res = newest.get()
+        resource = self._extract_data_from_s3_obj(newest_res)
+        _type = ''
+        if get_res_type:
+            metadata = self._extract_data_from_s3_obj(newest_meta)
+            _type = metadata.get('policy', {}) \
+                .get('resource', self.UNKNOWN_RESOURCE_TYPE)
+        return resource, _type
+
+    def _extract_data_from_s3_obj(self, obj):
+        """
+        Extracts a JSON payload from an S3 object.
+        """
+        res = obj.get()
         body = res['Body']
-        if newest.key.endswith('.gz'):
+        if obj.key.endswith('.gz'):
             # object is gzipped; see c7n.output.FSOutput.compress()
             body = body.read()
             body = decompress(body, 15 + 32)
-        resources = json.loads(body)
-        return resources
+        return json.loads(body)
 
 
 def parse_args(argv):
