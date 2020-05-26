@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0.0 (2020-05-26)
+------------------
+
+* Merge `PR #34 <https://github.com/manheim/manheim-c7n-tools/pull/34>`__ to add an optional full HTML report to the ``dryrun-diff`` step/entrypoint, triggered by the presence of a ``reporting-template/report.j2`` template file. Many thanks to `@JuubiSnake <https://github.com/JuubiSnake>`__ of `FundingCircle <https://github.com/FundingCircle>`__ for the contribution.
+* In recognition of this project being used extensively in our organization, bump version to 1.0.0.
+
 0.10.3 (2020-05-12)
 -------------------
 
