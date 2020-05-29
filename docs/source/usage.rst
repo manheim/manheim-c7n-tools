@@ -57,7 +57,7 @@ To run the Python scripts locally without Docker, install as described in :ref:`
 Using c7n-mailer-replay
 -----------------------
 
-Occasionally when running `c7n-mailer <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer>`__, you may have template issues that result in c7n-mailer throwing exceptions and leaving messages in the SQS queue. One way to debug these template errors is by using the actual data from SQS to render a template locally via the `c7n-mailer-replay entrypoint <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer#testing-templates-and-recipients>`__ and iterate on fixing the template.
+Occasionally when running :std:doc:`cloud custodian:tools/c7n-mailer`, you may have template issues that result in c7n-mailer throwing exceptions and leaving messages in the SQS queue. One way to debug these template errors is by using the actual data from SQS to render a template locally via the ``c7n-mailer-replay`` and iterate on fixing the template.
 
 Using this entrypoint via manheim-c7n-tools is a bit difficult, as we don't have the separate c7n-mailer configuration file that it requires. Here's the process for using ``c7n-mailer-replay`` from manheim-c7n-tools:
 
