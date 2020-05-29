@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Unreleased Changes
+------------------
+
+* Add documentation on how to run ``c7n-mailer-replay``.
+
 1.0.0 (2020-05-26)
 ------------------
 
