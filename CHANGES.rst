@@ -1,10 +1,13 @@
 Changelog
 =========
 
-Unreleased Changes
+1.1.0 (2020-06-10)
 ------------------
 
 * Add documentation on how to run ``c7n-mailer-replay``.
+* Add ``-n`` / ``--never-match-re`` option to ``errorscan`` endpoint, to allow specifying a regex for log messages to never consider a failure/error.
+* Bump c7n from `b62af99 <https://github.com/cloud-custodian/cloud-custodian/commit/b62af99171bf1163413d7f7411e4a0db8a50f27e>`__ (master after 0.9.1 plus some merged PRs) to the upstream `0.9.3 release <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.3.0>`__. This pulls in changes from the upstream `0.9.2.0 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.2.0>`__ and `0.9.3.0 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.3.0>`__ releases.
+* Bump c7n-mailer from `b62af99 <https://github.com/cloud-custodian/cloud-custodian/commit/b62af99171bf1163413d7f7411e4a0db8a50f27e>`__ (master after 0.6.0 plus some merged PRs) to the upstream 0.6.2 release. This pulls in changes from the upstream `0.9.2.0 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.2.0>`__ and `0.9.3.0 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.3.0>`__ releases.
 
 1.0.0 (2020-05-26)
 ------------------
