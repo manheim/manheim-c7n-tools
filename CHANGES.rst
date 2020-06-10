@@ -1,10 +1,11 @@
 Changelog
 =========
 
-Unreleased Changes
+1.1.0 (2020-06-10)
 ------------------
 
 * Add documentation on how to run ``c7n-mailer-replay``.
+* Add ``-n`` / ``--never-match-re`` option to ``errorscan`` endpoint, to allow specifying a regex for log messages to never consider a failure/error.
 
 1.0.0 (2020-05-26)
 ------------------

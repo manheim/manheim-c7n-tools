@@ -109,7 +109,7 @@ class LambdaHealthChecker(object):
 
     def get_filtered_logs(
             self, request_ids, interval=86400, group_name=None,
-            always_match_re=None
+            always_match_re=None, never_match_re=None
     ):
         """
         Get CloudWatch logs for the last ``interval`` seconds and return only
@@ -124,6 +124,9 @@ class LambdaHealthChecker(object):
         :type interval: int
         :param always_match_re: Regex for logs to ALWAYS return
         :type always_match_re: ``re``
+        :param never_match_re: Regex for logs to NEVER return, even if they
+          match ``always_match_re``.
+        :type never_match_re: ``re``
         :return: dict of request_id to list of log entry dicts
         :rtype: dict
         """
@@ -161,6 +164,15 @@ class LambdaHealthChecker(object):
                     result[req_id].append(log)
                     matchcount += 1
             if always_m is not None:
+                if (
+                    never_match_re is not None and
+                    never_match_re.match(log['message'])
+                ):
+                    logger.debug(
+                        'Message matched always_match_re but also '
+                        'never_match_re; suppressing: %s', log['message']
+                    )
+                    continue
                 if 'always_match' not in result:
                     result['always_match'] = []
                 result['always_match'].append(log)
@@ -411,7 +423,7 @@ class CustodianErrorReporter(object):
             logger.info('SQS Queue %s does not exist', arn)
             return None
 
-    def run(self):
+    def run(self, never_match_re=None):
         """ collect and report on all cloud-custodian Lambda errors """
         print(
             'Searching cloud-custodian Lambda functions for failed invocations'
@@ -427,7 +439,7 @@ class CustodianErrorReporter(object):
             len(self._failed_request_ids), self._failed_request_ids.keys()
         )
         for fname in lambda_names:
-            if not self._check_function(fname):
+            if not self._check_function(fname, never_match_re=never_match_re):
                 logger.info(
                     '_check_function returned False (NOT HEALTHY) for: %s',
                     fname
@@ -496,13 +508,16 @@ class CustodianErrorReporter(object):
                 ReceiptHandle=rh
             )
 
-    def _check_function(self, func_name):
+    def _check_function(self, func_name, never_match_re=None):
         """
         Check health of one Lambda function. Print information on it to STDOUT.
         Return True for healthy, False if errors/failures.
 
         :param func_name: Lambda function name to check
         :type func_name: str
+        :param never_match_re: Regex for logs to NEVER return, even if they
+          match ``always_match_re``.
+        :type never_match_re: ``re``
         :return: whether the function had errors/failures
         :rtype: bool
         """
@@ -515,7 +530,8 @@ class CustodianErrorReporter(object):
         ]
         if self.ALL_ERROR_FUNCTIONS.match(func_name):
             logs = c.get_filtered_logs(
-                req_ids, always_match_re=self.ALL_ERROR_LOG_RE
+                req_ids, always_match_re=self.ALL_ERROR_LOG_RE,
+                never_match_re=never_match_re
             )
         else:
             logs = c.get_filtered_logs(req_ids)
@@ -607,6 +623,10 @@ def parse_args(argv):
     p.add_argument('-c', '--config', dest='config', action='store',
                    default='manheim-c7n-tools.yml',
                    help='Config file path (default: ./manheim-c7n-tools.yml)')
+    p.add_argument('-n', '--never-match-re', dest='never_match_re', type=str,
+                   action='store', default=None,
+                   help='Regex for Lambda function logs to suppress/never '
+                        'match')
     p.add_argument('ACCOUNT_NAME', action='store', type=str,
                    help='Account name to run errorscan against')
     p.add_argument('REGION_NAME', action='store', type=str,
@@ -627,7 +647,11 @@ def main():
     conf = ManheimConfig.from_file(args.config, args.ACCOUNT_NAME)
     if args.assume_role:
         assume_role(conf)
-    CustodianErrorReporter(conf, args.REGION_NAME).run()
+    if args.never_match_re is not None:
+        args.never_match_re = re.compile(args.never_match_re)
+    CustodianErrorReporter(conf, args.REGION_NAME).run(
+        never_match_re=args.never_match_re
+    )
 
 
 if __name__ == "__main__":
