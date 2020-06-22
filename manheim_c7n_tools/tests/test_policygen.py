@@ -1297,7 +1297,7 @@ class TestMergeConfigs(PolicyGenTester):
             'myAccount': {
                 'region1': {
                     'rule1': {
-                        'foo': 'bar-myAccount/region1'
+                        'bar': 'baz-myAccount/region1'
                     },
                     'rule2': {
                         'baz': 'blam'
@@ -1320,7 +1320,42 @@ class TestMergeConfigs(PolicyGenTester):
         }
 
         res = self.cls._merge_configs(target, source)
+        assert 'foo' not in res['myAccount']['region1']['rule1']
+        assert res['myAccount']['region1']['rule1']['bar'] == \
+            'baz-myAccount/region1'
         assert res['myAccount']['region1']['rule2']['baz'] == 'blam'
+
+    def test_rule_disable(self):
+        source = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'bar': 'baz-myAccount/region1'
+                    },
+                    'rule2': {
+                        'disable': True
+                    }
+                }
+            }
+        }
+
+        target = {
+            'myAccount': {
+                'region1': {
+                    'rule1': {
+                        'foo': 'bar-myAccount/region1'
+                    },
+                    'rule2': {
+                        'baz': 'bang'
+                    }
+                }
+            }
+        }
+
+        res = self.cls._merge_configs(target, source)
+        assert 'rule2' not in res['myAccount']['region1']
+        assert res['myAccount']['region1']['rule1']['bar'] == \
+            'baz-myAccount/region1'
 
 
 class TestLoadAllPolicies(PolicyGenTester):
