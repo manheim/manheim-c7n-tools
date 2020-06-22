@@ -148,22 +148,26 @@ class PolicyGen(object):
 
     def _merge_configs(self, target, source):
         new_config = deepcopy(target)
-        for acctname in source:
-            if acctname in new_config:
-                for region in source[acctname]:
-                    if region in new_config[acctname]:
-                        for rule in source[acctname][region]:
-                            if rule in new_config[acctname][region]:
-                                new_config[acctname][region][rule] \
-                                    .update(source[acctname][region][rule])
+        for account in source:
+            if account in new_config:
+                for region in source[account]:
+                    if region in new_config[account]:
+                        for rule in source[account][region]:
+                            logger.info("Rule: " + rule)
+                            disable = source[account][region][rule].get(
+                                "disable", False
+                            )
+                            if disable is True:
+                                if rule in new_config[account][region]:
+                                    del new_config[account][region][rule]
                             else:
-                                new_config[acctname][region][rule] = \
-                                    deepcopy(source[acctname][region][rule])
+                                new_config[account][region][rule] = \
+                                    deepcopy(source[account][region][rule])
                     else:
-                        new_config[acctname][region] = \
-                            deepcopy(source[acctname][region])
+                        new_config[account][region] = \
+                            deepcopy(source[account][region])
             else:
-                new_config[acctname] = deepcopy(source[acctname])
+                new_config[account] = deepcopy(source[account])
         return new_config
 
     def _load_policy(self, path=''):
