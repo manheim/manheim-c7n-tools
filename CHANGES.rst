@@ -4,7 +4,7 @@ Changelog
 1.2.0 (2020-06-22)
 ------------------
 
-* Add a new ``disabled`` option for rules to disable rules from parent rulesets
+* Add a new ``disable`` option for rules to disable rules from parent rulesets
 * Fix bug in rule overriding where rules with the same names were merged rather than the later rule completely overriding the older one
 
 1.1.0 (2020-06-10)
