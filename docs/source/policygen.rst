@@ -107,11 +107,11 @@ Overriding rules is based on naming. **Rules will not be merged, only replaced.*
 Disabling rules
 ---------------
 
-Rules from higher-level rulesets can be disabled by creating a new rule with the same name and setting a ``disabled`` key for that rule to ``true``.
+Rules from higher-level rulesets can be disabled by creating a new rule with the same name and setting a ``disable`` key for that rule to ``true``.
 
 .. code:: yaml
     name: rule-name
-    disabled: true
+    disable: true
 
 Mailer Templates
 ----------------
