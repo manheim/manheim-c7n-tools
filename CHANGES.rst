@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.2.1 (2020-06-25)
+------------------
+
+* Bump c7n and c7n-mailer installed version to `26ba07e <https://github.com/cloud-custodian/cloud-custodian/commit/26ba07ea569dfe320682f7509082fc9bead0ca4c>`__ in order to pull in `PR #5893 <https://github.com/cloud-custodian/cloud-custodian/pull/5893>`__, fix for `#5854 <https://github.com/cloud-custodian/cloud-custodian/issues/5854>`__ c7n config splunk sourcetype.
+* Bump c7n and c7n-mailer versions in setup.py to match the latest versions released
+
 1.2.0 (2020-06-22)
 ------------------
 
