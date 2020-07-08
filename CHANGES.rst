@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.2.2 (2020-07-08)
+------------------
+
+* Bump c7n to release 0.9.4
+* Bump c7n-mailer to release 0.6.3
+* Updated dependencies for c7n and c7n-mailer
+
 1.2.1 (2020-06-25)
 ------------------
 
