@@ -5,15 +5,15 @@ with open('README.md') as f:
     long_description = f.read()
 
 requires = [
-    'boto3==1.12.47',
-    'botocore==1.15.47',
+    'boto3==1.14.16',
+    'botocore==1.17.16',
     'docutils>=0.10,<0.16',
     'tabulate>=0.8.0,<0.9.0',
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
-    'c7n==0.9.3',
-    'c7n-mailer==0.6.2',
+    'c7n==0.9.4',
+    'c7n-mailer==0.6.3',
     # for building generated policy docs
     'sphinx>=1.8.0,<1.9.0',
     'sphinx_rtd_theme',

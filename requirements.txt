@@ -4,12 +4,10 @@ tabulate>=0.8.0,<0.9.0
 pyyaml
 # for building generated policy docs
 sphinx>=1.8.0,<1.9.0
+c7n==0.9.4
+c7n-mailer==0.6.3
 # to match up with c7n / c7n-mailer dependencies
-boto3==1.13.24
-botocore==1.16.24
+boto3==1.14.16
+botocore==1.17.16
 docutils==0.15.2
-jmespath==0.9.5
-# @TODO Bump this to a released version once c7n > 0.9.3 and c7n-mailer > 0.6.2 is out.
-# We're pulling in this git branch in order to pull in https://github.com/cloud-custodian/cloud-custodian/pull/5893
--e git+https://github.com/cloud-custodian/cloud-custodian.git@26ba07ea569dfe320682f7509082fc9bead0ca4c#egg=c7n
--e git+https://github.com/cloud-custodian/cloud-custodian.git@26ba07ea569dfe320682f7509082fc9bead0ca4c#egg=c7n-mailer&subdirectory=tools/c7n_mailer
+jmespath==0.10.0
