@@ -53,6 +53,16 @@ def timestr():
     return datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
 
 
+def is_enabled(policy):
+    """
+    Helper function to determine if a policy is enabled.
+
+    :param policy: policy to check
+    :type policy: dict
+    """
+    return not(policy.get("disable", False))
+
+
 class PolicyGen(object):
 
     def __init__(self, config):
@@ -255,15 +265,6 @@ class PolicyGen(object):
         self._write_custodian_configs(result, region_name)
         return result
 
-    def _is_enabled(self, policy):
-        """
-        Helper function to determine if a policy is enabled.
-
-        :param policy: policy to check
-        :type policy: dict
-        """
-        return not(policy.get("disable", False))
-
     def _write_custodian_configs(self, result, region_name):
         """
         Write the per-region ``custodian_REGION.yml`` config file to disk. This
@@ -274,7 +275,7 @@ class PolicyGen(object):
         :param region_name: the name of the region the configs are for
         :type region_name: str
         """
-        enabled_policies = list(filter(self._is_enabled, result['policies']))
+        enabled_policies = list(filter(is_enabled, result['policies']))
         config_str = yaml.dump({"policies": enabled_policies})
         fname = 'custodian_%s.yml' % region_name
         logger.info('Writing %s policies to %s...' % (region_name, fname))
@@ -476,7 +477,7 @@ class PolicyGen(object):
         # add the filters
         for p in policies:
             name = p['name']
-            if self._is_enabled(p):
+            if is_enabled(p):
                 cwecleanup['filters'].append({
                     'type': 'value',
                     'key': 'Name',
@@ -694,7 +695,7 @@ class PolicyGen(object):
                     names_to_accts_regions[acctname][pname].append(rname)
                     metadata[pname] = {
                         "description": self._policy_comment(policies[pname]),
-                        "enabled": self._is_enabled(policies[pname])
+                        "enabled": is_enabled(policies[pname])
                     }
         result = []
         for pname in sorted(metadata.keys()):

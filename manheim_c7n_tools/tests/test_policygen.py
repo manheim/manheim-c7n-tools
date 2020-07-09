@@ -3035,6 +3035,21 @@ class TestTimestr(object):
         assert policygen.timestr() == '2018-04-01 01:02:03 UTC'
 
 
+class TestIsEnabled(object):
+
+    def test_is_enabled_not_specified(self):
+        policy = {}
+        assert policygen.is_enabled(policy)
+
+    def test_is_disabled(self):
+        policy = {"disable": True}
+        assert not(policygen.is_enabled(policy))
+
+    def test_is_enabled_specified(self):
+        policy = {"disable": False}
+        assert policygen.is_enabled(policy)
+
+
 class TestMain(object):
 
     def test_main(self):
