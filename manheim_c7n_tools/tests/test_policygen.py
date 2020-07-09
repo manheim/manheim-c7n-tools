@@ -1764,6 +1764,82 @@ class TestWriteCustodianConfigs(PolicyGenTester):
             )
         ]
 
+    @patch.dict(
+        'os.environ',
+        {'POLICYGEN_ENV_foo': 'EVAR', 'Something': 'else'},
+        clear=True
+    )
+    def test_write_with_disabled(self):
+        original = {"policies": [
+            {
+                'foo': 'bar%%AWS_REGION%%baz',
+                'bar': [
+                    'baz',
+                    'AWS_REGION',
+                    '%%AWS_REGION%%',
+                    'xx%%AWS_REGION%%xx',
+                    'blam',
+                    'xx%%BUCKET_NAME%%xx'
+                ],
+                'baz': {
+                    'blam': {
+                        'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
+                    }
+                }
+            },
+            {
+                'quz': 'name',
+                'disable': True
+            },
+            {
+                'qux': 'wobble'
+            }
+        ]}
+
+        expected = {"policies": [
+            {
+                'foo': 'bar%%AWS_REGION%%baz',
+                'bar': [
+                    'baz',
+                    'AWS_REGION',
+                    '%%AWS_REGION%%',
+                    'xx%%AWS_REGION%%xx',
+                    'blam',
+                    'xx%%BUCKET_NAME%%xx'
+                ],
+                'baz': {
+                    'blam': {
+                        'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
+                    }
+                }
+            },
+            {
+                'qux': 'wobble'
+            }
+        ]}
+
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._write_file', autospec=True
+        ) as mock_wf:
+            with patch(
+                'manheim_c7n_tools.policygen.yaml.dump', autospec=True
+            ) as mock_dump:
+                mock_dump.return_value = \
+                    'yaml%%AWS_REGION%%yaml%%BUCKET_NAME%%x%%LOG_GROUP%%x' \
+                    '%%DLQ_ARN%%x%%ROLE_ARN%%x%%MAILER_QUEUE_URL%%x' \
+                    '%%ACCOUNT_NAME%%x%%ACCOUNT_ID%%xx' \
+                    '%%POLICYGEN_ENV_foo%%x'
+                self.cls._write_custodian_configs(original, 'region1')
+        assert mock_dump.mock_calls == [call(expected)]
+        assert mock_wf.mock_calls == [
+            call(
+                self.cls,
+                'custodian_region1.yml',
+                'yamlregion1yamlBktNamexLogGroupxDlq_region1_ArnxRoleArnx'
+                'MailerUrlxmyAccountx1234567890xxEVARx'
+            )
+        ]
+
 
 class TestCheckPolicies(PolicyGenTester):
 
@@ -2315,6 +2391,118 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
             {'mode': {'type': 'periodic'}, 'name': 'foo'},
             {'name': 'bar'},
             {'mode': {'type': 'periodic'}, 'name': 'baz'}
+        ]
+        assert self.cls._generate_cleanup_policies(policies) == [
+            lcleanup, cwecleanup
+        ]
+
+    def test_cleanup_with_disabled(self):
+        lcleanup = {
+            'name': 'c7n-cleanup-lambda',
+            'comment': 'Find and alert on orphaned c7n Lambda functions',
+            'resource': 'lambda',
+            'actions': [{
+                'type': 'notify',
+                'violation_desc': 'The following cloud-custodian Lambda '
+                                  'functions appear to be orphaned',
+                'action_desc': 'and should probably be deleted',
+                'subject': '[cloud-custodian {{ account }}] Orphaned '
+                           'cloud-custodian Lambda funcs in {{ region }}',
+                'to': ['me@example.com', 'foo']
+            }],
+            'filters': [
+                {'tag:Project': 'cloud-custodian'},
+                {'tag:Component': 'present'},
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'c7n-cleanup-lambda'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'c7n-cleanup-cwe'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'foo'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'bar'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'baz'
+                }
+            ]
+        }
+        cwecleanup = {
+            'name': 'c7n-cleanup-cwe',
+            'comment': 'Find and alert on orphaned c7n CloudWatch Events',
+            'resource': 'event-rule',
+            'actions': [{
+                'type': 'notify',
+                'violation_desc': 'The following cloud-custodian CloudWatch '
+                                  'Event rules appear to be orphaned',
+                'action_desc': 'and should probably be deleted',
+                'subject': '[cloud-custodian {{ account }}] Orphaned '
+                           'cloud-custodian CW Event rules in {{ region }}',
+                'to': ['me@example.com', 'foo']
+            }],
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'glob',
+                    'value': 'custodian-*'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-c7n-cleanup-lambda'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-c7n-cleanup-cwe'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-foo'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-bar'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-baz'
+                }
+            ]
+        }
+        policies = [
+            {'mode': {'type': 'periodic'}, 'name': 'foo'},
+            {'name': 'bar', 'disable': False},
+            {'name': 'quz', 'disable': True},
+            {'mode': {'type': 'periodic'}, 'name': 'baz'},
+            {'mode': {'type': 'periodic'}, 'name': 'qux', 'disable': True}
         ]
         assert self.cls._generate_cleanup_policies(policies) == [
             lcleanup, cwecleanup
