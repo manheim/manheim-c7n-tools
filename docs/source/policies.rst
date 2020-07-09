@@ -413,6 +413,32 @@ Other keys under the ``mode`` section include:
 -  **execution\_options** - Internal options of the Lambda function. Our defaults send logs to a CloudWatch log group
    and output to an S3 bucket, and setup the Dead Letter Queue.
 
+.. _`policies.disable`:
+
+Disabling a policy
+------------------
+
+It is possible to disable a rule. Simply setting the ``disable`` key in a policy to ``true`` will stop that policy from being
+deployed.
+
+.. code:: yaml
+
+    name: onhour-start-ec2
+    comments: Start tagged EC2 Instances daily at 06:00 Eastern, or per tag value
+    resource: ec2
+    disable: true
+
+The ``disable`` key can be added to an existing policy to temporarily disable the policy, and can also be used to disable a
+policy inherited from a higher-level policy source location by creating a new policy with the same name as the inherited
+policy and adding the ``disable`` key. Only the ``name`` and ``disable`` keys are required in this case, though adding about
+comment can help explain why the policy is disabled.
+
+.. code:: yaml
+
+    name: onhour-start-ec2
+    comments: Disabled due to ...
+    disable: true
+
 .. _`policies.action_transition`:
 
 Data Collection/Notification to Action Transition
