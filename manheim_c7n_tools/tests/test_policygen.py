@@ -1726,7 +1726,7 @@ class TestWriteCustodianConfigs(PolicyGenTester):
         clear=True
     )
     def test_write(self):
-        original = {
+        original = {"policies": [{
             'foo': 'bar%%AWS_REGION%%baz',
             'bar': [
                 'baz',
@@ -1741,7 +1741,7 @@ class TestWriteCustodianConfigs(PolicyGenTester):
                     'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
                 }
             }
-        }
+        }]}
         with patch(
             'manheim_c7n_tools.policygen.PolicyGen._write_file', autospec=True
         ) as mock_wf:
@@ -2382,7 +2382,8 @@ class TestPolicyRst(PolicyGenTester):
                     'Policy Name',
                     'Account(s) / Region(s)',
                     'Source Path(s)',
-                    'Description/Comment'
+                    'Description/Comment',
+                    'Enabled'
                 ],
                 tablefmt='grid'
             )
@@ -2439,7 +2440,8 @@ class TestPolicyRst(PolicyGenTester):
                 headers=[
                     'Policy Name',
                     'Account(s) / Region(s)',
-                    'Description/Comment'
+                    'Description/Comment',
+                    'Enabled'
                 ],
                 tablefmt='grid'
             )
@@ -2499,52 +2501,62 @@ class TestPolicyRstData(PolicyGenTester):
             [
                 'all_common',
                 '',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'all_r1',
                 'myAccount (region1) otherAccount (region1)',
-                'region1'
+                'region1',
+                True
             ],
             [
                 'all_r2',
                 'myAccount (region2) otherAccount (region2)',
-                'region2'
+                'region2',
+                True
             ],
             [
                 'all_r3',
                 'myAccount (region3) otherAccount (region3)',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'baz',
                 'myAccount (region1 region2) otherAccount (region2 region3)',
-                'blam'
+                'blam',
+                True
             ],
             [
                 'foo',
                 'myAccount (region3) otherAccount (region1)',
-                'bar-otherAccount/region1'
+                'bar-otherAccount/region1',
+                True
             ],
             [
                 'fooA1',
                 'myAccount (region1 region2)',
-                'bar-myAccount/region2'
+                'bar-myAccount/region2',
+                True
             ],
             [
                 'fooA2',
                 'otherAccount (region2 region3)',
-                'bar-otherAccount/region3'
+                'bar-otherAccount/region3',
+                True
             ],
             [
                 'myAccount/common',
                 'myAccount',
-                'c'
+                'c',
+                True
             ],
             [
                 'otherAccount/common',
                 'otherAccount',
-                'c'
+                'c',
+                True
             ]
         ]
 
@@ -2612,61 +2624,71 @@ class TestPolicyRstData(PolicyGenTester):
                 'all_common',
                 '',
                 'path1',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'all_r1',
                 'myAccount (region1) otherAccount (region1)',
                 'path2',
-                'region1'
+                'region1',
+                True
             ],
             [
                 'all_r2',
                 'myAccount (region2) otherAccount (region2)',
                 'path2',
-                'region2'
+                'region2',
+                True
             ],
             [
                 'all_r3',
                 'myAccount (region3) otherAccount (region3)',
                 'path3',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'baz',
                 'myAccount (region1 region2) otherAccount (region2 region3)',
                 'path1 path2',
-                'blam'
+                'blam',
+                True
             ],
             [
                 'foo',
                 'myAccount (region3) otherAccount (region1)',
                 'path1 path2 path3',
-                'bar-otherAccount/region1'
+                'bar-otherAccount/region1',
+                True
             ],
             [
                 'fooA1',
                 'myAccount (region1 region2)',
                 'path1',
-                'bar-myAccount/region2'
+                'bar-myAccount/region2',
+                True
             ],
             [
                 'fooA2',
                 'otherAccount (region2 region3)',
                 'path1',
-                'bar-otherAccount/region3'
+                'bar-otherAccount/region3',
+                True
             ],
             [
                 'myAccount/common',
                 'myAccount',
                 'path2',
-                'c'
+                'c',
+                True
             ],
             [
                 'otherAccount/common',
                 'otherAccount',
                 'path3',
-                'c'
+                'c',
+                True
             ]
         ]
 
