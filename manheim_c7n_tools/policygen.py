@@ -264,22 +264,6 @@ class PolicyGen(object):
         """
         return not(policy.get("disable", False))
 
-    def _map_policies(self, result):
-        """
-        Separates a list of policies into two lists containing enabled and
-        disabled policies.
-
-        :param result: List of policies to map
-        :type result: list
-        """
-        mapped_policies = {"enabled": [], "disabled": []}
-        for policy in result['policies']:
-            if self._is_enabled(policy):
-                mapped_policies['enabled'].append(policy)
-            else:
-                mapped_policies['disabled'].append(policy)
-        return mapped_policies
-
     def _write_custodian_configs(self, result, region_name):
         """
         Write the per-region ``custodian_REGION.yml`` config file to disk. This
