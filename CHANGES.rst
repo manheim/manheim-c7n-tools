@@ -1,5 +1,9 @@
 Changelog
 =========
+1.2.3 (2020-07-10)
+------------------
+
+* Update policygen to add enabled/disabled status to generated policy documentation
 
 1.2.2 (2020-07-08)
 ------------------
