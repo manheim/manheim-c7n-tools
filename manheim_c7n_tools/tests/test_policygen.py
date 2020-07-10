@@ -1726,7 +1726,7 @@ class TestWriteCustodianConfigs(PolicyGenTester):
         clear=True
     )
     def test_write(self):
-        original = {
+        original = {"policies": [{
             'foo': 'bar%%AWS_REGION%%baz',
             'bar': [
                 'baz',
@@ -1741,7 +1741,7 @@ class TestWriteCustodianConfigs(PolicyGenTester):
                     'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
                 }
             }
-        }
+        }]}
         with patch(
             'manheim_c7n_tools.policygen.PolicyGen._write_file', autospec=True
         ) as mock_wf:
@@ -1755,6 +1755,82 @@ class TestWriteCustodianConfigs(PolicyGenTester):
                     '%%POLICYGEN_ENV_foo%%x'
                 self.cls._write_custodian_configs(original, 'region1')
         assert mock_dump.mock_calls == [call(original)]
+        assert mock_wf.mock_calls == [
+            call(
+                self.cls,
+                'custodian_region1.yml',
+                'yamlregion1yamlBktNamexLogGroupxDlq_region1_ArnxRoleArnx'
+                'MailerUrlxmyAccountx1234567890xxEVARx'
+            )
+        ]
+
+    @patch.dict(
+        'os.environ',
+        {'POLICYGEN_ENV_foo': 'EVAR', 'Something': 'else'},
+        clear=True
+    )
+    def test_write_with_disabled(self):
+        original = {"policies": [
+            {
+                'foo': 'bar%%AWS_REGION%%baz',
+                'bar': [
+                    'baz',
+                    'AWS_REGION',
+                    '%%AWS_REGION%%',
+                    'xx%%AWS_REGION%%xx',
+                    'blam',
+                    'xx%%BUCKET_NAME%%xx'
+                ],
+                'baz': {
+                    'blam': {
+                        'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
+                    }
+                }
+            },
+            {
+                'quz': 'name',
+                'disable': True
+            },
+            {
+                'qux': 'wobble'
+            }
+        ]}
+
+        expected = {"policies": [
+            {
+                'foo': 'bar%%AWS_REGION%%baz',
+                'bar': [
+                    'baz',
+                    'AWS_REGION',
+                    '%%AWS_REGION%%',
+                    'xx%%AWS_REGION%%xx',
+                    'blam',
+                    'xx%%BUCKET_NAME%%xx'
+                ],
+                'baz': {
+                    'blam': {
+                        'blarg%%AWS_REGION%%xx': 'xxx%%AWS_REGION%%xxx'
+                    }
+                }
+            },
+            {
+                'qux': 'wobble'
+            }
+        ]}
+
+        with patch(
+            'manheim_c7n_tools.policygen.PolicyGen._write_file', autospec=True
+        ) as mock_wf:
+            with patch(
+                'manheim_c7n_tools.policygen.yaml.dump', autospec=True
+            ) as mock_dump:
+                mock_dump.return_value = \
+                    'yaml%%AWS_REGION%%yaml%%BUCKET_NAME%%x%%LOG_GROUP%%x' \
+                    '%%DLQ_ARN%%x%%ROLE_ARN%%x%%MAILER_QUEUE_URL%%x' \
+                    '%%ACCOUNT_NAME%%x%%ACCOUNT_ID%%xx' \
+                    '%%POLICYGEN_ENV_foo%%x'
+                self.cls._write_custodian_configs(original, 'region1')
+        assert mock_dump.mock_calls == [call(expected)]
         assert mock_wf.mock_calls == [
             call(
                 self.cls,
@@ -2320,6 +2396,118 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
             lcleanup, cwecleanup
         ]
 
+    def test_cleanup_with_disabled(self):
+        lcleanup = {
+            'name': 'c7n-cleanup-lambda',
+            'comment': 'Find and alert on orphaned c7n Lambda functions',
+            'resource': 'lambda',
+            'actions': [{
+                'type': 'notify',
+                'violation_desc': 'The following cloud-custodian Lambda '
+                                  'functions appear to be orphaned',
+                'action_desc': 'and should probably be deleted',
+                'subject': '[cloud-custodian {{ account }}] Orphaned '
+                           'cloud-custodian Lambda funcs in {{ region }}',
+                'to': ['me@example.com', 'foo']
+            }],
+            'filters': [
+                {'tag:Project': 'cloud-custodian'},
+                {'tag:Component': 'present'},
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'c7n-cleanup-lambda'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'c7n-cleanup-cwe'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'foo'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'bar'
+                },
+                {
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': 'baz'
+                }
+            ]
+        }
+        cwecleanup = {
+            'name': 'c7n-cleanup-cwe',
+            'comment': 'Find and alert on orphaned c7n CloudWatch Events',
+            'resource': 'event-rule',
+            'actions': [{
+                'type': 'notify',
+                'violation_desc': 'The following cloud-custodian CloudWatch '
+                                  'Event rules appear to be orphaned',
+                'action_desc': 'and should probably be deleted',
+                'subject': '[cloud-custodian {{ account }}] Orphaned '
+                           'cloud-custodian CW Event rules in {{ region }}',
+                'to': ['me@example.com', 'foo']
+            }],
+            'filters': [
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'glob',
+                    'value': 'custodian-*'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-c7n-cleanup-lambda'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-c7n-cleanup-cwe'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-foo'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-bar'
+                },
+                {
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-baz'
+                }
+            ]
+        }
+        policies = [
+            {'mode': {'type': 'periodic'}, 'name': 'foo'},
+            {'name': 'bar', 'disable': False},
+            {'name': 'quz', 'disable': True},
+            {'mode': {'type': 'periodic'}, 'name': 'baz'},
+            {'mode': {'type': 'periodic'}, 'name': 'qux', 'disable': True}
+        ]
+        assert self.cls._generate_cleanup_policies(policies) == [
+            lcleanup, cwecleanup
+        ]
+
 
 class TestPolicyRst(PolicyGenTester):
 
@@ -2382,7 +2570,8 @@ class TestPolicyRst(PolicyGenTester):
                     'Policy Name',
                     'Account(s) / Region(s)',
                     'Source Path(s)',
-                    'Description/Comment'
+                    'Description/Comment',
+                    'Enabled'
                 ],
                 tablefmt='grid'
             )
@@ -2439,7 +2628,8 @@ class TestPolicyRst(PolicyGenTester):
                 headers=[
                     'Policy Name',
                     'Account(s) / Region(s)',
-                    'Description/Comment'
+                    'Description/Comment',
+                    'Enabled'
                 ],
                 tablefmt='grid'
             )
@@ -2499,52 +2689,62 @@ class TestPolicyRstData(PolicyGenTester):
             [
                 'all_common',
                 '',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'all_r1',
                 'myAccount (region1) otherAccount (region1)',
-                'region1'
+                'region1',
+                True
             ],
             [
                 'all_r2',
                 'myAccount (region2) otherAccount (region2)',
-                'region2'
+                'region2',
+                True
             ],
             [
                 'all_r3',
                 'myAccount (region3) otherAccount (region3)',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'baz',
                 'myAccount (region1 region2) otherAccount (region2 region3)',
-                'blam'
+                'blam',
+                True
             ],
             [
                 'foo',
                 'myAccount (region3) otherAccount (region1)',
-                'bar-otherAccount/region1'
+                'bar-otherAccount/region1',
+                True
             ],
             [
                 'fooA1',
                 'myAccount (region1 region2)',
-                'bar-myAccount/region2'
+                'bar-myAccount/region2',
+                True
             ],
             [
                 'fooA2',
                 'otherAccount (region2 region3)',
-                'bar-otherAccount/region3'
+                'bar-otherAccount/region3',
+                True
             ],
             [
                 'myAccount/common',
                 'myAccount',
-                'c'
+                'c',
+                True
             ],
             [
                 'otherAccount/common',
                 'otherAccount',
-                'c'
+                'c',
+                True
             ]
         ]
 
@@ -2612,61 +2812,71 @@ class TestPolicyRstData(PolicyGenTester):
                 'all_common',
                 '',
                 'path1',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'all_r1',
                 'myAccount (region1) otherAccount (region1)',
                 'path2',
-                'region1'
+                'region1',
+                True
             ],
             [
                 'all_r2',
                 'myAccount (region2) otherAccount (region2)',
                 'path2',
-                'region2'
+                'region2',
+                True
             ],
             [
                 'all_r3',
                 'myAccount (region3) otherAccount (region3)',
                 'path3',
-                'region3'
+                'region3',
+                True
             ],
             [
                 'baz',
                 'myAccount (region1 region2) otherAccount (region2 region3)',
                 'path1 path2',
-                'blam'
+                'blam',
+                True
             ],
             [
                 'foo',
                 'myAccount (region3) otherAccount (region1)',
                 'path1 path2 path3',
-                'bar-otherAccount/region1'
+                'bar-otherAccount/region1',
+                True
             ],
             [
                 'fooA1',
                 'myAccount (region1 region2)',
                 'path1',
-                'bar-myAccount/region2'
+                'bar-myAccount/region2',
+                True
             ],
             [
                 'fooA2',
                 'otherAccount (region2 region3)',
                 'path1',
-                'bar-otherAccount/region3'
+                'bar-otherAccount/region3',
+                True
             ],
             [
                 'myAccount/common',
                 'myAccount',
                 'path2',
-                'c'
+                'c',
+                True
             ],
             [
                 'otherAccount/common',
                 'otherAccount',
                 'path3',
-                'c'
+                'c',
+                True
             ]
         ]
 
@@ -3011,6 +3221,21 @@ class TestTimestr(object):
     @freeze_time('2018-04-01 01:02:03', tz_offset=0)
     def test_timestr(self):
         assert policygen.timestr() == '2018-04-01 01:02:03 UTC'
+
+
+class TestIsEnabled(object):
+
+    def test_is_enabled_not_specified(self):
+        policy = {}
+        assert policygen.is_enabled(policy)
+
+    def test_is_disabled(self):
+        policy = {"disable": True}
+        assert not(policygen.is_enabled(policy))
+
+    def test_is_enabled_specified(self):
+        policy = {"disable": False}
+        assert policygen.is_enabled(policy)
 
 
 class TestMain(object):

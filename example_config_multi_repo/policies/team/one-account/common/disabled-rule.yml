@@ -1,0 +1,4 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: disabled-rule
+comments: Test rule to test disabling rules. This will disable the "shared" rule of the same name.
+disable: true

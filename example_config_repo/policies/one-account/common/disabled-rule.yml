@@ -1,0 +1,19 @@
+# REMINDER: defaults.yml will be merged in to this. See the README.
+name: disabled-rule
+comments: Test rule to test disabling rules.
+resource: log-group
+disable: true
+filters:
+  # custodian- or cloud-custodian- lambda log groups
+  - type: value
+    key: logGroupName
+    op: regex
+    value: "^/aws/lambda/(cloud-custodian-|custodian-)"
+  - type: value
+    key: retentionInDays
+    op: ne
+    value: 30
+actions:
+  # set Log Group retention to 30 days
+  - type: retention
+    days: 30

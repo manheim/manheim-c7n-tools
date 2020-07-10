@@ -53,6 +53,16 @@ def timestr():
     return datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
 
 
+def is_enabled(policy):
+    """
+    Helper function to determine if a policy is enabled.
+
+    :param policy: policy to check
+    :type policy: dict
+    """
+    return not(policy.get("disable", False))
+
+
 class PolicyGen(object):
 
     def __init__(self, config):
@@ -265,7 +275,8 @@ class PolicyGen(object):
         :param region_name: the name of the region the configs are for
         :type region_name: str
         """
-        config_str = yaml.dump(result)
+        enabled_policies = list(filter(is_enabled, result['policies']))
+        config_str = yaml.dump({"policies": enabled_policies})
         fname = 'custodian_%s.yml' % region_name
         logger.info('Writing %s policies to %s...' % (region_name, fname))
         conf = config_str
@@ -466,18 +477,19 @@ class PolicyGen(object):
         # add the filters
         for p in policies:
             name = p['name']
-            cwecleanup['filters'].append({
-                'type': 'value',
-                'key': 'Name',
-                'op': 'ne',
-                'value': 'custodian-%s' % name
-            })
-            lcleanup['filters'].append({
-                'type': 'value',
-                'key': 'tag:Component',
-                'op': 'ne',
-                'value': name
-            })
+            if is_enabled(p):
+                cwecleanup['filters'].append({
+                    'type': 'value',
+                    'key': 'Name',
+                    'op': 'ne',
+                    'value': 'custodian-%s' % name
+                })
+                lcleanup['filters'].append({
+                    'type': 'value',
+                    'key': 'tag:Component',
+                    'op': 'ne',
+                    'value': name
+                })
         return [lcleanup, cwecleanup]
 
     def _write_file(self, path, content):
@@ -642,12 +654,13 @@ class PolicyGen(object):
             assert len(self._config.policy_source_paths) > 0
             headers = [
                 'Policy Name', 'Account(s) / Region(s)', 'Source Path(s)',
-                'Description/Comment'
+                'Description/Comment', 'Enabled'
             ]
             have_source_paths = True
         except Exception:
             headers = [
-                'Policy Name', 'Account(s) / Region(s)', 'Description/Comment'
+                'Policy Name', 'Account(s) / Region(s)', 'Description/Comment',
+                'Enabled'
             ]
             have_source_paths = False
         s += tabulate(
@@ -673,16 +686,19 @@ class PolicyGen(object):
         names_to_accts_regions = {
             x: defaultdict(list) for x in account_policies.keys()
         }
-        descriptions = {}
+        metadata = {}
         for acctname in sorted(account_policies.keys()):
             region_policies = account_policies[acctname]
             for rname in sorted(region_policies.keys()):
                 policies = region_policies[rname]
                 for pname in sorted(policies.keys()):
                     names_to_accts_regions[acctname][pname].append(rname)
-                    descriptions[pname] = self._policy_comment(policies[pname])
+                    metadata[pname] = {
+                        "description": self._policy_comment(policies[pname]),
+                        "enabled": is_enabled(policies[pname])
+                    }
         result = []
-        for pname in sorted(descriptions.keys()):
+        for pname in sorted(metadata.keys()):
             accts = []
             for acctname in acct_names:
                 regions = sorted(names_to_accts_regions[acctname][pname])
@@ -701,13 +717,15 @@ class PolicyGen(object):
                     pname,
                     apart,
                     ' '.join(sorted(self._policy_sources.get(pname, []))),
-                    descriptions[pname]
+                    metadata[pname]["description"],
+                    metadata[pname]["enabled"]
                 ])
             else:
                 result.append([
                     pname,
                     apart,
-                    descriptions[pname]
+                    metadata[pname]["description"],
+                    metadata[pname]["enabled"]
                 ])
         return result
 
