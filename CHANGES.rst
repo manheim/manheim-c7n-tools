@@ -6,7 +6,8 @@ Changelog
 
 * Fixes `#53 <https://github.com/manheim/manheim-c7n-tools/issues/53>`__
 
-  * Add ``function_prefix`` option to ``manheim-c7n-tools.yml`` to allow passing this option to mugc.
+  * Add ``function_prefix`` option to ``manheim-c7n-tools.yml`` to allow passing this option to mugc. Default it to the current/default ``custodian-``.
+  * Have :py:class:`~.runner.MugcStep` use configured ``function_prefix`` instead of hard-coded ``custodian-``.
 
 * Switch from deprecated pep8 / pytest-pep8 to pycodestyle / pytest-pycodestyle.
 

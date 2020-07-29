@@ -123,6 +123,9 @@ class TestValidateStep(StepTester):
 class TestMugcStep(StepTester):
 
     def test_run(self):
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='foobar-'
+        )
         mock_pol1 = Mock(provider_name='foo')
         mock_pol2 = Mock(provider_name='aws')
         mock_pol3 = Mock(provider_name='azure')
@@ -149,8 +152,8 @@ class TestMugcStep(StepTester):
             call(
                 config_files=['custodian_rName.yml'],
                 regions=['rName'],
-                prefix='custodian-',
-                policy_regex='^custodian-.*',
+                prefix='foobar-',
+                policy_regex='^foobar\\-.*',
                 assume=None,
                 policy_filter=None,
                 log_group=None,
@@ -175,6 +178,9 @@ class TestMugcStep(StepTester):
         ]
 
     def test_dryrun(self):
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='foobar-'
+        )
         mock_pol1 = Mock(provider_name='foo')
         mock_pol2 = Mock(provider_name='aws')
         mock_pol3 = Mock(provider_name='azure')
@@ -201,8 +207,8 @@ class TestMugcStep(StepTester):
             call(
                 config_files=['custodian_rName.yml'],
                 regions=['rName'],
-                prefix='custodian-',
-                policy_regex='^custodian-.*',
+                prefix='foobar-',
+                policy_regex='^foobar\\-.*',
                 assume=None,
                 policy_filter=None,
                 log_group=None,

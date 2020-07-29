@@ -31,6 +31,7 @@ import functools
 from shutil import rmtree
 import os
 from copy import deepcopy
+import re
 
 from sphinx.cmd.build import main as sphinx_main
 import jsonschema
@@ -181,8 +182,8 @@ class MugcStep(BaseStep):
         conf = Config.empty(
             config_files=['custodian_%s.yml' % self.region_name],
             regions=[self.region_name],
-            prefix='custodian-',
-            policy_regex='^custodian-.*',
+            prefix=self.config.function_prefix,
+            policy_regex='^' + re.escape(self.config.function_prefix) + '.*',
             assume=None,
             policy_filter=None,
             log_group=None,
@@ -212,8 +213,8 @@ class MugcStep(BaseStep):
         conf = Config.empty(
             config_files=['custodian_%s.yml' % self.region_name],
             regions=[self.region_name],
-            prefix='custodian-',
-            policy_regex='^custodian-.*',
+            prefix=self.config.function_prefix,
+            policy_regex='^' + re.escape(self.config.function_prefix) + '.*',
             assume=None,
             policy_filter=None,
             log_group=None,
