@@ -329,6 +329,16 @@ class PolicyGen(object):
             raise SystemExit(1)
         logger.info('OK: All policies passed sanity/safety checks.')
 
+    def _check_policy_function_prefix(self, policy):
+        """
+        Fail if function-prefix doesn't match between manheim-c7n-tools config
+        and the policy.
+        """
+        fp = policy.get('mode', {}).get('function-prefix', 'custodian-')
+        if fp != self._config.function_prefix:
+            return False
+        return True
+
     def _check_policy_marked_for_op_first(self, policy):
         """
         Policy includes a marked-for-op filter, but it is not the first filter.

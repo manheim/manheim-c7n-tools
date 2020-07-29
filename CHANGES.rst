@@ -8,6 +8,7 @@ Changelog
 
   * Add ``function_prefix`` option to ``manheim-c7n-tools.yml`` to allow passing this option to mugc. Default it to the current/default ``custodian-``.
   * Have :py:class:`~.runner.MugcStep` use configured ``function_prefix`` instead of hard-coded ``custodian-``.
+  * New policy sanity check :py:meth:`~.PolicyGen._check_policy_function_prefix` - fail if a policy's ``function-prefix`` doesn't match the configured (``manheim-c7n-tools.yml``) ``function_prefix``.
 
 * Switch from deprecated pep8 / pytest-pep8 to pycodestyle / pytest-pycodestyle.
 

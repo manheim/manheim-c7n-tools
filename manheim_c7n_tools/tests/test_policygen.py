@@ -74,6 +74,9 @@ class PolicyGenTester(object):
         type(self.m_conf).mailer_config = PropertyMock(
             return_value={'queue_url': 'MailerUrl'}
         )
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='custodian-'
+        )
         type(self.m_conf).account_name = PropertyMock(return_value='myAccount')
         type(self.m_conf).account_id = PropertyMock(return_value='1234567890')
         self.m_conf.list_accounts.return_value = ['myAccount', 'otherAccount']
@@ -1903,6 +1906,66 @@ class TestCheckPolicies(PolicyGenTester):
             call.error('foo'),
             call.error('\t_check_policy_marked_for_op_first')
         ]
+
+
+class TestCheckPolicyFunctionPrefix(PolicyGenTester):
+
+    def test_success_no_prefix(self):
+        policy = {
+            'name': 'foo',
+            'mode': {
+                'type': 'periodic'
+            }
+        }
+        assert self.cls._check_policy_function_prefix(policy) is True
+
+    def test_success_default_prefix(self):
+        policy = {
+            'name': 'foo',
+            'mode': {
+                'type': 'periodic',
+                'function-prefix': 'custodian-'
+            }
+        }
+        assert self.cls._check_policy_function_prefix(policy) is True
+
+    def test_success_custom_prefix(self):
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='foobar-'
+        )
+        policy = {
+            'name': 'foo',
+            'mode': {
+                'type': 'periodic',
+                'function-prefix': 'foobar-'
+            }
+        }
+        assert self.cls._check_policy_function_prefix(policy) is True
+
+    def test_fail_config_custom_prefix(self):
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='foobar-'
+        )
+        policy = {
+            'name': 'foo',
+            'mode': {
+                'type': 'periodic'
+            }
+        }
+        assert self.cls._check_policy_function_prefix(policy) is False
+
+    def test_fail_policy_custom_prefix(self):
+        type(self.m_conf).function_prefix = PropertyMock(
+            return_value='custodian-'
+        )
+        policy = {
+            'name': 'foo',
+            'mode': {
+                'type': 'periodic',
+                'function-prefix': 'foobar-'
+            }
+        }
+        assert self.cls._check_policy_function_prefix(policy) is False
 
 
 class TestCheckPolicyMarkedForOpFirst(PolicyGenTester):
