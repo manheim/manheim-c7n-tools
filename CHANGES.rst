@@ -1,5 +1,11 @@
 Changelog
 =========
+
+1.2.4 (2020-07-29)
+------------------
+
+* Switch from deprecated pep8 / pytest-pep8 to pycodestyle / pytest-pycodestyle.
+
 1.2.3 (2020-07-10)
 ------------------
 

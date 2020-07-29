@@ -576,9 +576,9 @@ class CustodianErrorReporter(object):
             )))
             for e in events:
                 print("\n".join([
-                    "\t\t%s" % l.replace("\t", ' ')
-                    for l in e['message'].split("\n")
-                    if l.strip() != ''
+                    "\t\t%s" % line.replace("\t", ' ')
+                    for line in e['message'].split("\n")
+                    if line.strip() != ''
                 ]))
         if 'always_match' in logs:
             print("\t" + red(
@@ -587,21 +587,21 @@ class CustodianErrorReporter(object):
             ))
             for e in logs['always_match']:
                 print("\n".join([
-                    "\t\t%s" % l.replace("\t", ' ')
-                    for l in e['message'].split("\n")
-                    if l.strip() != ''
+                    "\t\t%s" % line.replace("\t", ' ')
+                    for line in e['message'].split("\n")
+                    if line.strip() != ''
                 ]))
         print('')
         return False
 
 
-def _name_value_dict(l):
+def _name_value_dict(lst):
     """
-    Given a list (``l``) containing dicts with ``Name`` and ``Value`` keys,
+    Given a list (``lst``) containing dicts with ``Name`` and ``Value`` keys,
     return a single dict of Name -> Value.
     """
     res = {}
-    for item in l:
+    for item in lst:
         res[item['Name']] = item['Value']
     return res
 
