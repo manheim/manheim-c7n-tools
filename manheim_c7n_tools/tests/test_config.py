@@ -35,7 +35,8 @@ class TestManheimConfig(object):
                 )
         assert cls._config == {
             'foo': 'bar', 'baz': 2, 'regions': ['us-east-1'],
-            'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
+            'account_id': '1234', 'cleanup_notify': ['foo@bar.com'],
+            'function_prefix': 'custodian-'
         }
         assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
@@ -59,11 +60,12 @@ class TestManheimConfig(object):
                 cls = ManheimConfig(
                     foo='bar', baz=2, regions=['us-east-2'],
                     config_path='manheim-c7n-tools.yml', account_id='1234',
-                    cleanup_notify=['foo@bar.com']
+                    cleanup_notify=['foo@bar.com'], function_prefix='foo-'
                 )
         assert cls._config == {
             'foo': 'bar', 'baz': 2, 'regions': ['us-east-2'],
-            'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
+            'account_id': '1234', 'cleanup_notify': ['foo@bar.com'],
+            'function_prefix': 'foo-'
         }
         assert cls.config_path == 'manheim-c7n-tools.yml'
         assert mock_logger.mock_calls == [
@@ -73,7 +75,8 @@ class TestManheimConfig(object):
             call(
                 {
                     'foo': 'bar', 'baz': 2, 'regions': ['us-east-2'],
-                    'account_id': '1234', 'cleanup_notify': ['foo@bar.com']
+                    'account_id': '1234', 'cleanup_notify': ['foo@bar.com'],
+                    'function_prefix': 'foo-'
                 },
                 MANHEIM_CONFIG_SCHEMA
             )
@@ -260,7 +263,8 @@ class TestManheimConfig(object):
             },
             'account_id': '012345',
             'regions': ['us-east-1', 'us-east-2'],
-            'cleanup_notify': []
+            'cleanup_notify': [],
+            'function_prefix': 'custodian-'
         }
         with patch('%s.jsonschema.validate' % pbm, autospec=True):
             with patch.dict(

@@ -56,6 +56,8 @@ MANHEIM_CONFIG_SCHEMA = {
         # Optional policy source paths. If not specified, uses the current
         # directory
         'policy_source_paths': {'type': 'array', 'items': {'type': 'string'}},
+        # Name prefix for custodian Lambda functions
+        'function_prefix': {'type': 'string'},
         # A list of region names that custodian should run in for this account
         'regions': {'type': 'array', 'items': {'type': 'string'}},
         # Name of the S3 bucket for storing Custodian output; should include
@@ -72,7 +74,6 @@ MANHEIM_CONFIG_SCHEMA = {
         # Array of notification recipients for orphaned Lambda/CWE Rule
         # notifications; set to empty array to disable this functionality
         'cleanup_notify': {'type': 'array'},
-
         # Optional list of notification targets to add to EVERY policy
         'always_notify': {
             'to': {'type': 'array', 'items': {'type': 'string'}},
@@ -115,9 +116,11 @@ class ManheimConfig(object):
     def __init__(self, **kwargs):
         self.config_path = kwargs.pop('config_path')
         logger.debug('Validating configuration...')
-        jsonschema.validate(kwargs, MANHEIM_CONFIG_SCHEMA)
+        jsonschema.validate(dict(kwargs), MANHEIM_CONFIG_SCHEMA)
         self._config = kwargs
         self._config['account_id'] = str(self._config['account_id'])
+        if 'function_prefix' not in self._config:
+            self._config['function_prefix'] = 'custodian-'
         if 'cleanup_notify' not in self._config:
             self._config['cleanup_notify'] = []
 
