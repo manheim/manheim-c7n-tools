@@ -4,6 +4,10 @@ Changelog
 1.2.4 (2020-07-29)
 ------------------
 
+* Fixes `#53 <https://github.com/manheim/manheim-c7n-tools/issues/53>`__
+
+  * Add ``function_prefix`` option to ``manheim-c7n-tools.yml`` to allow passing this option to mugc.
+
 * Switch from deprecated pep8 / pytest-pep8 to pycodestyle / pytest-pycodestyle.
 
 1.2.3 (2020-07-10)
