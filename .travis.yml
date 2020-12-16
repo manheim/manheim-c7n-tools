@@ -33,6 +33,9 @@ jobs:
       python: '3.8'
       env: TOXENV=py38
     - stage: test
+      python: '3.9'
+      env: TOXENV=py39
+    - stage: test
       python: '3.8'
       env: TOXENV=docs
     - stage: test
