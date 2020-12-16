@@ -1,4 +1,4 @@
-FROM python:3.7.3-alpine3.9
+FROM python:3.9.1-alpine3.12
 
 ARG git_version
 

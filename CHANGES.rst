@@ -6,6 +6,7 @@ Changelog
 
 * Fixes `#56 <https://github.com/manheim/manheim-c7n-tools/issues/56>`__ - Bump c7n version from 0.9.4 to `0.9.9 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.9.0>`__ and c7n-mailer from 0.6.3 to 0.6.8.
 * Begin testing against Python 3.9
+* Bump base Docker image to latest ``python:3.9.1-alpine3.12``
 
 1.2.4 (2020-07-29)
 ------------------
