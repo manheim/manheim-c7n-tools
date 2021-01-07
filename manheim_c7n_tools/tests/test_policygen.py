@@ -1610,6 +1610,9 @@ class TestGenerateConfigs(PolicyGenTester):
         def se_apply_defaults(klass, defaults, policy):
             return '%s+defaults' % policy
 
+        def se_notify_only(klass, policy):
+            return f'{policy}+notifyonly'
+
         policies = {
             'foo': 'bar',
             'baz': 'blam'
@@ -1620,17 +1623,19 @@ class TestGenerateConfigs(PolicyGenTester):
             _apply_defaults=DEFAULT,
             _generate_cleanup_policies=DEFAULT,
             _check_policies=DEFAULT,
-            _write_custodian_configs=DEFAULT
+            _write_custodian_configs=DEFAULT,
+            _handle_notify_only_policy=DEFAULT
         ) as mocks:
             mocks['_apply_defaults'].side_effect = se_apply_defaults
             mocks['_generate_cleanup_policies'].return_value = [
                 'cleanup1', 'cleanup2'
             ]
+            mocks['_handle_notify_only_policy'].side_effect = se_notify_only
             res = self.cls._generate_configs(policies, 'quux', 'region2')
         assert res == {
             'policies': [
-                'blam+defaults',
-                'bar+defaults',
+                'blam+defaults+notifyonly',
+                'bar+defaults+notifyonly',
                 'cleanup1+defaults',
                 'cleanup2+defaults'
             ]
@@ -1641,13 +1646,20 @@ class TestGenerateConfigs(PolicyGenTester):
             call(self.cls, 'quux', 'cleanup1'),
             call(self.cls, 'quux', 'cleanup2')
         ]
+        assert mocks['_handle_notify_only_policy'].mock_calls == [
+            call(self.cls, 'blam+defaults'),
+            call(self.cls, 'bar+defaults')
+        ]
         assert mocks['_generate_cleanup_policies'].mock_calls == [
-            call(self.cls, ['blam+defaults', 'bar+defaults'])
+            call(
+                self.cls,
+                ['blam+defaults+notifyonly', 'bar+defaults+notifyonly']
+            )
         ]
         exp_policies = {
             'policies': [
-                'blam+defaults',
-                'bar+defaults',
+                'blam+defaults+notifyonly',
+                'bar+defaults+notifyonly',
                 'cleanup1+defaults',
                 'cleanup2+defaults'
             ]
@@ -1659,8 +1671,8 @@ class TestGenerateConfigs(PolicyGenTester):
             call(
                 self.cls,
                 [
-                    'blam+defaults',
-                    'bar+defaults',
+                    'blam+defaults+notifyonly',
+                    'bar+defaults+notifyonly',
                     'cleanup1+defaults',
                     'cleanup2+defaults'
                 ]
@@ -1675,6 +1687,9 @@ class TestGenerateConfigs(PolicyGenTester):
         def se_apply_defaults(klass, defaults, policy):
             return '%s+defaults' % policy
 
+        def se_notify_only(klass, policy):
+            return f'{policy}+notifyonly'
+
         policies = {
             'foo': 'bar',
             'baz': 'blam'
@@ -1685,26 +1700,32 @@ class TestGenerateConfigs(PolicyGenTester):
             _apply_defaults=DEFAULT,
             _generate_cleanup_policies=DEFAULT,
             _check_policies=DEFAULT,
-            _write_custodian_configs=DEFAULT
+            _write_custodian_configs=DEFAULT,
+            _handle_notify_only_policy=DEFAULT
         ) as mocks:
             mocks['_apply_defaults'].side_effect = se_apply_defaults
             mocks['_generate_cleanup_policies'].return_value = []
+            mocks['_handle_notify_only_policy'].side_effect = se_notify_only
             res = self.cls._generate_configs(policies, 'quux', 'region2')
         assert res == {
             'policies': [
-                'blam+defaults',
-                'bar+defaults'
+                'blam+defaults+notifyonly',
+                'bar+defaults+notifyonly'
             ]
         }
         assert mocks['_apply_defaults'].mock_calls == [
             call(self.cls, 'quux', 'blam'),
             call(self.cls, 'quux', 'bar')
         ]
+        assert mocks['_handle_notify_only_policy'].mock_calls == [
+            call(self.cls, 'blam+defaults'),
+            call(self.cls, 'bar+defaults')
+        ]
         assert mocks['_generate_cleanup_policies'].mock_calls == []
         exp_policies = {
             'policies': [
-                'blam+defaults',
-                'bar+defaults'
+                'blam+defaults+notifyonly',
+                'bar+defaults+notifyonly'
             ]
         }
         assert mocks['_write_custodian_configs'].mock_calls == [
@@ -1714,8 +1735,8 @@ class TestGenerateConfigs(PolicyGenTester):
             call(
                 self.cls,
                 [
-                    'blam+defaults',
-                    'bar+defaults'
+                    'blam+defaults+notifyonly',
+                    'bar+defaults+notifyonly'
                 ]
             )
         ]

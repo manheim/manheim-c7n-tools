@@ -251,7 +251,9 @@ class PolicyGen(object):
         result = {'policies': []}
         for k in sorted(policies.keys()):
             result['policies'].append(
-                self._apply_defaults(defaults, policies[k])
+                self._handle_notify_only_policy(
+                    self._apply_defaults(defaults, policies[k])
+                )
             )
         if self._config.cleanup_notify:
             logger.info('Generating c7n cleanup policies...')
@@ -506,6 +508,18 @@ class PolicyGen(object):
         """write a file - helper to make unit tests simpler"""
         with open(path, 'w') as fh:
             fh.write(content)
+
+    def _handle_notify_only_policy(self, policy):
+        """
+        Given an individual policy configuration dict, if it has ``notify_only``
+        set to True, update the policy accordingly.
+
+        :param policy: policy dict, with defaults applied
+        :type policy: dict
+        :return: policy updated as needed
+        :rtype: dict
+        """
+        return policy
 
     def _apply_defaults(self, defaults, policy):
         d = deepcopy(defaults)
