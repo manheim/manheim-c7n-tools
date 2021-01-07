@@ -33,6 +33,7 @@ except ImportError:
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.config import ManheimConfig
 from manheim_c7n_tools.utils import git_html_url
+from manheim_c7n_tools.notifyonly import NotifyOnlyPolicy
 
 whtspc_re = re.compile(r'\s+')
 
@@ -519,6 +520,12 @@ class PolicyGen(object):
         :return: policy updated as needed
         :rtype: dict
         """
+        if 'notify_only' not in policy:
+            return policy
+        notify_only = policy['notify_only']
+        del policy['notify_only']
+        if notify_only:
+            return NotifyOnlyPolicy.as_notify_only(policy)
         return policy
 
     def _apply_defaults(self, defaults, policy):

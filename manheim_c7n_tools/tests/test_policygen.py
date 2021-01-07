@@ -2593,6 +2593,46 @@ class TestGenerateCleanupPolicies(PolicyGenTester):
         ]
 
 
+class TestHandleNotifyOnlyPolicy(PolicyGenTester):
+
+    def test_not_set(self):
+        with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
+            mock_nop.as_notify_only.return_value = {
+                'notify': 'only'
+            }
+            res = self.cls._handle_notify_only_policy({'my': 'policy'})
+        assert res == {'my': 'policy'}
+        assert mock_nop.mock_calls == []
+
+    def test_false(self):
+        with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
+            mock_nop.as_notify_only.return_value = {
+                'notify': 'only'
+            }
+            res = self.cls._handle_notify_only_policy({
+                'my': 'policy',
+                'notify_only': False
+            })
+        assert res == {'my': 'policy'}
+        assert mock_nop.mock_calls == []
+
+    def test_true(self):
+        pol = {
+            'my': 'policy',
+            'notify_only': True
+        }
+        with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
+            mock_nop.as_notify_only.return_value = {
+                'notify': 'only'
+            }
+
+            res = self.cls._handle_notify_only_policy(pol)
+        assert res == {'notify': 'only'}
+        assert mock_nop.mock_calls == [
+            call.as_notify_only(pol)
+        ]
+
+
 class TestPolicyRst(PolicyGenTester):
 
     def test_rst_jenkins(self):
