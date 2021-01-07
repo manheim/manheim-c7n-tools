@@ -12,11 +12,11 @@ Development
 Local Development and Testing
 =============================
 
-Clone this repo locally on a machine with Python 3.7. Then:
+Clone this repo locally on a machine with Python 3. Then:
 
 .. code-block:: shell
 
-    virtualenv --python=python3.7 .
+    virtualenv --python=python3 .
     source bin/activate
     pip install 'tox>=3.4.0'
     pip install -r requirements.txt
