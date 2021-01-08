@@ -14,6 +14,7 @@
 
 from typing import List
 import logging
+from c7n.tags import DEFAULT_TAG
 
 logger = logging.getLogger(__name__)
 
@@ -82,12 +83,26 @@ class NotifyOnlyPolicy:
 
     @staticmethod
     def _fix_tag_action(item: dict) -> dict:
+        if 'tag' in item:
+            item['tag'] = item['tag'] + '-notify-only'
+        if 'key' in item:
+            item['key'] = item['key'] + '-notify-only'
+        if 'tags' in item:
+            item['tags'] = {
+                f'{k}-notify-only': v for k, v in item['tags'].items()
+            }
+        if 'tag' not in item and 'key' not in item and 'tags' not in item:
+            item['tag'] = f'{DEFAULT_TAG}-notify-only'
         return item
 
     @staticmethod
     def _fix_mark_for_op_action(item: dict) -> dict:
+        if 'tag' not in item:
+            item['tag'] = DEFAULT_TAG
+        item['tag'] += '-notify-only'
         return item
 
     @staticmethod
     def _fix_untag_action(item: dict) -> dict:
+        item['tags'] = [f'{tag}-notify-only' for tag in item['tags']]
         return item

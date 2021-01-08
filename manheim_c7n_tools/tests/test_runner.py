@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import sys
-from mock import patch, call, DEFAULT, Mock, PropertyMock
+from unittest.mock import patch, call, DEFAULT, Mock, PropertyMock
 import pytest
 from functools import partial
 

@@ -23,7 +23,7 @@ from manheim_c7n_tools.utils import (
 )
 from manheim_c7n_tools.config import ManheimConfig
 
-from mock import patch, call, Mock, PropertyMock  # noqa
+from unittest.mock import patch, call, Mock, PropertyMock
 
 pbm = 'manheim_c7n_tools.utils'
 

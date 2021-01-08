@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from mock import patch, call, mock_open, DEFAULT, Mock, PropertyMock
+from unittest.mock import patch, call, mock_open, DEFAULT, Mock, PropertyMock
 import pytest
 import os
 from freezegun import freeze_time
