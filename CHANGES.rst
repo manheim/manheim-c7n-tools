@@ -8,6 +8,8 @@ Unreleased
 * Bump relax boto3 and botocore dependencies to work with c7n and new pip resolver.
 * Add testing under Python 3.9; switch default Python version for tox/TravisCI to 3.9.
 * Bump base Docker image to latest ``python:3.9.1-alpine3.12``
+* Implement :ref:`policies.notify_only`.
+* Fix failing test.
 
 1.2.4 (2020-07-29)
 ------------------
