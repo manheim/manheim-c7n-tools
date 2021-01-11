@@ -502,7 +502,7 @@ As described above in :ref:`policies.action_transition`, it's common to want to 
 
 To support this, manheim-c7n-tools (specifically :ref:`policygen`) supports the addition of a boolean ``notify_only`` option at the top level of policy files, or in ``defaults.yml`` for account- / repository-wide notify-only. Setting this flag will cause :ref:`policygen` to pass the effected policies through :py:class:`~.NotifyOnlyPolicy` for pre-processing. This will cause the following changes to the final YAML policy:
 
-* The ``comment`` / ``comments`` / ``description`` fields will be prefixed with the string ``NOTIFY ONLY: ``
+* The ``comment`` / ``comments`` / ``description`` fields will be prefixed with the string ``NOTIFY ONLY:``
 * If the policy has a ``tags`` list, a ``notify-only`` tag will be appended to it.
 * All tagging actions will have the string ``-notify-only`` appended to their tag names, to automate the above-described transition. Specifically:
 
@@ -510,5 +510,5 @@ To support this, manheim-c7n-tools (specifically :ref:`policygen`) supports the 
   * Any ``mark-for-op`` actions will have the string ``-notify-only`` appended to their ``tag`` value. If they do not already have a ``tag`` value, it will be set to custodian's ``DEFAULT_TAG`` value, with ``-notify-only`` appended.
   * Any ``remove-tag`` / ``unmark`` / ``untag`` actions wukk have the string ``-notify-only`` appended to all items in their ``tags`` list.
 
-* All ``notify`` actions will have their ``violation_desc``, if present, prefixed with ``NOTIFY ONLY: ``. Their ``action_desc``, if present, will be prefixed with ``in the future (currently notify-only)``.
+* All ``notify`` actions will have their ``violation_desc``, if present, prefixed with ``NOTIFY ONLY:``. Their ``action_desc``, if present, will be prefixed with ``in the future (currently notify-only)``.
 * All other action types, not listed above, will be **removed from the policy**. We enforce notify-only by only retaining specifically whitelisted actions in the policy.
