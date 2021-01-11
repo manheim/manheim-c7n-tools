@@ -118,7 +118,24 @@ class NotifyOnlyPolicy:
 
     @staticmethod
     def _fix_notify_action(item: dict) -> dict:
-        raise NotImplementedError()
+        """
+        Fix a ``notify`` action for notify-only operation.
+
+        If the ``violation_desc`` key is present, its value will be prefixed
+        with ``NOTIFY ONLY: ``. If the ``action_desc`` key is present, its value
+        will be prefixed with the string
+        ``in the future (currently notify-only)``.
+
+        :param item: the original action
+        :type item: dict
+        :return: the modified action
+        :rtype: dict
+        """
+        if 'violation_desc' in item:
+            item['violation_desc'] = 'NOTIFY ONLY: ' + item['violation_desc']
+        if 'action_desc' in item:
+            item['action_desc'] = 'in the future (currently notify-only) ' + \
+                                  item['action_desc']
         return item
 
     @staticmethod

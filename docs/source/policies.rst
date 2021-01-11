@@ -510,4 +510,5 @@ To support this, manheim-c7n-tools (specifically :ref:`policygen`) supports the 
   * Any ``mark-for-op`` actions will have the string ``-notify-only`` appended to their ``tag`` value. If they do not already have a ``tag`` value, it will be set to custodian's ``DEFAULT_TAG`` value, with ``-notify-only`` appended.
   * Any ``remove-tag`` / ``unmark`` / ``untag`` actions wukk have the string ``-notify-only`` appended to all items in their ``tags`` list.
 
+* All ``notify`` actions will have their ``violation_desc``, if present, prefixed with ``NOTIFY ONLY: ``. Their ``action_desc``, if present, will be prefixed with ``in the future (currently notify-only)``.
 * All other action types, not listed above, will be **removed from the policy**. We enforce notify-only by only retaining specifically whitelisted actions in the policy.

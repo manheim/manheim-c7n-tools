@@ -125,6 +125,30 @@ class TestFixActions:
         ]
 
 
+class TestFixNotifyAction:
+
+    def test_no_description(self):
+        policy = {
+            'type': 'notify',
+            'subject': 'foo'
+        }
+        assert NotifyOnlyPolicy._fix_notify_action(policy) == policy
+
+    def test_description(self):
+        policy = {
+            'type': 'notify',
+            'subject': 'foo',
+            'violation_desc': 'Violation',
+            'action_desc': 'actionDesc'
+        }
+        assert NotifyOnlyPolicy._fix_notify_action(policy) == {
+            'type': 'notify',
+            'subject': 'foo',
+            'violation_desc': 'NOTIFY ONLY: Violation',
+            'action_desc': 'in the future (currently notify-only) actionDesc'
+        }
+
+
 class TestFixTagAction:
 
     def test_tag(self):
