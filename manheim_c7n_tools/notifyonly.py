@@ -196,5 +196,7 @@ class NotifyOnlyPolicy:
         :return: the modified action
         :rtype: dict
         """
+        if 'tags' not in item:
+            item['tags'] = [f'{DEFAULT_TAG}-notify-only']
         item['tags'] = [f'{tag}-notify-only' for tag in item['tags']]
         return item

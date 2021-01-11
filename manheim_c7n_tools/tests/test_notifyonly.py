@@ -239,3 +239,13 @@ class TestFixUntagAction:
             'baz': 'blam',
             'action': 'untag'
         }
+
+    def test_tags_not_present(self):
+        assert NotifyOnlyPolicy._fix_untag_action({
+            'baz': 'blam',
+            'action': 'untag'
+        }) == {
+            'tags': [f'{DEFAULT_TAG}-notify-only'],
+            'baz': 'blam',
+            'action': 'untag'
+        }
