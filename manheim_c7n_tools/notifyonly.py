@@ -197,6 +197,6 @@ class NotifyOnlyPolicy:
         :rtype: dict
         """
         if 'tags' not in item:
-            item['tags'] = [f'{DEFAULT_TAG}-notify-only']
+            item['tags'] = [f'{DEFAULT_TAG}']
         item['tags'] = [f'{tag}-notify-only' for tag in item['tags']]
         return item
