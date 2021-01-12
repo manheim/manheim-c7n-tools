@@ -29,6 +29,7 @@ class TestInit:
             cls = NotifyOnlyPolicy({'my': 'policy'})
         assert cls._original == {'my': 'policy'}
         assert cls._fixed == {'fixed': 'policy'}
+        assert cls._mark_for_op_tags == []
         assert m_process.mock_calls == [
             call({'my': 'policy'})
         ]
@@ -61,11 +62,14 @@ class TestProcess(NotifyOnlyTester):
             'comments': 'commentsVal',
             'description': 'descriptionVal',
             'tags': ['my', 'tags'],
-            'actions': ['some', 'actions']
+            'actions': ['some', 'actions'],
+            'filters': ['my-filters']
         }
         with patch(f'{pb}._fix_actions', autospec=True) as mock_fa:
             mock_fa.return_value = ['updated', 'actions']
-            res = self.cls._process(policy)
+            with patch(f'{pb}._fix_filters', autospec=True) as mock_ff:
+                mock_ff.return_value = ['fixed', 'filters']
+                res = self.cls._process(policy)
         assert res == {
             'foo': 'bar',
             'baz': 'blam',
@@ -73,10 +77,14 @@ class TestProcess(NotifyOnlyTester):
             'comments': 'NOTIFY ONLY: commentsVal',
             'description': 'NOTIFY ONLY: descriptionVal',
             'tags': ['my', 'tags', 'notify-only'],
-            'actions': ['updated', 'actions']
+            'actions': ['updated', 'actions'],
+            'filters': ['fixed', 'filters']
         }
         assert mock_fa.mock_calls == [
             call(self.cls, ['some', 'actions'])
+        ]
+        assert mock_ff.mock_calls == [
+            call(self.cls, ['my-filters'])
         ]
 
     def test_empty_policy(self):
@@ -86,12 +94,50 @@ class TestProcess(NotifyOnlyTester):
         }
         with patch(f'{pb}._fix_actions', autospec=True) as mock_fa:
             mock_fa.return_value = ['updated', 'actions']
-            res = self.cls._process(policy)
+            with patch(f'{pb}._fix_filters', autospec=True) as mock_ff:
+                mock_ff.return_value = ['fixed', 'filters']
+                res = self.cls._process(policy)
         assert res == {
             'foo': 'bar',
             'baz': 'blam',
         }
         assert mock_fa.mock_calls == []
+        assert mock_ff.mock_calls == []
+
+
+class TestFixFilters(NotifyOnlyTester):
+
+    def test_simple(self):
+        self.cls._mark_for_op_tags = ['tagA', 'tagB']
+        filters = [
+            {'tag:tagA': 'absent'},
+            {'State.Name': 'running'},
+            {'tag:something': 'present'},
+            {'or': [
+                {'and': [
+                    {'something': 'else'},
+                    {'tag:tagA': 'present'}
+                ]},
+                {'tag:tagB': 'absent'},
+                {'something': 'different'},
+                'not-a-dict'
+            ]}
+        ]
+        expected = [
+            {'tag:tagA-notify-only': 'absent'},
+            {'State.Name': 'running'},
+            {'tag:something': 'present'},
+            {'or': [
+                {'and': [
+                    {'something': 'else'},
+                    {'tag:tagA-notify-only': 'present'}
+                ]},
+                {'tag:tagB-notify-only': 'absent'},
+                {'something': 'different'},
+                'not-a-dict'
+            ]}
+        ]
+        assert self.cls._fix_filters(filters) == expected
 
 
 class TestFixComment(NotifyOnlyTester):
@@ -236,12 +282,14 @@ class TestFixMarkForOpAction(NotifyOnlyTester):
             'tag': 'mytag',
             'days': 7
         }
+        assert self.cls._mark_for_op_tags == []
         assert self.cls._fix_mark_for_op_action(policy) == {
             'action': 'mark-for-op',
             'op': 'foo',
             'tag': 'mytag-notify-only',
             'days': 7
         }
+        assert self.cls._mark_for_op_tags == ['mytag']
 
     def test_tag_not_present(self):
         policy = {
@@ -249,12 +297,14 @@ class TestFixMarkForOpAction(NotifyOnlyTester):
             'op': 'foo',
             'days': 7
         }
+        self.cls._mark_for_op_tags = ['foo', 'bar']
         assert self.cls._fix_mark_for_op_action(policy) == {
             'action': 'mark-for-op',
             'op': 'foo',
             'tag': f'{DEFAULT_TAG}-notify-only',
             'days': 7
         }
+        assert self.cls._mark_for_op_tags == ['foo', 'bar', DEFAULT_TAG]
 
 
 class TestFixUntagAction(NotifyOnlyTester):

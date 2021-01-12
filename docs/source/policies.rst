@@ -511,4 +511,5 @@ To support this, manheim-c7n-tools (specifically :ref:`policygen`) supports the 
   * Any ``remove-tag`` / ``unmark`` / ``untag`` actions wukk have the string ``-notify-only`` appended to all items in their ``tags`` list.
 
 * All ``notify`` actions will have their ``violation_desc``, if present, prefixed with ``NOTIFY ONLY:``. Their ``action_desc``, if present, will be prefixed with ``in the future (currently notify-only)``.
+* Any ``filters`` items with ``tag:NAME`` keys, which match up with ``NAME`` tags used in ``mark-for-op`` actions, will be updated to ``tag:NAME-notify-only`` to retain their intended functionality.
 * All other action types, not listed above, will be **removed from the policy**. We enforce notify-only by only retaining specifically whitelisted actions in the policy.

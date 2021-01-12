@@ -36,6 +36,7 @@ class NotifyOnlyPolicy:
         :type policy: dict
         """
         self._original: dict = policy
+        self._mark_for_op_tags: List[str] = []
         self._fixed: dict = self._process(self._original)
 
     def as_notify_only(self) -> dict:
@@ -65,7 +66,36 @@ class NotifyOnlyPolicy:
                 policy[k] = self._fix_tags(policy[k])
             if k == 'actions':
                 policy[k] = self._fix_actions(policy[k])
+        # this needs to happen AFTER all _fix_actions calls...
+        if 'filters' in policy:
+            policy['filters'] = self._fix_filters(policy['filters'])
         return policy
+
+    def _fix_filters(self, filters: List) -> List:
+        """
+        Given a list of filters from a policy, update them for any tagging
+        changes.
+
+        :param filters: filters from policy, or a subset thereof
+        :type filters: list
+        :return: fixed filters
+        :rtype: list
+        """
+        tag_changes = {
+            f'tag:{x}': f'tag:{x}-notify-only' for x in self._mark_for_op_tags
+        }
+        for idx, item in enumerate(filters):
+            # each item should be a dict
+            if not isinstance(item, type({})):
+                continue
+            for k in list(item.keys()):
+                v = item[k]
+                if isinstance(v, type([])):
+                    item[k] = self._fix_filters(v)
+                if k in tag_changes:
+                    del item[k]
+                    item[tag_changes[k]] = v
+        return filters
 
     def _fix_comment(self, comment: str) -> str:
         """
@@ -192,6 +222,7 @@ class NotifyOnlyPolicy:
         """
         if 'tag' not in item:
             item['tag'] = DEFAULT_TAG
+        self._mark_for_op_tags.append(item['tag'])
         item['tag'] += '-notify-only'
         return item
 
