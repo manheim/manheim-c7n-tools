@@ -1636,8 +1636,8 @@ class TestGenerateConfigs(PolicyGenTester):
             'policies': [
                 'blam+defaults+notifyonly',
                 'bar+defaults+notifyonly',
-                'cleanup1+defaults',
-                'cleanup2+defaults'
+                'cleanup1+defaults+notifyonly',
+                'cleanup2+defaults+notifyonly'
             ]
         }
         assert mocks['_apply_defaults'].mock_calls == [
@@ -1648,7 +1648,9 @@ class TestGenerateConfigs(PolicyGenTester):
         ]
         assert mocks['_handle_notify_only_policy'].mock_calls == [
             call(self.cls, 'blam+defaults'),
-            call(self.cls, 'bar+defaults')
+            call(self.cls, 'bar+defaults'),
+            call(self.cls, 'cleanup1+defaults'),
+            call(self.cls, 'cleanup2+defaults')
         ]
         assert mocks['_generate_cleanup_policies'].mock_calls == [
             call(
@@ -1660,8 +1662,8 @@ class TestGenerateConfigs(PolicyGenTester):
             'policies': [
                 'blam+defaults+notifyonly',
                 'bar+defaults+notifyonly',
-                'cleanup1+defaults',
-                'cleanup2+defaults'
+                'cleanup1+defaults+notifyonly',
+                'cleanup2+defaults+notifyonly'
             ]
         }
         assert mocks['_write_custodian_configs'].mock_calls == [
@@ -1673,8 +1675,8 @@ class TestGenerateConfigs(PolicyGenTester):
                 [
                     'blam+defaults+notifyonly',
                     'bar+defaults+notifyonly',
-                    'cleanup1+defaults',
-                    'cleanup2+defaults'
+                    'cleanup1+defaults+notifyonly',
+                    'cleanup2+defaults+notifyonly'
                 ]
             )
         ]

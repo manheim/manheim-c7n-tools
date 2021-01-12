@@ -262,7 +262,11 @@ class PolicyGen(object):
             for pol in self._generate_cleanup_policies(
                 deepcopy(result['policies'])
             ):
-                result['policies'].append(self._apply_defaults(defaults, pol))
+                result['policies'].append(
+                    self._handle_notify_only_policy(
+                        self._apply_defaults(defaults, pol)
+                    )
+                )
         logger.info('Checking policies for sanity and safety...')
         self._check_policies(result['policies'])
         self._write_custodian_configs(result, region_name)
