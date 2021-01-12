@@ -21,7 +21,36 @@ pbm = 'manheim_c7n_tools.notifyonly'
 pb = f'{pbm}.NotifyOnlyPolicy'
 
 
-class TestAsNotifyOnly:
+class TestInit:
+
+    def test_simple(self):
+        with patch(f'{pb}._process') as m_process:
+            m_process.return_value = {'fixed': 'policy'}
+            cls = NotifyOnlyPolicy({'my': 'policy'})
+        assert cls._original == {'my': 'policy'}
+        assert cls._fixed == {'fixed': 'policy'}
+        assert m_process.mock_calls == [
+            call({'my': 'policy'})
+        ]
+
+
+class NotifyOnlyTester:
+
+    def setup(self):
+        self.policy = {}
+        with patch(f'{pb}._process') as m_process:
+            m_process.return_value = {}
+            self.cls = NotifyOnlyPolicy(self.policy)
+
+
+class TestAsNotifyOnly(NotifyOnlyTester):
+
+    def test_simple(self):
+        self.cls._fixed = {'foo': 'bar'}
+        assert self.cls.as_notify_only() == {'foo': 'bar'}
+
+
+class TestProcess(NotifyOnlyTester):
 
     def test_all(self):
         policy = {
@@ -34,9 +63,9 @@ class TestAsNotifyOnly:
             'tags': ['my', 'tags'],
             'actions': ['some', 'actions']
         }
-        with patch(f'{pb}._fix_actions') as mock_fa:
+        with patch(f'{pb}._fix_actions', autospec=True) as mock_fa:
             mock_fa.return_value = ['updated', 'actions']
-            res = NotifyOnlyPolicy.as_notify_only(policy)
+            res = self.cls._process(policy)
         assert res == {
             'foo': 'bar',
             'baz': 'blam',
@@ -47,7 +76,7 @@ class TestAsNotifyOnly:
             'actions': ['updated', 'actions']
         }
         assert mock_fa.mock_calls == [
-            call(['some', 'actions'])
+            call(self.cls, ['some', 'actions'])
         ]
 
     def test_empty_policy(self):
@@ -55,9 +84,9 @@ class TestAsNotifyOnly:
             'foo': 'bar',
             'baz': 'blam',
         }
-        with patch(f'{pb}._fix_actions') as mock_fa:
+        with patch(f'{pb}._fix_actions', autospec=True) as mock_fa:
             mock_fa.return_value = ['updated', 'actions']
-            res = NotifyOnlyPolicy.as_notify_only(policy)
+            res = self.cls._process(policy)
         assert res == {
             'foo': 'bar',
             'baz': 'blam',
@@ -65,19 +94,19 @@ class TestAsNotifyOnly:
         assert mock_fa.mock_calls == []
 
 
-class TestFixComment:
+class TestFixComment(NotifyOnlyTester):
 
     def test_simple(self):
-        assert NotifyOnlyPolicy._fix_comment('foo') == 'NOTIFY ONLY: foo'
+        assert self.cls._fix_comment('foo') == 'NOTIFY ONLY: foo'
 
 
-class TestFixTags:
+class TestFixTags(NotifyOnlyTester):
 
     def test_simple(self):
-        assert NotifyOnlyPolicy._fix_tags(['foo']) == ['foo', 'notify-only']
+        assert self.cls._fix_tags(['foo']) == ['foo', 'notify-only']
 
 
-class TestFixActions:
+class TestFixActions(NotifyOnlyTester):
 
     def test_all(self):
         actions = [
@@ -97,11 +126,12 @@ class TestFixActions:
             _fix_tag_action=DEFAULT,
             _fix_mark_for_op_action=DEFAULT,
             _fix_untag_action=DEFAULT,
+            autospec=True
         ) as mocks:
             mocks['_fix_tag_action'].return_value = {'fixed': 'tag'}
             mocks['_fix_mark_for_op_action'].return_value = {'fixed': 'op'}
             mocks['_fix_untag_action'].return_value = {'fixed': 'untag'}
-            res = NotifyOnlyPolicy._fix_actions(actions)
+            res = self.cls._fix_actions(actions)
         assert res == [
             {'type': 'notify'},
             {'fixed': 'tag'},
@@ -112,27 +142,27 @@ class TestFixActions:
             {'fixed': 'untag'}
         ]
         assert mocks['_fix_tag_action'].mock_calls == [
-            call({'type': 'mark'}),
-            call({'type': 'tag'})
+            call(self.cls, {'type': 'mark'}),
+            call(self.cls, {'type': 'tag'})
         ]
         assert mocks['_fix_mark_for_op_action'].mock_calls == [
-            call({'type': 'mark-for-op'})
+            call(self.cls, {'type': 'mark-for-op'})
         ]
         assert mocks['_fix_untag_action'].mock_calls == [
-            call({'type': 'remove-tag'}),
-            call({'type': 'unmark'}),
-            call({'type': 'untag'}),
+            call(self.cls, {'type': 'remove-tag'}),
+            call(self.cls, {'type': 'unmark'}),
+            call(self.cls, {'type': 'untag'}),
         ]
 
 
-class TestFixNotifyAction:
+class TestFixNotifyAction(NotifyOnlyTester):
 
     def test_no_description(self):
         policy = {
             'type': 'notify',
             'subject': 'foo'
         }
-        assert NotifyOnlyPolicy._fix_notify_action(policy) == policy
+        assert self.cls._fix_notify_action(policy) == policy
 
     def test_description(self):
         policy = {
@@ -141,7 +171,7 @@ class TestFixNotifyAction:
             'violation_desc': 'Violation',
             'action_desc': 'actionDesc'
         }
-        assert NotifyOnlyPolicy._fix_notify_action(policy) == {
+        assert self.cls._fix_notify_action(policy) == {
             'type': 'notify',
             'subject': 'foo',
             'violation_desc': 'NOTIFY ONLY: Violation',
@@ -149,7 +179,7 @@ class TestFixNotifyAction:
         }
 
 
-class TestFixTagAction:
+class TestFixTagAction(NotifyOnlyTester):
 
     def test_tag(self):
         policy = {
@@ -157,7 +187,7 @@ class TestFixTagAction:
             'tag': 'foo',
             'value': 'bar'
         }
-        assert NotifyOnlyPolicy._fix_tag_action(policy) == {
+        assert self.cls._fix_tag_action(policy) == {
             'action': 'mark',
             'tag': 'foo-notify-only',
             'value': 'bar'
@@ -169,7 +199,7 @@ class TestFixTagAction:
             'key': 'foo',
             'value': 'bar'
         }
-        assert NotifyOnlyPolicy._fix_tag_action(policy) == {
+        assert self.cls._fix_tag_action(policy) == {
             'action': 'mark',
             'key': 'foo-notify-only',
             'value': 'bar'
@@ -180,7 +210,7 @@ class TestFixTagAction:
             'action': 'mark',
             'tags': {'foo': 'bar', 'baz': 'blam'}
         }
-        assert NotifyOnlyPolicy._fix_tag_action(policy) == {
+        assert self.cls._fix_tag_action(policy) == {
             'action': 'mark',
             'tags': {'foo-notify-only': 'bar', 'baz-notify-only': 'blam'}
         }
@@ -190,14 +220,14 @@ class TestFixTagAction:
             'action': 'mark',
             'value': 'bar'
         }
-        assert NotifyOnlyPolicy._fix_tag_action(policy) == {
+        assert self.cls._fix_tag_action(policy) == {
             'action': 'mark',
             'tag': f'{DEFAULT_TAG}-notify-only',
             'value': 'bar'
         }
 
 
-class TestFixMarkForOpAction:
+class TestFixMarkForOpAction(NotifyOnlyTester):
 
     def test_tag_present(self):
         policy = {
@@ -206,7 +236,7 @@ class TestFixMarkForOpAction:
             'tag': 'mytag',
             'days': 7
         }
-        assert NotifyOnlyPolicy._fix_mark_for_op_action(policy) == {
+        assert self.cls._fix_mark_for_op_action(policy) == {
             'action': 'mark-for-op',
             'op': 'foo',
             'tag': 'mytag-notify-only',
@@ -219,7 +249,7 @@ class TestFixMarkForOpAction:
             'op': 'foo',
             'days': 7
         }
-        assert NotifyOnlyPolicy._fix_mark_for_op_action(policy) == {
+        assert self.cls._fix_mark_for_op_action(policy) == {
             'action': 'mark-for-op',
             'op': 'foo',
             'tag': f'{DEFAULT_TAG}-notify-only',
@@ -227,10 +257,10 @@ class TestFixMarkForOpAction:
         }
 
 
-class TestFixUntagAction:
+class TestFixUntagAction(NotifyOnlyTester):
 
     def test_simple(self):
-        assert NotifyOnlyPolicy._fix_untag_action({
+        assert self.cls._fix_untag_action({
             'tags': ['foo', 'bar'],
             'baz': 'blam',
             'action': 'untag'
@@ -241,7 +271,7 @@ class TestFixUntagAction:
         }
 
     def test_tags_not_present(self):
-        assert NotifyOnlyPolicy._fix_untag_action({
+        assert self.cls._fix_untag_action({
             'baz': 'blam',
             'action': 'untag'
         }) == {

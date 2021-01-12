@@ -2597,7 +2597,7 @@ class TestHandleNotifyOnlyPolicy(PolicyGenTester):
 
     def test_not_set(self):
         with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
-            mock_nop.as_notify_only.return_value = {
+            mock_nop.return_value.as_notify_only.return_value = {
                 'notify': 'only'
             }
             res = self.cls._handle_notify_only_policy({'my': 'policy'})
@@ -2606,7 +2606,7 @@ class TestHandleNotifyOnlyPolicy(PolicyGenTester):
 
     def test_false(self):
         with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
-            mock_nop.as_notify_only.return_value = {
+            mock_nop.return_value.as_notify_only.return_value = {
                 'notify': 'only'
             }
             res = self.cls._handle_notify_only_policy({
@@ -2622,14 +2622,14 @@ class TestHandleNotifyOnlyPolicy(PolicyGenTester):
             'notify_only': True
         }
         with patch(f'{pbm}.NotifyOnlyPolicy') as mock_nop:
-            mock_nop.as_notify_only.return_value = {
+            mock_nop.return_value.as_notify_only.return_value = {
                 'notify': 'only'
             }
 
             res = self.cls._handle_notify_only_policy(pol)
         assert res == {'notify': 'only'}
         assert mock_nop.mock_calls == [
-            call.as_notify_only(pol)
+            call(pol), call().as_notify_only()
         ]
 
 

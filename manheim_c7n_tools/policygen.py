@@ -525,7 +525,7 @@ class PolicyGen(object):
         notify_only = policy['notify_only']
         del policy['notify_only']
         if notify_only:
-            return NotifyOnlyPolicy.as_notify_only(policy)
+            return NotifyOnlyPolicy(policy).as_notify_only()
         return policy
 
     def _apply_defaults(self, defaults, policy):

@@ -28,8 +28,26 @@ class NotifyOnlyPolicy:
     :ref:`policies.notify_only` in the documentation.
     """
 
-    @staticmethod
-    def as_notify_only(policy: dict) -> dict:
+    def __init__(self, policy: dict):
+        """
+        Initialize a NotifyOnlyPolicy.
+
+        :param policy: the original policy
+        :type policy: dict
+        """
+        self._original: dict = policy
+        self._fixed: dict = self._process(self._original)
+
+    def as_notify_only(self) -> dict:
+        """
+        Return the policy, converted to a notify-only version.
+
+        :return: converted policy
+        :rtype: dict
+        """
+        return self._fixed
+
+    def _process(self, policy: dict) -> dict:
         """
         Return the given policy, converted to notify-only.
 
@@ -42,15 +60,14 @@ class NotifyOnlyPolicy:
             del policy['notify_only']
         for k in policy.keys():
             if k in ['comment', 'comments', 'description']:
-                policy[k] = NotifyOnlyPolicy._fix_comment(policy[k])
+                policy[k] = self._fix_comment(policy[k])
             if k == 'tags':
-                policy[k] = NotifyOnlyPolicy._fix_tags(policy[k])
+                policy[k] = self._fix_tags(policy[k])
             if k == 'actions':
-                policy[k] = NotifyOnlyPolicy._fix_actions(policy[k])
+                policy[k] = self._fix_actions(policy[k])
         return policy
 
-    @staticmethod
-    def _fix_comment(comment: str) -> str:
+    def _fix_comment(self, comment: str) -> str:
         """
         Convert a policy comment/comments/description to a notify only version,
         by prefixing it with the string "NOTIFY ONLY: ".
@@ -62,8 +79,7 @@ class NotifyOnlyPolicy:
         """
         return f'NOTIFY ONLY: {comment}'
 
-    @staticmethod
-    def _fix_tags(tags: List[str]) -> List[str]:
+    def _fix_tags(self, tags: List[str]) -> List[str]:
         """
         Convert a policy tags list to a notify only version, by appending a
         ``notify-only`` tag to the list.
@@ -75,8 +91,7 @@ class NotifyOnlyPolicy:
         """
         return tags + ['notify-only']
 
-    @staticmethod
-    def _fix_actions(original: List) -> List:
+    def _fix_actions(self, original: List) -> List:
         """
         Given a list of actions from a policy, return a new list of notify-only
         actions.
@@ -102,13 +117,13 @@ class NotifyOnlyPolicy:
                 continue
             a_type = item.get('type', '')
             if a_type == 'notify':
-                result.append(NotifyOnlyPolicy._fix_notify_action(item))
+                result.append(self._fix_notify_action(item))
             if a_type == 'mark' or a_type == 'tag':
-                result.append(NotifyOnlyPolicy._fix_tag_action(item))
+                result.append(self._fix_tag_action(item))
             elif a_type == 'mark-for-op':
-                result.append(NotifyOnlyPolicy._fix_mark_for_op_action(item))
+                result.append(self._fix_mark_for_op_action(item))
             elif a_type in ['remove-tag', 'unmark', 'untag']:
-                result.append(NotifyOnlyPolicy._fix_untag_action(item))
+                result.append(self._fix_untag_action(item))
             else:
                 logger.info(
                     'NotifyOnlyPolicy - removing %s action: %s', a_type, item
@@ -116,8 +131,7 @@ class NotifyOnlyPolicy:
                 continue
         return result
 
-    @staticmethod
-    def _fix_notify_action(item: dict) -> dict:
+    def _fix_notify_action(self, item: dict) -> dict:
         """
         Fix a ``notify`` action for notify-only operation.
 
@@ -138,8 +152,7 @@ class NotifyOnlyPolicy:
                                   item['action_desc']
         return item
 
-    @staticmethod
-    def _fix_tag_action(item: dict) -> dict:
+    def _fix_tag_action(self, item: dict) -> dict:
         """
         Fix a ``tag`` / ``mark`` action for notify-only operation.
 
@@ -166,8 +179,7 @@ class NotifyOnlyPolicy:
             item['tag'] = f'{DEFAULT_TAG}-notify-only'
         return item
 
-    @staticmethod
-    def _fix_mark_for_op_action(item: dict) -> dict:
+    def _fix_mark_for_op_action(self, item: dict) -> dict:
         """
         Fix a ``mark-for-op`` action for notify-only operation.
 
@@ -183,8 +195,7 @@ class NotifyOnlyPolicy:
         item['tag'] += '-notify-only'
         return item
 
-    @staticmethod
-    def _fix_untag_action(item: dict) -> dict:
+    def _fix_untag_action(self, item: dict) -> dict:
         """
         Fix a ``remove-tag`` / ``unmark`` / ``untag`` action for notify-only
         operation.
