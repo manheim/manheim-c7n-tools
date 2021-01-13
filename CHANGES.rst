@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+1.3.0 (2021-01-13)
+------------------
 
 * Fixes `#56 <https://github.com/manheim/manheim-c7n-tools/issues/56>`__ - Bump c7n version from 0.9.4 to `0.9.10 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.10.0>`__ and c7n-mailer from 0.6.3 to 0.6.9.
 * Bump relax boto3 and botocore dependencies to work with c7n and new pip resolver.
