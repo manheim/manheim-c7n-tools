@@ -33,6 +33,7 @@ except ImportError:
 from manheim_c7n_tools.version import VERSION, PROJECT_URL
 from manheim_c7n_tools.config import ManheimConfig
 from manheim_c7n_tools.utils import git_html_url
+from manheim_c7n_tools.notifyonly import NotifyOnlyPolicy
 
 whtspc_re = re.compile(r'\s+')
 
@@ -251,7 +252,9 @@ class PolicyGen(object):
         result = {'policies': []}
         for k in sorted(policies.keys()):
             result['policies'].append(
-                self._apply_defaults(defaults, policies[k])
+                self._handle_notify_only_policy(
+                    self._apply_defaults(defaults, policies[k])
+                )
             )
         if self._config.cleanup_notify:
             logger.info('Generating c7n cleanup policies...')
@@ -259,7 +262,11 @@ class PolicyGen(object):
             for pol in self._generate_cleanup_policies(
                 deepcopy(result['policies'])
             ):
-                result['policies'].append(self._apply_defaults(defaults, pol))
+                result['policies'].append(
+                    self._handle_notify_only_policy(
+                        self._apply_defaults(defaults, pol)
+                    )
+                )
         logger.info('Checking policies for sanity and safety...')
         self._check_policies(result['policies'])
         self._write_custodian_configs(result, region_name)
@@ -506,6 +513,24 @@ class PolicyGen(object):
         """write a file - helper to make unit tests simpler"""
         with open(path, 'w') as fh:
             fh.write(content)
+
+    def _handle_notify_only_policy(self, policy):
+        """
+        Given an individual policy configuration dict, if it has ``notify_only``
+        set to True, update the policy accordingly.
+
+        :param policy: policy dict, with defaults applied
+        :type policy: dict
+        :return: policy updated as needed
+        :rtype: dict
+        """
+        if 'notify_only' not in policy:
+            return policy
+        notify_only = policy['notify_only']
+        del policy['notify_only']
+        if notify_only:
+            return NotifyOnlyPolicy(policy).as_notify_only()
+        return policy
 
     def _apply_defaults(self, defaults, policy):
         d = deepcopy(defaults)

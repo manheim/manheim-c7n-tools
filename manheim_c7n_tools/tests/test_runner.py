@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import sys
-from mock import patch, call, DEFAULT, Mock, PropertyMock
+from unittest.mock import patch, call, DEFAULT, Mock, PropertyMock
 import pytest
 from functools import partial
 
@@ -624,11 +624,11 @@ class TestMailerStep(StepTester):
                 '%s.mailer_deploy.provision' % pbm, autospec=True
             ) as mock_prov:
                 with patch(
-                    '%s.functools.partial' % pbm, autospec=True
-                ) as mock_partial:
+                    '%s.session_factory' % pbm, autospec=True
+                ) as mock_sf:
                     with patch(
-                        '%s.session_factory' % pbm, autospec=True
-                    ) as mock_sf:
+                        '%s.functools.partial' % pbm, autospec=True
+                    ) as mock_partial:
                         mock_config.return_value = m_conf
                         mock_partial.return_value = m_partial
                         runner.MailerStep('rName', self.m_conf).run()
@@ -646,11 +646,11 @@ class TestMailerStep(StepTester):
                 '%s.mailer_deploy.provision' % pbm, autospec=True
             ) as mock_prov:
                 with patch(
-                    '%s.functools.partial' % pbm, autospec=True
-                ) as mock_partial:
+                    '%s.session_factory' % pbm, autospec=True
+                ):
                     with patch(
-                        '%s.session_factory' % pbm, autospec=True
-                    ):
+                        '%s.functools.partial' % pbm, autospec=True
+                    ) as mock_partial:
                         mock_config.return_value = m_conf
                         mock_partial.return_value = m_partial
                         runner.MailerStep('rName', self.m_conf).dryrun()

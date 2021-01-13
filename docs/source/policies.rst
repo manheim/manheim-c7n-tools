@@ -252,6 +252,8 @@ The full list of top-level keys valid for a policy can be found by viewing the s
    :ref:`Actions <policies.actions>` section, below, for more information.
 -  **mode** - The ``mode`` key determines how the policy will be deployed and run. See the
    :ref:`Mode <policies.mode>` section, below, for more information.
+-  **notify_only** - This is a manheim-c7n-tools addition, which is used internally and removed from the policy before :ref:`policygen` generates the final YAML files for custodian. See :ref:`policies.notify_only` for further information.
+-  **disable** - This is a manheim-c7n-tools addition, which is used internally and removed from the policy before :ref:`policygen` generates the final YAML files for custodian. See :ref:`policies.disable` for further information.
 
 .. _`policies.filters`:
 
@@ -281,6 +283,8 @@ code for each (which is liked from that documentation).
 
 Actions
 -------
+
+.. note:: manheim-c7n-tools' :ref:`policies.notify_only` option on a policy can effect the actions specified. See that section for more information.
 
 Cloud-custodian has both generic/global actions (such as ``notify``) and resource-specific actions
 (such as ``stop`` and ``start``). Some actions are specified as only a string (i.e. ``stop`` or
@@ -418,7 +422,7 @@ Other keys under the ``mode`` section include:
 Disabling a policy
 ------------------
 
-It is possible to disable a rule. Simply setting the ``disable`` key in a policy to ``true`` will stop that policy from being
+It is possible to disable a policy. Simply setting the ``disable`` key in a policy to ``true`` will stop that policy from being
 deployed.
 
 .. code:: yaml
@@ -454,6 +458,13 @@ are later enabled for corresponding policies, the actions might be taken
 immediately when enabled as a result of the "notify only" policies
 marking resources for action.
 
+As of version 1.3.0, manheim-c7n-tools supports a :ref:`policies.notify_only` flag to help simplify this transition. For older versions, or policies that existed prior to 1.3.0, see the following section on manual tag cleanup.
+
+.. _`policies.action_transition_manual_tag_cleanup`:
+
+Manual Tag Cleanup
+------------------
+
 As a result, when adding actions to policies that have been running in
 data collection mode, it's important to manually purge the relevant tags
 so the policies don't take any action based on tags applied during data
@@ -481,3 +492,24 @@ tags with something like (example for EC2 instances):
       echo "removing tag from: $i"
       aws ec2 delete-tags --resources $i --tags Key=$tagname
     done
+
+.. _`policies.notify_only`:
+
+Notify-Only Option for Policies
+===============================
+
+As described above in :ref:`policies.action_transition`, it's common to want to run new policies in a "notify only" mode that sends notifications (and collects data) but does not yet take actions, assess those notifications, and enable actually taking action at a later date.
+
+To support this, manheim-c7n-tools (specifically :ref:`policygen`) supports the addition of a boolean ``notify_only`` option at the top level of policy files, or in ``defaults.yml`` for account- / repository-wide notify-only. Setting this flag will cause :ref:`policygen` to pass the effected policies through :py:class:`~.NotifyOnlyPolicy` for pre-processing. This will cause the following changes to the final YAML policy:
+
+* The ``comment`` / ``comments`` / ``description`` fields will be prefixed with the string ``NOTIFY ONLY:``
+* If the policy has a ``tags`` list, a ``notify-only`` tag will be appended to it.
+* All tagging actions will have the string ``-notify-only`` appended to their tag names, to automate the above-described transition. Specifically:
+
+  * Any ``mark`` or ``tag`` actions in the actions list will have the string ``-notify-only`` appended to their ``tag`` or ``key`` values (if present) or appended to every item in their ``tags`` list (if present). If none of the above are present, the ``tag`` item will be set to custodian's ``DEFAULT_TAG`` value, with ``-notify-only`` appended.
+  * Any ``mark-for-op`` actions will have the string ``-notify-only`` appended to their ``tag`` value. If they do not already have a ``tag`` value, it will be set to custodian's ``DEFAULT_TAG`` value, with ``-notify-only`` appended.
+  * Any ``remove-tag`` / ``unmark`` / ``untag`` actions wukk have the string ``-notify-only`` appended to all items in their ``tags`` list.
+
+* All ``notify`` actions will have their ``violation_desc``, if present, prefixed with ``NOTIFY ONLY:``. Their ``action_desc``, if present, will be prefixed with ``in the future (currently notify-only)``.
+* Any ``filters`` items with ``tag:NAME`` keys, which match up with ``NAME`` tags used in ``mark-for-op`` actions, will be updated to ``tag:NAME-notify-only`` to retain their intended functionality.
+* All other action types, not listed above, will be **removed from the policy**. We enforce notify-only by only retaining specifically whitelisted actions in the policy.

@@ -113,6 +113,13 @@ Rules from higher-level rulesets can be disabled by creating a new rule with the
     name: rule-name
     disable: true
 
+For further information, see :ref:`policies.disable`.
+
+Notify-Only rules
+-----------------
+
+Policygen also has support for setting rules to a notify-only mode via a single flag. Please see :ref:`policies.notify_only` for further information.
+
 Mailer Templates
 ----------------
 

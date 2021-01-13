@@ -36,13 +36,13 @@ jobs:
       python: '3.9'
       env: TOXENV=py39
     - stage: test
-      python: '3.8'
+      python: '3.9'
       env: TOXENV=docs
     - stage: test
-      python: '3.8'
+      python: '3.9'
       env: TOXENV=docker
     - stage: deploy
-      python: '3.7'
+      python: '3.9'
       script: bash build_or_deploy.sh build
       after_success: echo after_success
       deploy:

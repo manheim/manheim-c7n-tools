@@ -21,6 +21,7 @@ Submodules
    manheim_c7n_tools.config
    manheim_c7n_tools.dryrun_diff
    manheim_c7n_tools.errorscan
+   manheim_c7n_tools.notifyonly
    manheim_c7n_tools.policygen
    manheim_c7n_tools.runner
    manheim_c7n_tools.s3_archiver
