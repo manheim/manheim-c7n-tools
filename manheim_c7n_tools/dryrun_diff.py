@@ -101,30 +101,16 @@ class DryRunDiffer(object):
         :rtype: list
         """
 
-        copy_gitignore = subprocess.check_output(
-            ['mv', '.gitignore', '.gitignoreCOPY'],
-            cwd=git_dir
-        ).decode().split("\n")
-
-        git_add_policies = subprocess.check_output(
-            ['git', 'add', '--all', '-N', 'policies'],
-            cwd=git_dir
-        ).decode().split("\n")
+        subprocess.run(['mv', '.gitignore', '.gitignoreCOPY'], cwd=git_dir)
+        subprocess.run(['git', 'add', '--all', '-N', 'policies'],cwd=git_dir)
 
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
 
-        revert_gitignore = subprocess.check_output(
-            ['mv', '.gitignoreCOPY', '.gitignore'],
-            cwd=git_dir
-        ).decode().split("\n")
-
-        git_reset = subprocess.check_output(
-            ['git', 'reset'],
-            cwd=git_dir
-        ).decode().split("\n")
+        subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
+        subprocess.run(['git', 'reset'], cwd=git_dir)
 
         pnames = []
         polname_re = re.compile(r'^policies.*/([a-zA-Z0-9_-]+)\.yml$')
