@@ -76,7 +76,7 @@ class DryRunDiffer(object):
                 logger.warning(
                     f'{sub_policy_path} is defined in `policy_source_paths` '
                     'but is not checked out into a seperate directory. '
-                    'Dryrun-diff results will be incomplete until this is resolved!'
+                    'dryrun-diff results will be incomplete!'
                 )
         if len(changed_policies) == 0:
             logger.info(
