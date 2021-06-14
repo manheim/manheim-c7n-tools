@@ -101,17 +101,20 @@ class DryRunDiffer(object):
         :rtype: list
         """
 
+        logger.info('Running `mv .gitignore .gitignoreCOPY`')
         subprocess.run(['mv', '.gitignore', '.gitignoreCOPY'], cwd=git_dir)
+
+        logger.info('Running `git add --all -N policies`')
         subprocess.run(['git', 'add', '--all', '-N', 'policies'], cwd=git_dir)
+
+        logger.info(f'Running git diff --name-only {diff_against}')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
-        subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
-        subprocess.run(['git', 'reset'], cwd=git_dir)
 
         pnames = []
-        polname_re = re.compile(r'^policies.*/([a-zA-Z0-9_-]+)\.yml$')
+        polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
         for x in res:
             x = x.strip()
             if x == '':
@@ -120,6 +123,14 @@ class DryRunDiffer(object):
             if not m:
                 continue
             pnames.append(m.group(1))
+
+        
+        logger.info('Running `mv .gitignoreCOPY .gitignore`')
+        subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
+
+        logger.info('Running `git reset`')
+        subprocess.run(['git', 'reset'], cwd=git_dir)
+
         return pnames
 
     def _make_diff_report(self, dryrun):
