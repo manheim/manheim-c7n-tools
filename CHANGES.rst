@@ -5,7 +5,7 @@ Changelog
 1.3.1 (2021-06-14)
 ------------------
 
-* Fixing dryrun-diff bug to show changes to nested policies
+* Fixing dryrun-diff bug to show changes to nested policies.
 
 1.3.0 (2021-01-13)
 ------------------
