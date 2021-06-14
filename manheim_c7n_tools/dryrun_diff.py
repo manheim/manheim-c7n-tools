@@ -60,24 +60,23 @@ class DryRunDiffer(object):
 
     def run(self, git_dir=None, diff_against='master'):
         changed_policies = self._find_changed_policies(git_dir, diff_against)
-
-        # Loop over the 'parent' source paths (not the last element)
         source_paths = self.config.policy_source_paths
         parent_source_paths = source_paths[:-1]
-        for source_path in parent_source_paths:
-            if git_dir is None:
+        for p in parent_source_paths:
+            # Assumes these policies are checked out into ./policies/<parent_source_path>/
+            sub_policy_path = f'policies/{p}'
+            if os.path.isdir(sub_policy_path):
                 changed_policies.append(
                     self._find_changed_policies(
-                        f'./policies/{source_path}',
+                        sub_policy_path,
                         diff_against
                     )
                 )
             else:
-                changed_policies.append(
-                    self._find_changed_policies(
-                        f'{git_dir}/policies/{source_path}',
-                        diff_against
-                    )
+                logger.warning(
+                    f'{sub_policy_path} is defined in `policy_source_paths` '
+                    'but is not checked out into a seperate directory. '
+                    'Dryrun-diff results will be incomplete until this is resolved!'
                 )
         if len(changed_policies) == 0:
             logger.info(
