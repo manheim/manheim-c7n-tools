@@ -360,7 +360,7 @@ class DryRunDiffStep(BaseStep):
 
     @staticmethod
     def run_in_region(region_name, conf):
-        return True
+        return region_name == conf.regions[-1]
 
 
 class S3ArchiverStep(BaseStep):
