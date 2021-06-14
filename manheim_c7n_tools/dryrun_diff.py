@@ -101,13 +101,13 @@ class DryRunDiffer(object):
         :rtype: list
         """
 
-        logger.info('Running `mv .gitignore .gitignoreCOPY`')
+        logger.debug('Running `mv .gitignore .gitignoreCOPY` (allows us to see diffs for nested policies)')
         subprocess.run(['mv', '.gitignore', '.gitignoreCOPY'], cwd=git_dir)
 
-        logger.info('Running `git add --all -N policies`')
+        logger.debug('Running `git add --all -N policies`. Using (-N) intent-to-add to see diffs for untracked files.')
         subprocess.run(['git', 'add', '--all', '-N', 'policies'], cwd=git_dir)
 
-        logger.info(f'Running git diff --name-only {diff_against}')
+        logger.debug(f'Running `git diff --name-only {diff_against}`')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
@@ -125,10 +125,10 @@ class DryRunDiffer(object):
             pnames.append(m.group(1))
 
         
-        logger.info('Running `mv .gitignoreCOPY .gitignore`')
+        logger.debug('Running `mv .gitignoreCOPY .gitignore` to reset the .gitignore file')
         subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
 
-        logger.info('Running `git reset`')
+        logger.debug('Running `git reset`')
         subprocess.run(['git', 'reset'], cwd=git_dir)
 
         return pnames
