@@ -79,8 +79,6 @@ class DryRunDiffer(object):
                         diff_against
                     )
                 )
-
-
         if len(changed_policies) == 0:
             logger.info(
                 'Git diff did not report any changed policies; skipping '
