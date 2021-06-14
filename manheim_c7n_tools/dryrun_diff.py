@@ -60,6 +60,17 @@ class DryRunDiffer(object):
 
     def run(self, git_dir=None, diff_against='master'):
         changed_policies = self._find_changed_policies(git_dir, diff_against)
+
+        # Loop over the 'parent' source paths (not the last element)
+        source_paths = self.config.policy_source_paths
+        parent_source_paths = source_paths[:-1]
+        for source_path in parent_source_paths:
+            if git_dir == None:
+                changed_policies.append(self._find_changed_policies(f'./policies/{source_path}', diff_against))
+            else:
+                changed_policies.append(self._find_changed_policies(f'{git_dir}/policies/{source_path}', diff_against))
+
+
         if len(changed_policies) == 0:
             logger.info(
                 'Git diff did not report any changed policies; skipping '
@@ -100,19 +111,10 @@ class DryRunDiffer(object):
         :return: list of policy names that differ from master
         :rtype: list
         """
-
-        logger.debug('Running `mv .gitignore .gitignoreCOPY` (allows us to see diffs for nested policies)')
-        subprocess.run(['mv', '.gitignore', '.gitignoreCOPY'], cwd=git_dir)
-
-        logger.debug('Running `git add --all -N policies`. Using (-N) intent-to-add to see diffs for untracked files.')
-        subprocess.run(['git', 'add', '--all', '-N', 'policies'], cwd=git_dir)
-
-        logger.debug(f'Running `git diff --name-only {diff_against}`')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
-
         pnames = []
         polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
         for x in res:
@@ -123,14 +125,6 @@ class DryRunDiffer(object):
             if not m:
                 continue
             pnames.append(m.group(1))
-
-        
-        logger.debug('Running `mv .gitignoreCOPY .gitignore` to reset the .gitignore file')
-        subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
-
-        logger.debug('Running `git reset`')
-        subprocess.run(['git', 'reset'], cwd=git_dir)
-
         return pnames
 
     def _make_diff_report(self, dryrun):
