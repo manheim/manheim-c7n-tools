@@ -67,10 +67,18 @@ class DryRunDiffer(object):
         for source_path in parent_source_paths:
             if git_dir is None:
                 changed_policies.append(
-                    self._find_changed_policies(f'./policies/{source_path}', diff_against))
+                    self._find_changed_policies(
+                        f'./policies/{source_path}',
+                        diff_against
+                    )
+                )
             else:
                 changed_policies.append(
-                    self._find_changed_policies(f'{git_dir}/policies/{source_path}', diff_against))
+                    self._find_changed_policies(
+                        f'{git_dir}/policies/{source_path}',
+                        diff_against
+                    )
+                )
 
 
         if len(changed_policies) == 0:
