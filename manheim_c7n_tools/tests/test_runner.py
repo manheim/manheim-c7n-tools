@@ -702,15 +702,7 @@ class TestDryRunDiffStep(StepTester):
             return_value=ALL_REGIONS
         )
         for rname in ALL_REGIONS:
-            if rname == 'us-west-2':
-                assert runner.DryRunDiffStep.run_in_region(
-                    rname, self.m_conf
-                ) is True
-            else:
-                assert runner.DryRunDiffStep.run_in_region(
-                    rname, self.m_conf
-                ) is False
-
+            assert runner.DryRunDiffStep.run_in_region(rname, self.m_conf) is True
 
 class TestS3ArchiverStep(StepTester):
 
