@@ -102,13 +102,11 @@ class DryRunDiffer(object):
         """
 
         subprocess.run(['mv', '.gitignore', '.gitignoreCOPY'], cwd=git_dir)
-        subprocess.run(['git', 'add', '--all', '-N', 'policies'],cwd=git_dir)
-
+        subprocess.run(['git', 'add', '--all', '-N', 'policies'], cwd=git_dir)
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
-
         subprocess.run(['mv', '.gitignoreCOPY', '.gitignore'], cwd=git_dir)
         subprocess.run(['git', 'reset'], cwd=git_dir)
 
