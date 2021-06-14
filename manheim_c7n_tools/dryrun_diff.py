@@ -107,7 +107,7 @@ class DryRunDiffer(object):
         ).decode().split("\n")
 
         git_add_policies = subprocess.check_output(
-           ['git', 'add', '--all', '-N', 'policies'],
+            ['git', 'add', '--all', '-N', 'policies'],
             cwd=git_dir
         ).decode().split("\n")
 
