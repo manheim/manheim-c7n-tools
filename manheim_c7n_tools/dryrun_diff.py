@@ -65,10 +65,11 @@ class DryRunDiffer(object):
         for p in parent_source_paths:
             sub_policy_path = f'policies/{p}'
             if os.path.isdir(sub_policy_path):
-                changed_policies.append(
+                changed_policies.extend(
                     self._find_changed_policies(
                         sub_policy_path,
-                        diff_against
+                        diff_against,
+                        parent_policy=True
                     )
                 )
             else:
@@ -112,24 +113,30 @@ class DryRunDiffer(object):
                 fh.write(diff_report)
             logger.info('PR report written to: pr_report.html')
 
-    def _find_changed_policies(self, git_dir=None, diff_against='master'):
+    def _find_changed_policies(self, git_dir=None, diff_against='master', parent_policy=False):
         """
         :return: list of policy names that differ from master
         :rtype: list
         """
+        logger.info(f'Running _find_changed_policies with {git_dir}, {diff_against}, {parent_policy}')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
         pnames = []
-        polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
+        if parent_policy:
+            polname_re = re.compile(r'^.*\/([a-zA-Z0-9_-]+)\.yml$')
+        else:
+            polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
         for x in res:
             x = x.strip()
             if x == '':
                 continue
+            logger.info(f'x: {x}')
             m = polname_re.match(x)
             if not m:
                 continue
+
             pnames.append(m.group(1))
         return pnames
 
