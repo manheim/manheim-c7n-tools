@@ -63,7 +63,6 @@ class DryRunDiffer(object):
         source_paths = self.config.policy_source_paths
         parent_source_paths = source_paths[:-1]
         for p in parent_source_paths:
-            # Assumes these policies are checked out into ./policies/<parent_source_path>/
             sub_policy_path = f'policies/{p}'
             if os.path.isdir(sub_policy_path):
                 changed_policies.append(
