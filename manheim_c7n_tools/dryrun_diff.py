@@ -125,7 +125,6 @@ class DryRunDiffer(object):
             x = x.strip()
             if x == '':
                 continue
-            logger.info(f'x: {x}')
             m = polname_re.match(x)
             if not m:
                 continue
@@ -148,7 +147,6 @@ class DryRunDiffer(object):
             x = x.strip()
             if x == '':
                 continue
-            logger.info(f'x: {x}')
             m = polname_re.match(x)
             if not m:
                 continue
