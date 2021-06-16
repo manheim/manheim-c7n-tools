@@ -94,12 +94,12 @@ class DryRunDiffer(object):
             if 'defaults' in changed_policies:
                 fh.write(
                     'PR found to contain changes to defaults.yml and '
-                    '%d other policies\n\n' % (len(diff_count) - 1)
+                    '%d other policies\n\n' % (diff_count - 1)
                 )
             else:
                 fh.write(
                     'PR found to contain changes to '
-                    '%d policies\n\n' % len(diff_count)
+                    '%d policies\n\n' % diff_count
                 )
             fh.write(diff_md)
         logger.info('PR diff written to: pr_diff.md')
@@ -269,6 +269,7 @@ class DryRunDiffer(object):
         :return: markdown diff
         :rtype: str
         """
+        policy_diff_count = 0
         all_policies = list(set(
             list(dryrun.keys()) + list(self._live_results.keys())
         ))
@@ -285,6 +286,7 @@ class DryRunDiffer(object):
         for pname in sorted(all_policies):
             res += '%s\n' % ('=' * linelen)
             res += pname + "\n"
+            policy_diff_count += 1
             for rname in self.config.regions:
                 a = len(self._live_results.get(pname, {}).get(rname, []))
                 b = len(dryrun.get(pname, {}).get(rname, []))
@@ -312,7 +314,7 @@ class DryRunDiffer(object):
                     prefix, rname, a_str, b_str, diff
                 )
         res += '```\n'
-        return res, len(res)
+        return res, policy_diff_count
 
     def _get_dryrun_results(self, pol_names):
         """
