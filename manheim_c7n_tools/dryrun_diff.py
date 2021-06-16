@@ -89,17 +89,17 @@ class DryRunDiffer(object):
         for rname in self.config.regions:
             logger.debug('Getting S3 results for region: %s', rname)
             self._get_s3_results_for_region(rname, changed_policies)
-        diff_md = self._make_diff_markdown(dryrun_results)
+        diff_md, diff_count = self._make_diff_markdown(dryrun_results)
         with open('pr_diff.md', 'w') as fh:
             if 'defaults' in changed_policies:
                 fh.write(
                     'PR found to contain changes to defaults.yml and '
-                    '%d other policies\n\n' % (len(changed_policies) - 1)
+                    '%d other policies\n\n' % (len(diff_count) - 1)
                 )
             else:
                 fh.write(
                     'PR found to contain changes to '
-                    '%d policies\n\n' % len(changed_policies)
+                    '%d policies\n\n' % len(diff_count)
                 )
             fh.write(diff_md)
         logger.info('PR diff written to: pr_diff.md')
@@ -312,7 +312,7 @@ class DryRunDiffer(object):
                     prefix, rname, a_str, b_str, diff
                 )
         res += '```\n'
-        return res
+        return res, len(res)
 
     def _get_dryrun_results(self, pol_names):
         """
