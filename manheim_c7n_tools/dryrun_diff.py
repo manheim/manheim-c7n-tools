@@ -59,56 +59,17 @@ class DryRunDiffer(object):
         self.config = config
 
     def run(self, git_dir=None, diff_against='master'):
-        changed_policies = self._find_changed_policies(git_dir, diff_against)
-        source_paths = self.config.policy_source_paths
-        parent_source_paths = source_paths[:-1]
-        for p in parent_source_paths:
-            sub_policy_path = f'policies/{p}'
-            if os.path.isdir(sub_policy_path):
-                logger.info(
-                    f'Adding all inherited policies from {p} to list '
-                    'of possible changed_policies'
-                )
-                changed_policies.extend(
-                    self._get_inherited_policies(sub_policy_path)
-                )
-            else:
-                logger.warning(
-                    f'\n\t{p} is defined in `policy_source_paths` '
-                    'but is not checked out into a seperate directory. '
-                    'Dryrun-diff results will be incomplete!\n'
-                    f'\tTo resolve this run `git clone '
-                    f'<repo link> {sub_policy_path}`.\n'
-                    f'\tThis will checkout the inherited policy ({p}) '
-                    'for dryrun-diff'
-                )
-        if len(changed_policies) == 0:
-            logger.info(
-                'Git diff did not report any changed policies; skipping '
-                'resource count diff.'
-            )
-            with open('pr_diff.md', 'w') as fh:
-                fh.write('Git diff did not report any changed policies; '
-                         'skipping resource count diff.')
-            return
-        logger.info('Changed policies for diff: %s', changed_policies)
-        dryrun_results = self._get_dryrun_results(changed_policies)
+        dryrun_results = self._get_dryrun_results()
         logger.info('Reading results from last run from S3')
         for rname in self.config.regions:
             logger.debug('Getting S3 results for region: %s', rname)
-            self._get_s3_results_for_region(rname, changed_policies)
+            self._get_s3_results_for_region(rname)
         diff_md, diff_count = self._make_diff_markdown(dryrun_results)
         with open('pr_diff.md', 'w') as fh:
-            if 'defaults' in changed_policies:
-                fh.write(
-                    'PR found to contain changes to defaults.yml and '
-                    '%d other policies\n\n' % (diff_count - 1)
-                )
-            else:
-                fh.write(
-                    'PR found to contain changes to '
-                    '%d policies\n\n' % diff_count
-                )
+            fh.write(
+                'PR found to contain changes to '
+                '%d policies\n\n' % diff_count
+            )
             fh.write(diff_md)
         logger.info('PR diff written to: pr_diff.md')
         diff_report = self._make_diff_report(dryrun_results)
@@ -116,50 +77,6 @@ class DryRunDiffer(object):
             with open('pr_report.html', 'w') as fh:
                 fh.write(diff_report)
             logger.info('PR report written to: pr_report.html')
-
-    def _find_changed_policies(self, git_dir=None, diff_against='master'):
-        """
-        :return: list of policy names that differ from master
-        :rtype: list
-        """
-        logger.debug(f'_find_changed_policies({git_dir}, {diff_against})')
-        res = subprocess.check_output(
-            ['git', 'diff', '--name-only', diff_against],
-            cwd=git_dir
-        ).decode().split("\n")
-        pnames = []
-        polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
-        for x in res:
-            x = x.strip()
-            if x == '':
-                continue
-            m = polname_re.match(x)
-            if not m:
-                continue
-            pnames.append(m.group(1))
-        return pnames
-
-    def _get_inherited_policies(self, git_dir=None):
-        """
-        :return: list of policy names from parent policies
-        :rtype: list
-        """
-        logger.debug(f'_get_inherited_policies({git_dir})')
-        res = subprocess.check_output(
-            ['git', 'ls-files'],
-            cwd=git_dir
-        ).decode().split("\n")
-        pnames = []
-        polname_re = re.compile(r'^.*\/([a-zA-Z0-9_-]+)\.yml$')
-        for x in res:
-            x = x.strip()
-            if x == '':
-                continue
-            m = polname_re.match(x)
-            if not m:
-                continue
-            pnames.append(m.group(1))
-        return pnames
 
     def _make_diff_report(self, dryrun):
         """
@@ -324,7 +241,7 @@ class DryRunDiffer(object):
         res += '```\n'
         return res, policy_diff_count
 
-    def _get_dryrun_results(self, pol_names):
+    def _get_dryrun_results(self):
         """
         Read the `resources.json` files from disk for the dryrun/ directory.
         Return a dictionary of string policy name to nested dictionaries, of
@@ -344,9 +261,6 @@ class DryRunDiffer(object):
                 continue
             region = m.group(1)
             policy = m.group(2)
-            if policy not in pol_names and 'defaults' not in pol_names:
-                # policy isn't changed
-                continue
             _dir = os.path.dirname(f)
             logger.debug('Reading files from directory: %s', _dir)
             try:
@@ -383,7 +297,7 @@ class DryRunDiffer(object):
                     'resource', self.UNKNOWN_RESOURCE_TYPE)
                 res[pol][self.RESOURCE_TYPE_KEY] = _type
 
-    def _get_s3_results_for_region(self, region_name, changed_pols):
+    def _get_s3_results_for_region(self, region_name):
         """
         Find the results files in S3 from the last live run of the deployed
         policies. Reads each file and maps resources to ``self._live_results``
@@ -397,9 +311,6 @@ class DryRunDiffer(object):
         prefixes = self._get_s3_policy_prefixes(bkt)
         logger.debug('Found %d policy prefixes in %s', len(prefixes), bktname)
         for p in prefixes:
-            if p not in changed_pols and 'defaults' not in changed_pols:
-                # policy was not changed, skip it
-                continue
             if p not in self._live_results:
                 self._live_results[p] = {}
             fetch_type = self.RESOURCE_TYPE_KEY not in self._live_results[p]
