@@ -129,7 +129,6 @@ class DryRunDiffer(object):
             m = polname_re.match(x)
             if not m:
                 continue
-
             pnames.append(m.group(1))
         return pnames
 
@@ -153,7 +152,6 @@ class DryRunDiffer(object):
             m = polname_re.match(x)
             if not m:
                 continue
-
             pnames.append(m.group(1))
         return pnames
 
