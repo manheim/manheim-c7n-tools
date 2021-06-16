@@ -65,6 +65,8 @@ class DryRunDiffer(object):
         for p in parent_source_paths:
             sub_policy_path = f'policies/{p}'
             if os.path.isdir(sub_policy_path):
+                # Add inherited policies to list of possible "changed_policies"
+                # We don't know if they differ from master until the comparison step
                 changed_policies.extend(
                     self._get_inherited_policies(sub_policy_path)
                 )
