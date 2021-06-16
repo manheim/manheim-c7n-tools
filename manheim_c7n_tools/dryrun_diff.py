@@ -66,11 +66,7 @@ class DryRunDiffer(object):
             sub_policy_path = f'policies/{p}'
             if os.path.isdir(sub_policy_path):
                 changed_policies.extend(
-                    self._find_changed_policies(
-                        sub_policy_path,
-                        diff_against,
-                        parent_policy=True
-                    )
+                    self._get_inherited_policies(sub_policy_path)
                 )
             else:
                 logger.warning(
@@ -113,21 +109,42 @@ class DryRunDiffer(object):
                 fh.write(diff_report)
             logger.info('PR report written to: pr_report.html')
 
-    def _find_changed_policies(self, git_dir=None, diff_against='master', parent_policy=False):
+    def _find_changed_policies(self, git_dir=None, diff_against='master'):
         """
         :return: list of policy names that differ from master
         :rtype: list
         """
-        logger.info(f'Running _find_changed_policies with {git_dir}, {diff_against}, {parent_policy}')
+        logger.info(f'Running _find_changed_policies with {git_dir}, {diff_against}')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
         ).decode().split("\n")
         pnames = []
-        if parent_policy:
-            polname_re = re.compile(r'^.*\/([a-zA-Z0-9_-]+)\.yml$')
-        else:
-            polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
+        polname_re = re.compile(r'^policies.*\/([a-zA-Z0-9_-]+)\.yml$')
+        for x in res:
+            x = x.strip()
+            if x == '':
+                continue
+            logger.info(f'x: {x}')
+            m = polname_re.match(x)
+            if not m:
+                continue
+
+            pnames.append(m.group(1))
+        return pnames
+
+    def _get_inherited_policies(self, git_dir=None):
+        """
+        :return: list of policy names from parent policies
+        :rtype: list
+        """
+        logger.info(f'Running _get_inherited_policies with {git_dir}')
+        res = subprocess.check_output(
+            ['git', 'ls-files'],
+            cwd=git_dir
+        ).decode().split("\n")
+        pnames = []
+        polname_re = re.compile(r'^.*\/([a-zA-Z0-9_-]+)\.yml$')
         for x in res:
             x = x.strip()
             if x == '':
