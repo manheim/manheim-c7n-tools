@@ -114,7 +114,7 @@ class DryRunDiffer(object):
         :return: list of policy names that differ from master
         :rtype: list
         """
-        logger.info(f'Running _find_changed_policies with {git_dir}, {diff_against}')
+        logger.debug(f'_find_changed_policies({git_dir}, {diff_against})')
         res = subprocess.check_output(
             ['git', 'diff', '--name-only', diff_against],
             cwd=git_dir
@@ -138,7 +138,7 @@ class DryRunDiffer(object):
         :return: list of policy names from parent policies
         :rtype: list
         """
-        logger.info(f'Running _get_inherited_policies with {git_dir}')
+        logger.debug(f'_get_inherited_policies({git_dir})')
         res = subprocess.check_output(
             ['git', 'ls-files'],
             cwd=git_dir
