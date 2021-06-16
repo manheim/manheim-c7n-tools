@@ -65,15 +65,22 @@ class DryRunDiffer(object):
         for p in parent_source_paths:
             sub_policy_path = f'policies/{p}'
             if os.path.isdir(sub_policy_path):
-                # Add inherited policies to list of possible "changed_policies"
+                logger.info(
+                    f'Adding all inherited policies from {p} to list '
+                    'of possible changed_policies'
+                )
                 changed_policies.extend(
                     self._get_inherited_policies(sub_policy_path)
                 )
             else:
                 logger.warning(
-                    f'{sub_policy_path} is defined in `policy_source_paths` '
+                    f'\n\t{p} is defined in `policy_source_paths` '
                     'but is not checked out into a seperate directory. '
-                    'dryrun-diff results will be incomplete!'
+                    'Dryrun-diff results will be incomplete!\n'
+                    f'\tTo resolve this run `git clone '
+                    f'<repo link> {sub_policy_path}`.\n'
+                    f'\tThis will checkout the inherited policy ({p}) '
+                    'for dryrun-diff'
                 )
         if len(changed_policies) == 0:
             logger.info(
