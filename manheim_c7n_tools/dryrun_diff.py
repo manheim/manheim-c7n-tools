@@ -215,8 +215,8 @@ class DryRunDiffer(object):
                 b_str = '--' if b == 0 else b
                 prefix = ' '
                 diff = ''
+                # No changes in resource counts
                 if a == b:
-                    # no changes
                     continue
                 res += '%s\n' % ('=' * linelen)
                 res += pname + "\n"
