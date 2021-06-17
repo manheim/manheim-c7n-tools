@@ -29,7 +29,6 @@ import argparse
 import itertools
 import os
 from zlib import decompress
-import subprocess
 from jinja2 import Environment, FileSystemLoader
 from jinja2.exceptions import TemplateNotFound
 
@@ -209,9 +208,6 @@ class DryRunDiffer(object):
         res += '##%s    live                  ##\n' % (' ' * maxlen)
         res += '##%s    run       PR    diff  ##\n' % (' ' * maxlen)
         for pname in sorted(all_policies):
-            res += '%s\n' % ('=' * linelen)
-            res += pname + "\n"
-            policy_diff_count += 1
             for rname in self.config.regions:
                 a = len(self._live_results.get(pname, {}).get(rname, []))
                 b = len(dryrun.get(pname, {}).get(rname, []))
@@ -219,6 +215,13 @@ class DryRunDiffer(object):
                 b_str = '--' if b == 0 else b
                 prefix = ' '
                 diff = ''
+                if a == b:
+                    # no changes
+                    continue
+                res += '%s\n' % ('=' * linelen)
+                res += pname + "\n"
+                policy_diff_count += 1
+
                 if a == '--' and b != '--':
                     # in PR but not in master/live
                     prefix = '+'
