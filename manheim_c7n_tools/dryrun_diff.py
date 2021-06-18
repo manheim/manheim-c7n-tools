@@ -29,7 +29,6 @@ import argparse
 import itertools
 import os
 from zlib import decompress
-import subprocess
 from jinja2 import Environment, FileSystemLoader
 from jinja2.exceptions import TemplateNotFound
 
@@ -59,34 +58,17 @@ class DryRunDiffer(object):
         self.config = config
 
     def run(self, git_dir=None, diff_against='master'):
-        changed_policies = self._find_changed_policies(git_dir, diff_against)
-        if len(changed_policies) == 0:
-            logger.info(
-                'Git diff did not report any changed policies; skipping '
-                'resource count diff.'
-            )
-            with open('pr_diff.md', 'w') as fh:
-                fh.write('Git diff did not report any changed policies; '
-                         'skipping resource count diff.')
-            return
-        logger.info('Changed policies for diff: %s', changed_policies)
-        dryrun_results = self._get_dryrun_results(changed_policies)
+        dryrun_results = self._get_dryrun_results()
         logger.info('Reading results from last run from S3')
         for rname in self.config.regions:
             logger.debug('Getting S3 results for region: %s', rname)
-            self._get_s3_results_for_region(rname, changed_policies)
-        diff_md = self._make_diff_markdown(dryrun_results)
+            self._get_s3_results_for_region(rname)
+        diff_md, diff_count = self._make_diff_markdown(dryrun_results)
         with open('pr_diff.md', 'w') as fh:
-            if 'defaults' in changed_policies:
-                fh.write(
-                    'PR found to contain changes to defaults.yml and '
-                    '%d other policies\n\n' % (len(changed_policies) - 1)
-                )
-            else:
-                fh.write(
-                    'PR found to contain changes to '
-                    '%d policies\n\n' % len(changed_policies)
-                )
+            fh.write(
+                'PR found to contain changes to '
+                '%d policies\n\n' % diff_count
+            )
             fh.write(diff_md)
         logger.info('PR diff written to: pr_diff.md')
         diff_report = self._make_diff_report(dryrun_results)
@@ -94,27 +76,6 @@ class DryRunDiffer(object):
             with open('pr_report.html', 'w') as fh:
                 fh.write(diff_report)
             logger.info('PR report written to: pr_report.html')
-
-    def _find_changed_policies(self, git_dir=None, diff_against='master'):
-        """
-        :return: list of policy names that differ from master
-        :rtype: list
-        """
-        res = subprocess.check_output(
-            ['git', 'diff', '--name-only', diff_against],
-            cwd=git_dir
-        ).decode().split("\n")
-        pnames = []
-        polname_re = re.compile(r'^policies.*/([a-zA-Z0-9_-]+)\.yml$')
-        for x in res:
-            x = x.strip()
-            if x == '':
-                continue
-            m = polname_re.match(x)
-            if not m:
-                continue
-            pnames.append(m.group(1))
-        return pnames
 
     def _make_diff_report(self, dryrun):
         """
@@ -232,6 +193,7 @@ class DryRunDiffer(object):
         :return: markdown diff
         :rtype: str
         """
+        policy_diff_count = 0
         all_policies = list(set(
             list(dryrun.keys()) + list(self._live_results.keys())
         ))
@@ -246,8 +208,6 @@ class DryRunDiffer(object):
         res += '##%s    live                  ##\n' % (' ' * maxlen)
         res += '##%s    run       PR    diff  ##\n' % (' ' * maxlen)
         for pname in sorted(all_policies):
-            res += '%s\n' % ('=' * linelen)
-            res += pname + "\n"
             for rname in self.config.regions:
                 a = len(self._live_results.get(pname, {}).get(rname, []))
                 b = len(dryrun.get(pname, {}).get(rname, []))
@@ -255,6 +215,13 @@ class DryRunDiffer(object):
                 b_str = '--' if b == 0 else b
                 prefix = ' '
                 diff = ''
+                # No changes in resource counts
+                if a == b:
+                    continue
+                res += '%s\n' % ('=' * linelen)
+                res += pname + "\n"
+                policy_diff_count += 1
+
                 if a == '--' and b != '--':
                     # in PR but not in master/live
                     prefix = '+'
@@ -275,9 +242,9 @@ class DryRunDiffer(object):
                     prefix, rname, a_str, b_str, diff
                 )
         res += '```\n'
-        return res
+        return res, policy_diff_count
 
-    def _get_dryrun_results(self, pol_names):
+    def _get_dryrun_results(self):
         """
         Read the `resources.json` files from disk for the dryrun/ directory.
         Return a dictionary of string policy name to nested dictionaries, of
@@ -297,9 +264,6 @@ class DryRunDiffer(object):
                 continue
             region = m.group(1)
             policy = m.group(2)
-            if policy not in pol_names and 'defaults' not in pol_names:
-                # policy isn't changed
-                continue
             _dir = os.path.dirname(f)
             logger.debug('Reading files from directory: %s', _dir)
             try:
@@ -336,7 +300,7 @@ class DryRunDiffer(object):
                     'resource', self.UNKNOWN_RESOURCE_TYPE)
                 res[pol][self.RESOURCE_TYPE_KEY] = _type
 
-    def _get_s3_results_for_region(self, region_name, changed_pols):
+    def _get_s3_results_for_region(self, region_name):
         """
         Find the results files in S3 from the last live run of the deployed
         policies. Reads each file and maps resources to ``self._live_results``
@@ -350,9 +314,6 @@ class DryRunDiffer(object):
         prefixes = self._get_s3_policy_prefixes(bkt)
         logger.debug('Found %d policy prefixes in %s', len(prefixes), bktname)
         for p in prefixes:
-            if p not in changed_pols and 'defaults' not in changed_pols:
-                # policy was not changed, skip it
-                continue
             if p not in self._live_results:
                 self._live_results[p] = {}
             fetch_type = self.RESOURCE_TYPE_KEY not in self._live_results[p]
