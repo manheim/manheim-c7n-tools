@@ -17,7 +17,7 @@ manheim-c7n-tools version configuration.
 """
 
 #: The semver-compliant version of the package.
-VERSION = '1.3.1'
+VERSION = '1.3.2'
 
 #: The URL for further information about the package.
 PROJECT_URL = 'https://github.com/manheim/manheim-c7n-tools'

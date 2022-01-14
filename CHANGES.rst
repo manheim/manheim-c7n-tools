@@ -2,6 +2,11 @@ Changelog
 =========
 
 
+Unreleased
+------------------
+
+* Fixes `#63 <https://github.com/manheim/manheim-c7n-tools/issues/63>`__ - Bump c7n version from 0.9.10 to `0.9.14 <https://github.com/cloud-custodian/cloud-custodian/releases/tag/0.9.14.0>`__ and c7n-mailer from 0.6.9 to 0.6.13.
+
 1.3.1 (2021-06-14)
 ------------------
 
