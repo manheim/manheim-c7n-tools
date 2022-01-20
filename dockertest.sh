@@ -21,5 +21,5 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-docker run -it --rm "$1" \
+docker run -i --rm "$1" \
   bash -c "policygen -V && s3-archiver -V && dryrun-diff -V && manheim-c7n-runner -V && mugc --help && errorscan -V && pip freeze"
