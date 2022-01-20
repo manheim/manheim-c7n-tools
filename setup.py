@@ -7,7 +7,7 @@ with open('README.md') as f:
 requires = [
     'boto3',
     'botocore',
-    'docutils>=0.10,<0.16',
+    'docutils',
     'tabulate>=0.8.0,<0.9.0',
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
