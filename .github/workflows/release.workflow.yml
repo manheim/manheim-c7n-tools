@@ -1,0 +1,121 @@
+name: Run Tests and Release
+
+on: # Build and release on push to master
+  push:
+    branches: [ master ]
+jobs:
+  test-py37:
+    env:
+      TOXENV: py37
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
+  test-py38:
+    env:
+      TOXENV: py38
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
+  test-py39:
+    env:
+      TOXENV: py39
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
+  test-docs:
+    env:
+      TOXENV: docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
+  test-docker:
+    env:
+      TOXENV: docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
+  deploy:
+    needs: [test-py37, test-py38, test-py39, test-docs, test-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - run: bash build_or_deploy.sh build
+      - run: bash build_or_deploy.sh push
