@@ -106,3 +106,16 @@ jobs:
       - run: virtualenv --version
       - run: tox -r
       - run: codecov
+  deploy:
+    needs: [test-py37, test-py38, test-py39, test-docs, test-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - run: bash build_or_deploy.sh build
+

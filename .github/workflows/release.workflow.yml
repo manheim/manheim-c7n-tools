@@ -1,8 +1,9 @@
 name: Run Tests and Release
 
-on: # Build and release on push to master
+on: # Build and release when creating new tags
   push:
-    branches: [ master ]
+    tags:
+      - '*'
 jobs:
   test-py37:
     env:
