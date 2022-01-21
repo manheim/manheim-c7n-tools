@@ -21,7 +21,6 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-env | grep GITHUB
 
 function gettag {
     # if it's a build of a tag, return that right away
@@ -78,6 +77,7 @@ elif [[ "$1" == "dockerbuild" ]]; then
 elif [[ "$1" == "push" ]]; then
     pythonpush
 elif [[ "$1" == "dockerbuildtest" ]]; then
+    env
     dockerbuildtest
 else
     >&2 echo "USAGE: do_docker.sh [build|dockerbuild|push|dockerbuildtest]"
