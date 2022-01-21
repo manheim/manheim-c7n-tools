@@ -23,10 +23,10 @@ fi
 
 function gettag {
     # if it's a build of a tag, return that right away
-    [ ! -z "$TRAVIS_TAG" ] && { echo $TRAVIS_TAG; return 0; }
+    [ ! -z "$GITHUB_REF_NAME" ] && { echo $GITHUB_REF_NAME; return 0; }
     # otherwise, prefix with PR number if available
     prefix=''
-    [ ! -z "$TRAVIS_PULL_REQUEST" ] && [[ "$TRAVIS_PULL_REQUEST" != "false" ]] && prefix="PR${TRAVIS_PULL_REQUEST}_"
+    [ ! -z "$GITHUB_HEAD_REF" ] && [[ "$GITHUB_HEAD_REF" != "false" ]] && prefix="PR${GITHUB_HEAD_REF}_"
     ref="test_${prefix}$(git rev-parse --short HEAD)_$(date +%s)"
     echo "${ref}"
 }
@@ -36,7 +36,7 @@ function getversion {
 }
 
 function getbuildurl {
-  [ ! -z "$TRAVIS_BUILD_WEB_URL" ] && { echo $TRAVIS_BUILD_WEB_URL; return 0; }
+  [ ! -z "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" ] && { echo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"; return 0; }
   echo "local"
 }
 
