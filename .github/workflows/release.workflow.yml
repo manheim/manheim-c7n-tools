@@ -118,5 +118,13 @@ jobs:
           architecture: 'x64'
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
       - run: bash build_or_deploy.sh build
       - run: bash build_or_deploy.sh push
