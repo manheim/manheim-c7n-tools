@@ -21,6 +21,8 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+env | grep GITHUB
+
 function gettag {
     # if it's a build of a tag, return that right away
     [ ! -z "$GITHUB_REF_NAME" ] && { echo $GITHUB_REF_NAME; return 0; }
