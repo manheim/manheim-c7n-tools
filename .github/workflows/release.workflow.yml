@@ -124,6 +124,7 @@ jobs:
       - run: git config --global user.name "Manheim RE"
       - run: pip install tox
       - run: pip install codecov
+      - run: pip install wheel
       - run: pip freeze
       - run: virtualenv --version
       - run: bash build_or_deploy.sh build
