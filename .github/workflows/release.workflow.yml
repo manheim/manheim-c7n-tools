@@ -109,6 +109,9 @@ jobs:
       - run: codecov
   deploy:
     needs: [test-py37, test-py38, test-py39, test-docs, test-docker]
+    env:
+      TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

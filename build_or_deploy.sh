@@ -23,11 +23,7 @@ fi
 
 
 function gettag {
-    # if it's a build of a tag, return that right away
-    [ ! -z "$GITHUB_REF_NAME" ] && { echo $GITHUB_REF_NAME; return 0; }
-    # otherwise, prefix with PR number if available
     prefix=''
-    [ ! -z "$GITHUB_HEAD_REF" ] && [[ "$GITHUB_HEAD_REF" != "false" ]] && prefix="PR${GITHUB_HEAD_REF}_"
     ref="test_${prefix}$(git rev-parse --short HEAD)_$(date +%s)"
     echo "${ref}"
 }
@@ -71,14 +67,12 @@ function pythonpush {
 }
 
 if [[ "$1" == "build" ]]; then
-    env
     pythonbuild
 elif [[ "$1" == "dockerbuild" ]]; then
     dockertoxbuild
 elif [[ "$1" == "push" ]]; then
     pythonpush
 elif [[ "$1" == "dockerbuildtest" ]]; then
-    env
     dockerbuildtest
 else
     >&2 echo "USAGE: do_docker.sh [build|dockerbuild|push|dockerbuildtest]"
