@@ -71,6 +71,7 @@ function pythonpush {
 }
 
 if [[ "$1" == "build" ]]; then
+    env
     pythonbuild
 elif [[ "$1" == "dockerbuild" ]]; then
     dockertoxbuild
