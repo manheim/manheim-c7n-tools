@@ -123,4 +123,11 @@ jobs:
         uses: docker/metadata-action@v3
         with:
           images: manheim/manheim-c7n-tools
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
