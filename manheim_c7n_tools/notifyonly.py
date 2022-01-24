@@ -14,6 +14,7 @@
 
 from typing import List
 import logging
+import c7n.filters  # noqa - used to fix a circular import error
 from c7n.tags import DEFAULT_TAG
 
 logger = logging.getLogger(__name__)

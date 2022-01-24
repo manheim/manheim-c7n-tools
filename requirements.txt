@@ -1,5 +1,5 @@
-c7n==0.9.10
-c7n-mailer==0.6.9
+c7n==0.9.14
+c7n-mailer==0.6.13
 tabulate>=0.8.0,<0.9.0
 # In order to work with the "mu" Lambda function management tool,
 # we need PyYAML 3.x, and need it as source and not a wheel

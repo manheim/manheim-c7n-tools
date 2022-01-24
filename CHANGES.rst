@@ -1,6 +1,16 @@
 Changelog
 =========
 
+1.4.0 (2022-01-20)
+------------------
+
+* Bump c7n to release 0.9.14
+* Bump c7n-mailer to release 0.6.13
+* Updated dependencies for c7n and c7n-mailer
+  * Remove version contstrains for ``docutils``
+  * Pin ``mistune==0.8.4`` for docs
+* Replace TravisCI with Github Actions
+
 
 1.3.1 (2021-06-14)
 ------------------
