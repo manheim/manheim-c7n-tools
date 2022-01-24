@@ -17,7 +17,8 @@ requires = [
     # for building generated policy docs
     'sphinx>=1.8.0,<1.9.0',
     'sphinx_rtd_theme',
-    'm2r'
+    'm2r',
+    'mistune==0.8.4'
 ]
 
 classifiers = [
