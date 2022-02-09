@@ -101,7 +101,8 @@ class TestValidateStep(StepTester):
                 runner.ValidateStep('rName', self.m_conf).run()
         assert mock_validate.mock_calls == [call(mock_conf)]
         assert mock_empty.mock_calls == [
-            call(configs=['custodian_rName.yml'], region='rName')
+            call(configs=['custodian_rName.yml'], region='rName',
+                 check_deprecations="yes")
         ]
 
     def test_dryrun(self):
@@ -112,7 +113,8 @@ class TestValidateStep(StepTester):
                 runner.ValidateStep('rName', self.m_conf).dryrun()
         assert mock_validate.mock_calls == [call(mock_conf)]
         assert mock_empty.mock_calls == [
-            call(configs=['custodian_rName.yml'], region='rName')
+            call(configs=['custodian_rName.yml'], region='rName',
+                 check_deprecations="yes")
         ]
 
     def test_run_in_region(self):
@@ -160,7 +162,8 @@ class TestMugcStep(StepTester):
                 external_id=None,
                 cache_period=0,
                 cache=None,
-                present=False
+                present=False,
+                check_deprecations="yes"
             )
         ]
         assert mocks['load_policies'].mock_calls == [
@@ -216,7 +219,8 @@ class TestMugcStep(StepTester):
                 cache_period=0,
                 cache=None,
                 present=False,
-                dryrun=True
+                dryrun=True,
+                check_deprecations="yes"
             )
         ]
         assert mocks['load_policies'].mock_calls == [
@@ -266,7 +270,8 @@ class TestCustodianStep(StepTester):
                 command='c7n.commands.run',
                 output_dir='cloud-custodian-ACCT-REGION/logs',
                 vars=None,
-                dryrun=False
+                dryrun=False,
+                check_deprecations="yes"
             )
         ]
 
@@ -295,7 +300,8 @@ class TestCustodianStep(StepTester):
                 command='c7n.commands.run',
                 output_dir='dryrun/rName',
                 vars=None,
-                dryrun=True
+                dryrun=True,
+                check_deprecations="yes"
             )
         ]
 

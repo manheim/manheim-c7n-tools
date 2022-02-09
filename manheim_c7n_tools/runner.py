@@ -155,7 +155,8 @@ class ValidateStep(BaseStep):
     def _do_validate(self):
         conf = Config.empty(
             configs=['custodian_%s.yml' % self.region_name],
-            region=self.region_name
+            region=self.region_name,
+            check_deprecations="yes"
         )
         validate(conf)
 
@@ -190,7 +191,8 @@ class MugcStep(BaseStep):
             external_id=None,
             cache_period=0,
             cache=None,
-            present=False
+            present=False,
+            check_deprecations="yes"
         )
         # use cloud provider to initialize policies to get region expansion
         policies = AWS().initialize_policies(
@@ -222,7 +224,8 @@ class MugcStep(BaseStep):
             cache_period=0,
             cache=None,
             present=False,
-            dryrun=True
+            dryrun=True,
+            check_deprecations="yes"
         )
         # use cloud provider to initialize policies to get region expansion
         policies = AWS().initialize_policies(
@@ -266,7 +269,8 @@ class CustodianStep(BaseStep):
             command='c7n.commands.run',
             output_dir='%s/logs' % self.config.output_s3_bucket_name,
             vars=None,
-            dryrun=False
+            dryrun=False,
+            check_deprecations="yes"
         )
         run(conf)
 
@@ -291,7 +295,8 @@ class CustodianStep(BaseStep):
             command='c7n.commands.run',
             output_dir='dryrun/%s' % self.region_name,
             vars=None,
-            dryrun=True
+            dryrun=True,
+            check_deprecations="yes"
         )
         run(conf)
 
