@@ -155,7 +155,8 @@ class ValidateStep(BaseStep):
     def _do_validate(self):
         conf = Config.empty(
             configs=['custodian_%s.yml' % self.region_name],
-            region=self.region_name
+            region=self.region_name,
+            check_deprecations="yes"
         )
         validate(conf)
 

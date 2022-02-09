@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.4.1 (2022-02-09)
+------------------
+
+* Fixes `#67 <https://github.com/manheim/manheim-c7n-tools/issues/67>`__ - Add ``check_deprecations="yes"`` for Validate stage
+
+
 1.4.0 (2022-01-20)
 ------------------
 
