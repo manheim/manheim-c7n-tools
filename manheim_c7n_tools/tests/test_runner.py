@@ -102,7 +102,7 @@ class TestValidateStep(StepTester):
         assert mock_validate.mock_calls == [call(mock_conf)]
         assert mock_empty.mock_calls == [
             call(configs=['custodian_rName.yml'], region='rName',
-                check_deprecations="yes")
+                 check_deprecations="yes")
         ]
 
     def test_dryrun(self):
@@ -114,7 +114,7 @@ class TestValidateStep(StepTester):
         assert mock_validate.mock_calls == [call(mock_conf)]
         assert mock_empty.mock_calls == [
             call(configs=['custodian_rName.yml'], region='rName',
-                check_deprecations="yes")
+                 check_deprecations="yes")
         ]
 
     def test_run_in_region(self):
