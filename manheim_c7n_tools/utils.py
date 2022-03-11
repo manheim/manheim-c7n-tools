@@ -124,7 +124,7 @@ def git_html_url():
     if not m:
         m = re.match(
             r'^https?://(([a-zA-Z0-9_-]+?):(.+?@?))?(?P<hostname>[a-zA-Z0-9_-]'
-            r'+(\.[a-zA-Z0-9_-]+)+)/(?P<path>.*\/[^\.]*)(\.git)?$'
+            r'+(\.[a-zA-Z0-9_-]+)+)/(?P<path>.*\/[^\.]*)(\.git)?$',
             p
         )
     if not m:
