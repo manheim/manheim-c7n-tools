@@ -318,12 +318,17 @@ linkcheck_ignore = [
     r'https?://.*\.readthedocs\.org.*',
     r'https?://codecov\.io.*',
     r'https?://.*readthedocs\.org.*',
-    r'https?://manheim-c7n-tools\.readthedocs\.org.*',
+    r'https?://manheim-c7n-tools\.readthedocs\.io.*',
     r'https?://pypi\.python\.org/pypi/manheim-c7n-tools',
     # broken bit.ly link in upstream c7n docs
     r'https?://bit\.ly/.*',
     r'https?://.*wikipedia\.org.*'
 ]
+
+linkcheck_request_headers = {
+    r'https://.*\.readthedocs.org/': {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; '
+                                                'rv:24.0) Gecko/20100101 Firefox/24.0'}
+}
 
 # exclude module docstrings - see http://stackoverflow.com/a/18031024/211734
 def remove_module_docstring(app, what, name, obj, options, lines):
