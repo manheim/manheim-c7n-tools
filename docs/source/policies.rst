@@ -262,7 +262,7 @@ Filters
 
 Cloud-custodian has support for many different kinds of filters to match various resource attributes.
 Upstream documentation exists on both the :ref:`Generic filters <cloud custodian:filters>`
-as well as the :ref:`resource-specific filters <cloud custodian:policy>`.
+as well as the :ref:`AWS-specific filters <cloud custodian:aws>`.
 In addition to that manually-curated documentation, there is also generated
 documentation for the :py:mod:`generic <cloud custodian:c7n.filters>`
 and :py:mod:`resource-specific filters <cloud custodian:c7n.resources>`, as well as the source
@@ -304,11 +304,11 @@ Cloud-custodian has both generic/global actions (such as ``notify``) and resourc
 -  :py:class:`put-metric <cloud custodian:c7n.actions.metric.PutMetric>` - Send a custom metric to CloudWatch
 
 To identify available resource-specific actions, either find the appropriate resource type module in the
-:py:mod:`resource-specific actions <cloud custodian:c7n.resources>` or the
+:ref:`cloud-custodian AWS documentation <cloud custodian:aws>` or the
 `c7n source code <https://github.com/capitalone/cloud-custodian/tree/master/c7n/resources>`_
 and find all classes in it that are based on ``c7n.actions.Action``, or use the ``custodian schema``
 command line tool. There is also
-:ref:`manually-curated documentation on resource-specific filters and actions <cloud custodian:policy>`
+:ref:`manually-curated documentation on resource-specific filters and actions <cloud custodian:aws>`
 that is helpful but incomplete.
 
 In addition to ``notify``, some of our most-used actions are the various resource-specific ``stop`` or
@@ -388,7 +388,7 @@ Mode
 ----
 
 We have standardized on deploying our policies as Lambda functions, to take advantage of c7n's excellent
-:std:doc:`cloud custodian:aws/policy/lambda`. The ``type`` key of the ``mode`` section
+:std:label:`cloud custodian:lambda`. The ``type`` key of the ``mode`` section
 of the policy defines how the policy will be deployed and executed.
 ``defaults.yml`` should specify everything needed to deploy a policy in ``periodic`` mode. If the ``mode`` section is completely
 omitted from a policy, the default periodic mode will be applied.
