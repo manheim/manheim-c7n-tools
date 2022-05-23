@@ -6,6 +6,7 @@ Changelog
 
 * Bump c7n to release 0.9.16
 * Bump c7n-mailer to release 0.6.15 
+* Update sphinx dependencies to 4.x
 
 1.4.2 (2022-05-20)
 ------------------
