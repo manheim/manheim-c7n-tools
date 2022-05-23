@@ -15,9 +15,9 @@ requires = [
     'c7n==0.9.16',
     'c7n-mailer==0.6.15',
     # for building generated policy docs
-    'sphinx>=1.8.0,<1.9.0',
+    'sphinx',
     'sphinx_rtd_theme',
-    'm2r',
+    'm2r2',
     'mistune==0.8.4'
 ]
 
