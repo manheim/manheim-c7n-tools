@@ -149,12 +149,12 @@ htmlhelp_basename = 'manheim-c7n-toolsdoc'
 # directly to the root of the documentation.
 # html_extra_path = []
 
-html_context = {
-    'css_files': [
-        # thanks to: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
-        '_static/theme_overrides.css',  # override wide tables in RTD theme
-    ],
-}
+# thanks to: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
+#   see: https://docs.readthedocs.io/en/stable/guides/adding-custom-css.html
+#   for the updated way to do this (as used here)
+html_css_files = [
+    '_static/theme_overrides.css',  # override wide tables in RTD theme
+]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
