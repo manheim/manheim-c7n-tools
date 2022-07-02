@@ -12,8 +12,8 @@ requires = [
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
-    'c7n==0.9.16',
-    'c7n-mailer==0.6.15',
+    'c7n==0.9.17',
+    'c7n-mailer==0.6.16',
     # for building generated policy docs
     'sphinx',
     'sphinx_rtd_theme',
