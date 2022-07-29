@@ -1,3 +1,3 @@
 pygments
 m2r2
-mistune==0.8.4
+mistune==2.0.3
