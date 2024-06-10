@@ -8,12 +8,12 @@ requires = [
     'boto3',
     'botocore',
     'docutils',
-    'tabulate>=0.8.0,<0.9.0',
+    'tabulate',
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
-    'c7n==0.9.16',
-    'c7n-mailer==0.6.15',
+    'c7n==0.9.37',
+    'c7n-mailer==0.6.36',
     # for building generated policy docs
     'sphinx',
     'sphinx_rtd_theme',

@@ -64,6 +64,26 @@ jobs:
       - run: virtualenv --version
       - run: tox -r
       - run: codecov
+  test-py312:
+    env:
+      TOXENV: py312
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+          architecture: 'x64'
+      - run: pip install virtualenv
+      - run: virtualenv --version
+      - run: git config --global user.email "man-releaseengineering@manheim.com"
+      - run: git config --global user.name "Manheim RE"
+      - run: pip install tox
+      - run: pip install codecov
+      - run: pip freeze
+      - run: virtualenv --version
+      - run: tox -r
+      - run: codecov
   test-docs:
     env:
       TOXENV: docs
@@ -72,7 +92,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.12'
           architecture: 'x64'
       - run: pip install virtualenv
       - run: virtualenv --version
@@ -92,7 +112,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.12'
           architecture: 'x64'
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -107,7 +127,7 @@ jobs:
       - run: tox -r
       - run: codecov
   pypi-build:
-    needs: [test-py37, test-py38, test-py39, test-docs, test-docker]
+    needs: [test-py37, test-py38, test-py39, test-py312, test-docs, test-docker]
     env:
       TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
       TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
@@ -116,7 +136,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
+          python-version: '3.12'
           architecture: 'x64'
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
