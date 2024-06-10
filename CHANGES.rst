@@ -6,6 +6,7 @@ Changelog
 
 * Bump c7n to release 0.9.37
 * Bump c7n-mailer to release 0.6.36
+* Drop python 3.7
 * Add python 3.12
 
 1.4.3 (2022-05-24)
