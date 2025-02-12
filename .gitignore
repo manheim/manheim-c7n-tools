@@ -65,7 +65,7 @@ target/
 # virtualenv
 bin/
 include/
-.pyvenv.cfg
+pyvenv.cfg
 
 .idea/
 .pytest_cache
