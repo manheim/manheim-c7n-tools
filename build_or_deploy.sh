@@ -44,7 +44,7 @@ function dockertoxbuild {
     echo "Building Docker image..."
     docker build \
       --build-arg git_version="$(git rev-parse --short HEAD)" \
-      --no-cache \
+      --no-cache --debug --progress=plain \
       -t "manheim/manheim-c7n-tools:${tag}" .
     echo "Built image and tagged as: manheim/manheim-c7n-tools:${tag}"
 }

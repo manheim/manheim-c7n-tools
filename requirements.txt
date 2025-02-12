@@ -1,8 +1,9 @@
-c7n==0.9.37
-c7n-mailer==0.6.36
+c7n==0.9.43
+c7n-mailer==0.6.42
 tabulate
 # In order to work with the "mu" Lambda function management tool,
 # we need PyYAML 3.x, and need it as source and not a wheel
 pyyaml
 # for building generated policy docs
 sphinx
+m2r2==0.3.2

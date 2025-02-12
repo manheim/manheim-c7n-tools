@@ -136,7 +136,7 @@ class TestGitHtmlUrl(object):
 
 class TestAssumeRole(object):
 
-    def setup(self):
+    def setup_method(self):
         self.m_conf = Mock(spec_set=ManheimConfig)
         type(self.m_conf).account_name = PropertyMock(return_value='aName')
 

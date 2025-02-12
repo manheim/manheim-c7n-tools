@@ -14,7 +14,7 @@ RUN cd /manheim_c7n_tools \
       openssl-dev \
       rust \
       cargo \
-  && pip install -r requirements.txt \
+  && pip install -r requirements.txt --verbose \
   && pip install -e . \
   # clean up build dependencies
   && apk del .build-deps \

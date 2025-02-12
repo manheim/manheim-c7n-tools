@@ -12,13 +12,14 @@ requires = [
     # In order to work with the "mu" Lambda function management tool,
     # we need PyYAML 3.x, and need it as source and not a wheel
     'pyyaml',
-    'c7n==0.9.37',
-    'c7n-mailer==0.6.36',
+    'c7n==0.9.43',
+    'c7n-mailer==0.6.42',
     # for building generated policy docs
     'sphinx',
     'sphinx_rtd_theme',
-    'm2r2',
-    'mistune==0.8.4'
+    'm2r2==0.3.2',
+    'mistune==0.8.4',
+    'setuptools'
 ]
 
 classifiers = [

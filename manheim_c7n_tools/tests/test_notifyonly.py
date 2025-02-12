@@ -37,7 +37,7 @@ class TestInit:
 
 class NotifyOnlyTester:
 
-    def setup(self):
+    def setup_method(self):
         self.policy = {}
         with patch(f'{pb}._process') as m_process:
             m_process.return_value = {}

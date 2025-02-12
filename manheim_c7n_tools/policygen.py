@@ -61,7 +61,7 @@ def is_enabled(policy):
     :param policy: policy to check
     :type policy: dict
     """
-    return not(policy.get("disable", False))
+    return not (policy.get("disable", False))
 
 
 class PolicyGen(object):
