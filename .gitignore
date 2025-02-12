@@ -65,6 +65,7 @@ target/
 # virtualenv
 bin/
 include/
+.pyvenv.cfg
 
 .idea/
 .pytest_cache
@@ -76,3 +77,5 @@ mailer.yml
 .direnv/
 .envrc
 .vscode/
+.DS_STORE
+CACHEDIR.TAG
