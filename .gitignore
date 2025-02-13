@@ -77,6 +77,6 @@ mailer.yml
 .direnv/
 .envrc
 .vscode/
-.DS_STORE
+.DS_Store
 manheim_c7n_tools/.DS_STORE
 CACHEDIR.TAG
