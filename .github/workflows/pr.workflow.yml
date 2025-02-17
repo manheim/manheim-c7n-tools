@@ -127,6 +127,7 @@ jobs:
       - run: pip install tox
       - run: pip install codecov
       - run: pip install wheel
+      - run: pip install setuptools
       - run: pip freeze
       - run: virtualenv --version
       - run: bash build_or_deploy.sh build
