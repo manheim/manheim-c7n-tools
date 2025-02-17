@@ -1,3 +1,4 @@
-sut:
-  build: .
-  command: bash -c "policygen -V && s3-archiver -V && dryrun-diff -V && manheim-c7n-runner -V && mugc --help && errorscan -V"
+services:
+  sut:
+    build: .
+    command: bash -c "policygen -V && s3-archiver -V && dryrun-diff -V && manheim-c7n-runner -V && mugc --help && errorscan -V"

@@ -3357,7 +3357,7 @@ class TestIsEnabled(object):
 
     def test_is_disabled(self):
         policy = {"disable": True}
-        assert not(policygen.is_enabled(policy))
+        assert not (policygen.is_enabled(policy))
 
     def test_is_enabled_specified(self):
         policy = {"disable": False}

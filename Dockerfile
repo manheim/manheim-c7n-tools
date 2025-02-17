@@ -1,4 +1,4 @@
-FROM python:3.9.1-alpine3.12
+FROM python:3.12-alpine
 
 ARG git_version
 
@@ -12,7 +12,9 @@ RUN cd /manheim_c7n_tools \
       musl-dev \
       libffi-dev \
       openssl-dev \
-  && pip install -r requirements.txt \
+      rust \
+      cargo \
+  && pip install -r requirements.txt --verbose \
   && pip install -e . \
   # clean up build dependencies
   && apk del .build-deps \

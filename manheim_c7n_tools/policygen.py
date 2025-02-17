@@ -61,7 +61,7 @@ def is_enabled(policy):
     :param policy: policy to check
     :type policy: dict
     """
-    return not(policy.get("disable", False))
+    return not (policy.get("disable", False))
 
 
 class PolicyGen(object):
@@ -410,7 +410,7 @@ class PolicyGen(object):
         """
         When c7n is run, it provisions all policies as lambda functions. But if
         policies are removed, it doesn't know how to clean them up. See
-        https://github.com/capitalone/cloud-custodian/issues/48
+        https://github.com/cloud-custodian/cloud-custodian/issues/48
 
         As a workaround for this, we tag all Lambda funcs created by c7n
         with Project: cloud-custodian and a Component tag of the policy name.

@@ -58,7 +58,7 @@ class FakeConfig:
 
 class StepTester(object):
 
-    def setup(self):
+    def setup_method(self):
         # in order to supplant __getattr__ calls
         self.m_conf = Mock(spec=ManheimConfig)
         self.m_conf.account_id = '01234567890'
@@ -686,12 +686,20 @@ class TestMailerStep(StepTester):
 
 class TestDryRunDiffStep(StepTester):
 
+    def setup_method(self):
+        self.m_conf = Mock(spec=ManheimConfig)
+        self.m_conf.account_id = '01234567890'
+
     def test_run(self):
+        self.m_conf = Mock(spec=ManheimConfig)
+        self.m_conf.account_id = '01234567890'
         with patch('%s.DryRunDiffer' % pbm, autospec=True) as mock_drd:
             runner.DryRunDiffStep('rName', self.m_conf).run()
         assert mock_drd.mock_calls == []
 
     def test_dryrun(self):
+        self.m_conf = Mock(spec=ManheimConfig)
+        self.m_conf.account_id = '01234567890'
         with patch('%s.DryRunDiffer' % pbm, autospec=True) as mock_drd:
             runner.DryRunDiffStep('rName', self.m_conf).dryrun()
         assert mock_drd.mock_calls == [
@@ -833,7 +841,7 @@ class TestStepClasses(object):
 
 class TestCustodianRunner(object):
 
-    def setup(self):
+    def setup_method(self):
 
         def se_cls2(rname, r_conf):
             return rname in ['r1', 'r3']

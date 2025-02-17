@@ -1,6 +1,17 @@
 Changelog
 =========
 
+1.5.0 (2024-06-10)
+------------------
+
+* Bump c7n to release 0.9.43
+* Bump c7n-mailer to release 0.6.42
+* Drop python 3.7
+* Add python 3.12
+* Update dependencies
+  * Pin ``m2r2==0.3.2`` for dependency consistency
+* Updating tests for compatibility with latest Pytest version
+
 1.4.3 (2022-05-24)
 ------------------
 

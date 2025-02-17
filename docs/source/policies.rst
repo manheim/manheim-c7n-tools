@@ -294,7 +294,7 @@ Cloud-custodian has both generic/global actions (such as ``notify``) and resourc
 
 -  :py:class:`Notify <cloud custodian:c7n.actions.notify.Notify>` - Send email to static
    addresses, or addresses from tags on the resource, via
-   `c7n\_mailer <https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer>`_.
+   `c7n\_mailer <https://github.com/cloud-custodian/cloud-custodian/tree/master/tools/c7n_mailer>`_.
    Our defaults include configuration required for using this action with our c7n\_mailer instance.
    The only configuration needed to make this action work is as shown in the example above; specifically,
    the ``type: notify`` key and the ``subject``, ``violation_desc`` and ``action_desc`` keys.
@@ -305,7 +305,7 @@ Cloud-custodian has both generic/global actions (such as ``notify``) and resourc
 
 To identify available resource-specific actions, either find the appropriate resource type module in the
 :ref:`cloud-custodian AWS documentation <cloud custodian:aws>` or the
-`c7n source code <https://github.com/capitalone/cloud-custodian/tree/master/c7n/resources>`_
+`c7n source code <https://github.com/cloud-custodian/cloud-custodian/tree/master/c7n/resources>`_
 and find all classes in it that are based on ``c7n.actions.Action``, or use the ``custodian schema``
 command line tool. There is also
 :ref:`manually-curated documentation on resource-specific filters and actions <cloud custodian:aws>`
