@@ -7,3 +7,4 @@ pyyaml
 # for building generated policy docs
 sphinx
 m2r2==0.3.2
+setuptools
